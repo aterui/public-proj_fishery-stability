@@ -1,11 +1,12 @@
 
 # setup -------------------------------------------------------------------
-
+  
+  rm(list = ls())
   pacman::p_load(tidyverse, runjags, foreach)
   source(here::here("data_fmt_fishdata.R"))
   
   n_ad <- 100
-  n_iter <- 2.0E+3
+  n_iter <- 1.0E+4
   n_thin <- 50
   n_burn <- ceiling(max(10, n_iter/2))
   n_sample <- ceiling(n_iter/n_thin)
@@ -26,6 +27,10 @@
     # prepare data ------------------------------------------------------------
     
     dat <- dat_list[[i]]
+    dat_full <- do.call(rbind, dat_list)
+    
+    # print species
+    print(unique(dat$LatinName))
       
     dat <- dat %>% 
       mutate(river_id = as.numeric(as.factor(river)))
@@ -42,7 +47,7 @@
     
     ## n iterators
     N_sample <- nrow(dat)
-    N_year <- n_distinct(dat$year)
+    N_year <- n_distinct(dat_full$year)
     N_river <- n_distinct(dat$river)
     N_site <- dat %>% 
       group_by(river_id) %>% 
@@ -56,8 +61,8 @@
     inits <- replicate(3,
                        list(
                          log_r_mean = rep(0, N_river),
-                         tau_eps_r = rep(1, N_river),
-                         tau_eps_site = 1,
+                         tau_eps_r = rep(0.1, N_river),
+                         tau_eps_site = 0.1,
                          .RNG.name = "base::Mersenne-Twister",
                          .RNG.seed = NA
                          ),
