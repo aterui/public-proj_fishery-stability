@@ -18,10 +18,12 @@
     pivot_wider(id_cols = c(river, year_id),
                 names_from = species,
                 values_from = abundance) %>% 
-    select(-Oncorhynchus_masou_masou) %>% 
     group_by(river) %>% 
-    do(mean_rho = data.frame(mean(cor(.[,3:ncol(.)]), na.rm = TRUE))) %>% 
-    mutate(mean_rho = as.numeric(mean_rho))
+    do(var1 = data.frame(sum(var(.[,3:ncol(.)]), na.rm = TRUE)),
+       var2 = data.frame(sum(apply(.[,3:ncol(.)], 2, sd), na.rm = TRUE)^2)) %>% 
+    mutate(var1 = as.numeric(var1),
+           var2 = as.numeric(var2),
+           phi = var1 / var2)
   
   
 # statistics --------------------------------------------------------------
@@ -70,7 +72,7 @@
     group_by(river) %>% 
     summarize(cv_mean = mean(cv)) %>% 
     left_join(df_com, by = "river") %>% 
-    mutate(pe = cv_mean/cv_ag)
+    mutate(pe = cv_mean / cv_ag)
   
 # explanatory variables ---------------------------------------------------
   
