@@ -4,6 +4,7 @@
   rm(list = ls())
   pacman::p_load(tidyverse, runjags, foreach)
   source(here::here("data_fmt_fishdata.R"))
+  dat_full <- do.call(rbind, dat_list)
   
   n_ad <- 100
   n_iter <- 1.0E+4
@@ -23,11 +24,9 @@
 # run analysis ------------------------------------------------------------
 
   joint_summary <- foreach(i = 1:length(dat_list), .combine = bind_rows) %do% {
-      
     # prepare data ------------------------------------------------------------
     
     dat <- dat_list[[i]]
-    dat_full <- do.call(rbind, dat_list)
     
     # print species
     print(unique(dat$LatinName))
