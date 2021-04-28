@@ -64,7 +64,7 @@
     left_join(p_lu, by = "id") %>% 
     left_join(mu_clim, by = "id") %>% 
     as_tibble() %>% 
-    select(-geom) %>% 
+    dplyr::select(-geom) %>% 
     rename(river = Watershed)
   
   write_csv(df_utm_wsd_polygon,
