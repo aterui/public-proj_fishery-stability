@@ -69,10 +69,13 @@
       
   ## predicted variance
   df_pe <- df_sp %>% 
+    mutate(w_cv = relative_abundance * cv) %>% 
     group_by(river) %>% 
-    summarize(cv_mean = mean(cv)) %>% 
+    summarize(cv_mean = mean(cv),
+              cv_w_mean = sum(w_cv)) %>% 
     left_join(df_com, by = "river") %>% 
-    mutate(pe = cv_mean / cv_ag)
+    mutate(pe = cv_mean / cv_ag,
+           pe_w = cv_w_mean / cv_ag)
   
 # explanatory variables ---------------------------------------------------
   
