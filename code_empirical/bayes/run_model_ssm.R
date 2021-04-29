@@ -3,7 +3,7 @@
   
   rm(list = ls())
   pacman::p_load(tidyverse, runjags, foreach)
-  source(here::here("data_fmt_fishdata.R"))
+  source(here::here("code_empirical/data_fmt_fishdata.R"))
   dat_full <- do.call(rbind, dat_list)
   
   n_ad <- 100
