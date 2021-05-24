@@ -32,14 +32,10 @@
   ## mean-variance
   df_sp <- d0 %>% 
     group_by(river, species) %>%
-    do(mean_abundance = mean(.$abundance),
-       var_abundance = var(.$abundance),
-       var_abundance_resid = var(resid(loess(abundance ~ year_id,
-                                             data = .)))) %>% 
-    mutate(mean_abundance = as.numeric(mean_abundance),
-           var_abundance = as.numeric(var_abundance),
-           var_abundance_resid = as.numeric(var_abundance_resid),
-           cv = sqrt(var_abundance) / mean_abundance)
+    summarize(log_mean_abundance = mean(median),
+              mean_abundance = mean(abundance),
+              var_abundance = var(abundance),
+              cv = sqrt(var_abundance) / mean_abundance)
   
   ## Relative abundance
   df_ra <- df_sp %>% 
@@ -56,14 +52,11 @@
   df_com <- d0 %>% 
     group_by(river, year_id) %>% 
     summarize(summed_abundance = sum(abundance)) %>% 
-    do(mean_abundance = mean(.$summed_abundance),
-       var_abundance = var(.$summed_abundance),
-       var_abundance_resid = var(resid(loess(summed_abundance ~ year_id,
-                                             data = .)))) %>% 
-    mutate(mean_abundance = as.numeric(mean_abundance),
-           var_abundance = as.numeric(var_abundance),
-           var_abundance_resid = as.numeric(var_abundance_resid),
-           cv_ag = sqrt(var_abundance) / mean_abundance)
+    ungroup() %>% 
+    group_by(river) %>% 
+    summarize(mean_abundance = mean(summed_abundance),
+              var_abundance = var(summed_abundance),
+              cv_ag = sqrt(var_abundance) / mean_abundance)
 
 
 # portfolio ---------------------------------------------------------------
@@ -94,8 +87,8 @@
     filter(between(year_release, 1999, 2016) & river != "ogawa") %>% 
     group_by(river) %>% 
     summarize(total_stock = sum(abundance),
-              mean_stock = sum(abundance) / (max(year_release) - min(year_release) + 1),
-    )
+              mean_stock = sum(abundance) / (max(year_release) - min(year_release) + 1))
+  
   
   ## environmental variables
   df_env <- read_csv("data_fmt/data_env_fmt.csv")
@@ -105,7 +98,7 @@
     left_join(df_stk, by = "river") %>% 
     left_join(df_env, by = "river") %>% 
     left_join(df_dvindex, by = "river") %>% 
-    left_join(df_rho, by = "river") %>% 
+    left_join(df_rho, by = "river")  %>% 
     mutate(total_stock = ifelse(is.na(total_stock), 0, total_stock),
            mean_stock = ifelse(is.na(mean_stock), 0, mean_stock)) %>% 
     dplyr::select(-id)
@@ -113,3 +106,13 @@
   df_pe <- df_ra %>% 
     filter(species == "Oncorhynchus_masou_masou") %>% 
     right_join(df_pe, by = "river")
+  
+  df_sp %>% 
+    left_join(df_stk, by = "river") %>%
+    mutate(total_stock = ifelse(is.na(total_stock), 0, total_stock),
+           mean_stock = ifelse(is.na(mean_stock), 0, mean_stock)) %>% 
+    ggplot() +
+    geom_point(aes(x = mean_stock,
+                   y = log_mean_abundance)) +
+    facet_wrap(facets = ~ species,
+               nrow = 3)
