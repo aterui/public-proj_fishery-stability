@@ -122,14 +122,31 @@ dynsim <- function(n_timestep = 1000,
     }
   }
   
-
+  df_dyn <- dplyr::as_tibble(m_dyn)
+  
+  df_community <- df_dyn %>% 
+    dplyr::group_by(timestep) %>% 
+    dplyr::summarize(summed_density = sum(density)) %>% 
+    dplyr::summarize(mean_density = mean(summed_density),
+                     sd_density = sd(summed_density))
+  
+  df_species <- df_dyn %>% 
+    dplyr::group_by(species) %>% 
+    dplyr::summarize(mean_density = mean(density),
+                     sd_density = sd(density)) %>% 
+    dplyr::mutate(species = seq_len(n_species),
+                  k = k,
+                  r = v_r,
+                  alpha1 = m_int[,1]) %>% 
+    dplyr::relocate(species)
+  
+  
 # return ------------------------------------------------------------------
   
   return(
-    list(df_dyn = dplyr::as_tibble(m_dyn),
-         df_species = dplyr::tibble(species = seq_len(n_species),
-                                    k = k,
-                                    r = v_r),
+    list(df_dyn = df_dyn,
+         df_community = df_community,
+         df_species = df_species,
          interaction_matrix = m_int)
   )
   
