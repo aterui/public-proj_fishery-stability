@@ -10,7 +10,7 @@ dynsim <- function(n_timestep = 1000,
                    r_max = 3.5,
                    sd_env = 0.1,
                    stock = 0,
-                   u = 0.6,
+                   phi = 0.6,
                    int_type = "constant",
                    alpha = 0.5,
                    alpha_min = 0,
@@ -35,7 +35,6 @@ dynsim <- function(n_timestep = 1000,
     }   
   }
   
-  
 # variables ---------------------------------------------------------------
   
   # basic objects
@@ -55,7 +54,7 @@ dynsim <- function(n_timestep = 1000,
   
   v_n <- rpois(n = n_species, seed)
   
-  # parameters: species interaction
+  # parameter: species interaction
   if (int_type == "random") {
     m_int <- matrix(runif(n_species * n_species,
                           min = alpha_min,
@@ -74,7 +73,7 @@ dynsim <- function(n_timestep = 1000,
   
   diag(m_int) <- 1
   
-  # parameters: population dynamics
+  # parameter: population dynamics
   if (r_type == "random") {
     v_r <- runif(n= n_species,
                  min = r_min,
@@ -87,10 +86,7 @@ dynsim <- function(n_timestep = 1000,
     }
   }
   
-  u_stock <- rbinom(n = n_sim,
-                    size = stock,
-                    prob = u)
-  
+  # parameter: environmental stochasticity
   m_eps <- matrix(rnorm(n = n_sim * n_species,
                         mean = 0,
                         sd = sd_env),
@@ -102,7 +98,7 @@ dynsim <- function(n_timestep = 1000,
   for (i in seq_len(n_sim)) {
     
     if (i > n_warmup) {
-      v_n[1] <- v_n[1] + u_stock[i]
+      v_n[1] <- v_n[1] + phi * stock
     }
     
     v_n_hat <- fun_dyn(r = v_r,
