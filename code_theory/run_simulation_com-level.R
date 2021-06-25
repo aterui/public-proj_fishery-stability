@@ -30,7 +30,7 @@
                           model = "bh",
                           seed = 5)
   
-  n_rep <- 300
+  n_rep <- 100
   repeat {
     stock <- round(runif(n_rep, min = 0, max = 500))
     if(min(stock) == 0 & max(stock) == 500) break    
@@ -83,13 +83,13 @@
 
   result %>% 
     ggplot() +
-    geom_point(aes(y = sd_density/mean_density,
+    geom_point(aes(y = sd_density / mean_density,
                    x = stock,
                    color = factor(alpha_max)),
                alpha = 0.2) +
     facet_wrap(facets = ~ factor(r),
                ncol = 2) +
-    geom_smooth(aes(y = sd_density/mean_density,
+    geom_smooth(aes(y = sd_density / mean_density,
                     x = stock,
                     color = factor(alpha_max))) +
     theme_bw()
