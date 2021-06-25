@@ -2,7 +2,6 @@
 # setup -------------------------------------------------------------------
   
   # remove site 4 at usubetsu - no coordinates data
-  # remove onnebetsu - only one sampling sites
 
   rm(list = ls())
   pacman::p_load(tidyverse, foreach)
@@ -12,72 +11,57 @@
 # read data ---------------------------------------------------------------
   
   d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>% 
-    mutate(LatinName = case_when(genus == "Cottus" ~ "Cottus_spp",
-                                 genus == "Pungitius" ~ "Pungitius_spp",
-                                 genus == "Tribolodon" ~ "Tribolodon_spp",
-                                 genus == "Gymnogobius" ~ "Gymnogobius_spp",
-                                 genus == "Lethenteron" ~ "Lethenteron_spp",
-                                 genus == "Rhinogobius" ~ "Rhinogobius_spp",
-                                 TRUE ~ as.character(LatinName))
+    mutate(taxon = case_when(genus == "Cottus" ~ "Cottus_spp",
+                             genus == "Pungitius" ~ "Pungitius_spp",
+                             genus == "Tribolodon" ~ "Tribolodon_spp",
+                             genus == "Gymnogobius" ~ "Gymnogobius_spp",
+                             genus == "Lethenteron" ~ "Lethenteron_spp",
+                             genus == "Rhinogobius" ~ "Rhinogobius_spp",
+                             TRUE ~ as.character(latin)),
+           site_id = paste0(river, site)
            ) %>% 
-    group_by(year, river, site, LatinName) %>% 
+    group_by(year, river, site, site_id, taxon) %>% 
     summarize(abundance = sum(abundance, na.rm = T),
               area = unique(area),
               genus = unique(genus),
-              LatinName = unique(LatinName)) %>% 
+              taxon = unique(taxon)) %>% 
     ungroup() %>% 
-    filter(!(site == 4 & river == "usubetsu") & river != "onnebetsu")
+    filter(!(site == 4 & river == "usubetsu"))
 
   
 # select by number of observations ----------------------------------------
 
-  obs_threshold <- 0
+  n_obs_threshold <- 5
+  range_threshold <- 10
   
-  river_selected <- d0 %>% 
-    group_by(river) %>% 
-    summarize(n_obs = n_distinct(year)) %>% 
-    filter(n_obs > obs_threshold) %>% 
-    pull(river)
+  site_selected <- d0 %>% 
+    group_by(site_id) %>% 
+    summarize(range_obs = max(year) - min(year) + 1,
+              n_obs = n_distinct(year)) %>% 
+    filter(range_obs > range_threshold & n_obs > n_obs_threshold) %>% 
+    pull(site_id)
     
   d0 <- d0 %>% 
-    filter(river %in% river_selected)
+    filter(site_id %in% site_selected)
   
-  
-# select by occurrence frequency ------------------------------------------
 
-  freq_threshold <- 3
+# summarize data to community level ---------------------------------------
   
-  ## occurrence frequency table
-  df_freq <- d0 %>% 
-    group_by(year, river, LatinName) %>% 
-    summarize(summed_n = sum(abundance)) %>% 
-    filter(summed_n > 0) %>% 
-    group_by(river, LatinName) %>% 
-    summarize(freq = n())
-  
-  ## species occurring > 3 times at any of the watersheds
-  species <- df_freq %>% 
-    filter(freq > freq_threshold) %>% 
+  dat <- d0 %>% 
+    group_by(year,
+             river,
+             site,
+             site_id) %>% 
+    summarize(abundance = sum(abundance, na.rm = TRUE),
+              area = unique(area),
+              density = abundance / area) %>% 
     ungroup() %>% 
-    distinct(LatinName) %>% 
-    arrange(LatinName) %>% 
-    pull()
+    mutate(site_id_numeric = as.numeric(factor(site_id)))
   
-
-# data list ---------------------------------------------------------------
+  dat_year <- d0 %>% 
+    group_by(site_id) %>% 
+    summarize(St_year = min(year) - min(.$year) + 1,
+              End_year = max(year) - min(.$year) + 1) %>% 
+    mutate(site_id_numeric = as.numeric(factor(site_id))) %>% 
+    relocate(site_id_numeric)
   
-  dat_list <- foreach(i = seq_len(length(species))) %do% {
-    
-    river_chosen <- df_freq %>% 
-      filter(freq > freq_threshold & LatinName == species[i]) %>% 
-      pull(river)
-    
-    print(species[i])
-    
-    dat <- d0 %>% 
-      filter(river %in% river_chosen & LatinName == species[i]) %>% 
-      mutate(n_river = length(river_chosen))
-    
-    return(dat)
-  }
-    
