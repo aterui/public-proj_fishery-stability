@@ -1,6 +1,6 @@
 model {
   
-  ninfo <- 0.1
+  ninfo <- 0.01
 
 # prior -------------------------------------------------------------------
   
@@ -46,7 +46,9 @@ model {
 # statistical quantity ----------------------------------------------------
 
   for (j in 1:Nsite) {
-    cv[j] <- sd(d[j, St_year[j]:End_year[j]]) / mean(d[j, St_year[j]:End_year[j]])
+    sigma[j] <- sd(d[j, St_year[j]:End_year[j]])
+    mu[j] <- mean(d[j, St_year[j]:End_year[j]])
+    cv[j] <- sigma[j] / mu[j]
   }
     
 }
