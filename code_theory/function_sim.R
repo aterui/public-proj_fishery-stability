@@ -17,9 +17,9 @@ dynsim <- function(n_timestep = 1000,
                    alpha_max = 0.5,
                    model = "ricker",
                    seed = 5
-                   ) {
-
-# function ----------------------------------------------------------------
+) {
+  
+  # function ----------------------------------------------------------------
   
   # ricker function
   if (model == "ricker") {
@@ -35,7 +35,7 @@ dynsim <- function(n_timestep = 1000,
     }   
   }
   
-# variables ---------------------------------------------------------------
+  # variables ---------------------------------------------------------------
   
   # basic objects
   n_sim <- n_warmup + n_burnin + n_timestep
@@ -93,7 +93,7 @@ dynsim <- function(n_timestep = 1000,
                   nrow = n_sim,
                   ncol = n_species)
   
-# dynamics ----------------------------------------------------------------
+  # dynamics ----------------------------------------------------------------
   
   for (i in seq_len(n_sim)) {
     
@@ -137,7 +137,7 @@ dynsim <- function(n_timestep = 1000,
     dplyr::relocate(species)
   
   
-# return ------------------------------------------------------------------
+  # return ------------------------------------------------------------------
   
   return(
     list(df_dyn = df_dyn,
@@ -147,4 +147,3 @@ dynsim <- function(n_timestep = 1000,
   )
   
 } 
-  
