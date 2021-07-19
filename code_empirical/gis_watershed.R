@@ -2,12 +2,14 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
+
 pacman::p_load(tidyverse,
                foreach,
                sf,
                raster,
                RSAGA,
                maptools)
+
 setwd(here::here("code_empirical"))
 
 
@@ -49,7 +51,8 @@ df_coord <- st_coordinates(df_site_snap) %>%
   dplyr::select(-geometry)
 
 df_coord_sf <- st_as_sf(df_coord,
-                        coords = c("X", "Y"))
+                        coords = c("X", "Y")) %>% 
+  st_set_crs(st_crs(df_channel))
 
 st_write(df_coord_sf,
          "data_gis/albers_point_snap_prwsd.gpkg",
@@ -62,14 +65,14 @@ st_write(df_coord_sf,
 #rsaga.get.modules("ta_hydrology")
 #rsaga.get.usage("ta_hydrology", module = 4)
 
-df_polygon <- foreach(i = seq_len(nrow(df_coord)),
-                      .combine = dplyr::bind_rows) %do% {
+df_wsd_polygon <- foreach(i = seq_len(nrow(df_coord)),
+                          .combine = dplyr::bind_rows) %do% {
   
   rsaga.geoprocessor(lib = "ta_hydrology",
                      module = 4,
                      param = list(TARGET_PT_X = df_coord$X[i], 
                                   TARGET_PT_Y = df_coord$Y[i], 
-                                  ELEVATION = "data_gis/albers_filled_dem_hkd.sgrd", 
+                                  ELEVATION = "tempdir/albers_filled_dem_hkd.sgrd", 
                                   AREA = "tempdir/raster.sgrd",
                                   METHOD = 0)
   )
@@ -94,12 +97,15 @@ df_polygon <- foreach(i = seq_len(nrow(df_coord)),
   return(wsd_polygon)
 }
 
-st_write(df_polygon,
+st_write(df_wsd_polygon,
          dsn = "data_gis/albers_wsd_prtwsd.gpkg",
          append = FALSE)
 
 # mapping -----------------------------------------------------------------
 
+df_site_snap <- st_read("data_gis/albers_point_snap_prwsd.gpkg")
+df_wsd_polygon <- st_read("data_gis/albers_wsd_prtwsd.gpkg")
+
 mapview::mapView(df_site_snap,
                  color = "red") +
-  mapview::mapView(df_polygon)
+  mapview::mapView(df_wsd_polygon)
