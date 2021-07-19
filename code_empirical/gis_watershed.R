@@ -33,52 +33,53 @@ st_snap_points = function(x, y, max_dist = 1000) {
 }
 
 
-# gis ---------------------------------------------------------------------
 
-df_channel <- st_read("data_gis/albers_channel_hkd.gpkg")
+# snap to the nearest stremline -------------------------------------------
 
-df_site <- read_csv("data_gis/site-coordinate_hogosuimen_terui-org-2019.csv") %>% 
+albers_sf_channel <- st_read("data_gis/albers_channel_hkd.gpkg")
+
+albers_sf_site <- read_csv("data_gis/site-coordinate_hogosuimen_terui-org-2019.csv") %>% 
   drop_na(longitude) %>% 
   st_as_sf(coords = c("longitude", "latitude")) %>% 
   st_set_crs(4326) %>% 
-  st_transform(crs = st_crs(df_channel))
+  st_transform(crs = st_crs(albers_sf_channel))
 
-df_site_snap <- st_snap_points(df_site, df_channel)
-df_coord <- st_coordinates(df_site_snap) %>% 
+albers_sf_site_snap <- st_snap_points(albers_sf_site, albers_sf_channel)
+df_site_snap_coord <- st_coordinates(albers_sf_site_snap) %>% 
   as_tibble() %>% 
-  bind_cols(df_site) %>% 
+  bind_cols(albers_sf_site) %>% 
   as_tibble() %>% 
   dplyr::select(-geometry)
 
-df_coord_sf <- st_as_sf(df_coord,
-                        coords = c("X", "Y")) %>% 
-  st_set_crs(st_crs(df_channel))
+albers_sf_site_snap_coord <- st_as_sf(df_site_snap_coord,
+                                      coords = c("X", "Y")) %>% 
+  st_set_crs(st_crs(albers_sf_channel))
 
-st_write(df_coord_sf,
-         "data_gis/albers_point_snap_prwsd.gpkg",
+st_write(albers_sf_site_snap_coord,
+         "data_gis/albers_point_snap_prtwsd.gpkg",
          append = FALSE)
 
 
-# watersehd delineation ---------------------------------------------------
+# watershed delineation ---------------------------------------------------
 
 #rsaga.get.libraries()
 #rsaga.get.modules("ta_hydrology")
 #rsaga.get.usage("ta_hydrology", module = 4)
 
-df_wsd_polygon <- foreach(i = seq_len(nrow(df_coord)),
-                          .combine = dplyr::bind_rows) %do% {
+albers_sf_wsd <- foreach(i = seq_len(nrow(df_site_snap_coord)),
+                         .combine = dplyr::bind_rows) %do% {
   
   rsaga.geoprocessor(lib = "ta_hydrology",
                      module = 4,
-                     param = list(TARGET_PT_X = df_coord$X[i], 
-                                  TARGET_PT_Y = df_coord$Y[i], 
+                     param = list(TARGET_PT_X = df_site_snap_coord$X[i], 
+                                  TARGET_PT_Y = df_site_snap_coord$Y[i], 
                                   ELEVATION = "tempdir/albers_filled_dem_hkd.sgrd", 
                                   AREA = "tempdir/raster.sgrd",
                                   METHOD = 0)
   )
   
   wsd <- stars::read_stars("tempdir/raster.sdat")
-  st_crs(wsd) <- st_crs(df_channel)
+  st_crs(wsd) <- st_crs(albers_sf_channel)
   wsd[wsd == 0] <- NA
   wsd_polygon <- st_as_sf(wsd,
                           as_points = FALSE,
@@ -97,15 +98,15 @@ df_wsd_polygon <- foreach(i = seq_len(nrow(df_coord)),
   return(wsd_polygon)
 }
 
-st_write(df_wsd_polygon,
+st_write(albers_sf_wsd,
          dsn = "data_gis/albers_wsd_prtwsd.gpkg",
          append = FALSE)
 
 # mapping -----------------------------------------------------------------
 
-df_site_snap <- st_read("data_gis/albers_point_snap_prwsd.gpkg")
-df_wsd_polygon <- st_read("data_gis/albers_wsd_prtwsd.gpkg")
+albers_sf_site_snap <- st_read("data_gis/albers_point_snap_prwsd.gpkg")
+albers_sf_wsd <- st_read("data_gis/albers_wsd_prtwsd.gpkg")
 
-mapview::mapView(df_site_snap,
+mapview::mapView(albers_sf_site_snap,
                  color = "red") +
-  mapview::mapView(df_wsd_polygon)
+  mapview::mapView(albers_sf_wsd)
