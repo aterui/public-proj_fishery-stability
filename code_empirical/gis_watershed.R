@@ -75,9 +75,8 @@ albers_sf_wsd <- foreach(i = seq_len(nrow(df_site_snap_coord)),
                                   TARGET_PT_Y = df_site_snap_coord$Y[i], 
                                   ELEVATION = "tempdir/albers_filled_dem_hkd.sgrd", 
                                   AREA = "tempdir/raster.sgrd",
-                                  METHOD = 0)
-  )
-  
+                                  METHOD = 0))
+                           
   wsd <- stars::read_stars("tempdir/raster.sdat")
   st_crs(wsd) <- st_crs(albers_sf_channel)
   wsd[wsd == 0] <- NA
@@ -87,14 +86,14 @@ albers_sf_wsd <- foreach(i = seq_len(nrow(df_site_snap_coord)),
   
   wsd_polygon <- wsd_polygon %>% 
     mutate(id = i,
-           river = df_site$river[i],
-           site = df_site$site[i])
+           river = albers_sf_site$river[i],
+           site = albers_sf_site$site[i])
   
   file.remove(c("tempdir/raster.mgrd",
                 "tempdir/raster.prj",
                 "tempdir/raster.sdat",
                 "tempdir/raster.sgrd"))
-    
+  
   return(wsd_polygon)
 }
 
