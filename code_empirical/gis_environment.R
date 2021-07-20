@@ -110,7 +110,7 @@ st_write(albers_sf_wsd,
 df_albers_sf_wsd <- albers_sf_wsd %>% 
   as_tibble() %>% 
   dplyr::select(-geom,
-                -albers_raster_watershed.sdat)
+                -raster.sdat)
 
 write_csv(df_albers_sf_wsd,
           file = "data_fmt/data_env_fmt.csv")
