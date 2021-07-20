@@ -48,7 +48,6 @@ albers_sf_site_snap <- st_snap_points(albers_sf_site, albers_sf_channel)
 df_site_snap_coord <- st_coordinates(albers_sf_site_snap) %>% 
   as_tibble() %>% 
   bind_cols(albers_sf_site) %>% 
-  as_tibble() %>% 
   dplyr::select(-geometry)
 
 albers_sf_site_snap_coord <- st_as_sf(df_site_snap_coord,
@@ -66,13 +65,23 @@ st_write(albers_sf_site_snap_coord,
 #rsaga.get.modules("ta_hydrology")
 #rsaga.get.usage("ta_hydrology", module = 4)
 
-albers_sf_wsd <- foreach(i = seq_len(nrow(df_site_snap_coord)),
+#"albers_point_outlet_prtwsd":
+#"albers_point_snap_prtwsd.gpkg" was manually edited to delineate correct watershed polygons
+albers_sf_outlet <- st_read("data_gis/albers_point_outlet_prtwsd.gpkg")
+
+df_outlet_coord <- st_coordinates(albers_sf_outlet) %>% 
+  as_tibble() %>% 
+  bind_cols(albers_sf_outlet) %>% 
+  dplyr::select(-geom)
+  
+
+albers_sf_wsd <- foreach(i = seq_len(nrow(df_outlet_coord)),
                          .combine = dplyr::bind_rows) %do% {
   
   rsaga.geoprocessor(lib = "ta_hydrology",
                      module = 4,
-                     param = list(TARGET_PT_X = df_site_snap_coord$X[i], 
-                                  TARGET_PT_Y = df_site_snap_coord$Y[i], 
+                     param = list(TARGET_PT_X = df_outlet_coord$X[i], 
+                                  TARGET_PT_Y = df_outlet_coord$Y[i], 
                                   ELEVATION = "tempdir/albers_filled_dem_hkd.sgrd", 
                                   AREA = "tempdir/raster.sgrd",
                                   METHOD = 0))
@@ -86,8 +95,8 @@ albers_sf_wsd <- foreach(i = seq_len(nrow(df_site_snap_coord)),
   
   wsd_polygon <- wsd_polygon %>% 
     mutate(id = i,
-           river = albers_sf_site$river[i],
-           site = albers_sf_site$site[i])
+           river = df_outlet_coord$river[i],
+           site = df_outlet_coord$site[i])
   
   file.remove(c("tempdir/raster.mgrd",
                 "tempdir/raster.prj",
@@ -106,9 +115,9 @@ st_write(albers_sf_wsd,
 albers_sf_site_snap <- st_read("data_gis/albers_point_snap_prtwsd.gpkg")
 albers_sf_wsd <- st_read("data_gis/albers_wsd_prtwsd.gpkg")
 
-mapview::mapView(albers_sf_site_snap,
-                 color = "red") +
-  mapview::mapView(albers_sf_wsd) +
-  mapview::mapView(albers_sf_channel)
+mapview::mapView(albers_sf_site_snap) +
+  mapview::mapView(albers_sf_outlet,
+                   color = "red") +
+  mapview::mapView(albers_sf_wsd)
   
 
