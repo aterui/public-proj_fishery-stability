@@ -103,9 +103,12 @@ st_write(albers_sf_wsd,
 
 # mapping -----------------------------------------------------------------
 
-albers_sf_site_snap <- st_read("data_gis/albers_point_snap_prwsd.gpkg")
+albers_sf_site_snap <- st_read("data_gis/albers_point_snap_prtwsd.gpkg")
 albers_sf_wsd <- st_read("data_gis/albers_wsd_prtwsd.gpkg")
 
 mapview::mapView(albers_sf_site_snap,
                  color = "red") +
-  mapview::mapView(albers_sf_wsd)
+  mapview::mapView(albers_sf_wsd) +
+  mapview::mapView(albers_sf_channel)
+  
+
