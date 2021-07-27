@@ -10,7 +10,7 @@ setwd(here::here("code_empirical"))
 d0 <- read_csv("data_raw/data_hkd_ocean.csv")  
 skimr::skim_without_charts(d0)
 
-dat <- d0 %>% 
+df <- d0 %>% 
   filter(source == "modis" & buffer == "30km") %>% 
   group_by(river, measure) %>% 
   summarize(value_mean = mean(value)) %>% 
@@ -19,5 +19,5 @@ dat <- d0 %>%
               values_from = value_mean) %>% 
   mutate(river = str_to_lower(river))
 
-write_csv(dat,
+write_csv(df,
           file = "data_fmt/data_ocean_fmt.csv")
