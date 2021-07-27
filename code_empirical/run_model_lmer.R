@@ -9,23 +9,30 @@ setwd(here::here("code_empirical"))
 # data --------------------------------------------------------------------
 
 d0 <- read_csv("data_fmt/data_ssm_est.csv") %>% 
-  filter(param_name == "cv") %>% 
-  select(cv = '50%',
-         river,
+  filter(param_name %in% c("cv", "mu", "sigma")) %>% 
+  rename(median = '50%',
+         high = '97.5%',
+         low = '2.5%') %>% 
+  select(river,
          site,
-         site_id)
-
+         site_id,
+         param_name,
+         median,
+         high,
+         low)
 
 df_env <- read_csv("data_fmt/data_env_fmt.csv")
+
 df_stock <- read_csv("data_fmt/data_hkd_prtwsd_stock_fmt.csv") %>% 
   filter(between(year_release, 1999, 2019)) %>% 
   group_by(river) %>% 
   summarize(mean_stock = sum(abundance) / (2019 - 1999 + 1))
 
 df <- d0 %>% 
-  left_join(df_env, by = "river") %>% 
+  left_join(df_env, by = c("river", "site")) %>% 
   left_join(df_stock, by = "river") %>% 
-  mutate(mean_stock = ifelse(is.na(mean_stock), 0, mean_stock))
+  mutate(mean_stock = ifelse(is.na(mean_stock), 0, mean_stock)) %>% 
+  filter(param_name == "mu")
 
 Nsite <- df %>% 
   group_by(river) %>% 
@@ -37,16 +44,22 @@ Site <- df %>%
   summarize(site_cor = as.numeric(factor(site))) %>% 
   pull(site_cor)
 
-d_jags <- list(Y = log(df$cv),
+d_jags <- list(Y = log(df$median),
                Stock = df$mean_stock,
+               Area = df$area,
+               Precipitation = df$ppt,
+               Temperature = df$temp,
+               Forest = df$frac_forest,
                River = as.numeric(factor(df$river)),
                Site = Site,
                Nsample = nrow(df),
                Nriver = n_distinct(df$river),
                Nsite = Nsite)
 
-para <- c("w_stock",
-          "b",
+para <- c("b",
+          "scl_b",
+          "p_b",
+          "w_stock",
           "p")
 
 m <- read.jagsfile("model_lmer.R")
@@ -65,7 +78,7 @@ inits <- replicate(3,
                         .RNG.seed = NA),
                    simplify = FALSE)
 
-for (i in 1:3) inits[[i]]$.RNG.seed <- i + 1
+for (i in 1:3) inits[[i]]$.RNG.seed <- i
 
 
 # run jags ----------------------------------------------------------------
@@ -91,7 +104,7 @@ max(mcmc_summary$Rhat)
 
 df %>% 
   ggplot() +
-  geom_point(aes(x = mcmc_summary$mean[1:nrow(df)],
-                 y = cv)) +
+  geom_point(aes(x = mcmc_summary$'50%'[str_detect(rownames(mcmc_summary), "w_stock")],
+                 y = median)) +
   scale_y_continuous(trans = "log")
 
