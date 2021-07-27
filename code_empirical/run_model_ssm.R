@@ -10,14 +10,14 @@ setwd(here::here("code_empirical"))
 
 source("data_fmt_fishdata.R")
 
-d_jags <- list(N = dat$abundance,
-               Site = dat$site_id_numeric,
-               Year = dat$year - min(dat$year) + 1,
-               St_year = dat_year$St_year,
-               End_year = dat_year$End_year,
-               Area = dat$area,
-               Nsample = nrow(dat),
-               Nsite = n_distinct(dat$site_id))
+d_jags <- list(N = df_fish$abundance,
+               Site = df_fish$site_id_numeric,
+               Year = df_fish$year - min(df_fish$year) + 1,
+               St_year = df_year$St_year,
+               End_year = df_year$End_year,
+               Area = df_fish$area,
+               Nsample = nrow(df_fish),
+               Nsite = n_distinct(df_fish$site_id))
                
 para <- c("log_global_r",
           "sd_r_space",
@@ -35,7 +35,7 @@ m <- read.jagsfile("model_ssm.R")
 # mcmc setup --------------------------------------------------------------
 
 n_ad <- 100
-n_iter <- 1.5E+4
+n_iter <- 1.0E+4
 n_thin <- max(3, ceiling(n_iter / 500))
 n_burn <- ceiling(max(10, n_iter/2))
 n_sample <- ceiling(n_iter / n_thin)
@@ -82,6 +82,9 @@ while(max(r_hat$Rhat) > 1.09) {
                       combine = TRUE)
   
   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+  r_hat <- filter(mcmc_summary,
+                  !str_detect(rownames(mcmc_summary),
+                              pattern = "(^cv)|(^mu)|(^sigma)"))
   print(max(r_hat$Rhat))
 }
 
@@ -102,7 +105,7 @@ param <- rownames(mcmc_summary)
 param_name <- str_remove(param,
                          pattern = "\\[.{1,}\\]")
 
-dat_site <- dat %>% 
+df_site <- df_fish %>% 
   group_by(site_id_numeric) %>% 
   summarize(river = unique(river),
             site = unique(site),
