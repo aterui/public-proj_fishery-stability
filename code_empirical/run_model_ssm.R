@@ -25,7 +25,9 @@ para <- c("log_global_r",
           "sd_r_time",
           "sd_obs",
           "log_d",
-          "cv")
+          "cv",
+          "mu",
+          "sigma")
 
 m <- read.jagsfile("model_ssm.R")
 
@@ -33,7 +35,7 @@ m <- read.jagsfile("model_ssm.R")
 # mcmc setup --------------------------------------------------------------
 
 n_ad <- 100
-n_iter <- 1.0E+4
+n_iter <- 1.5E+4
 n_thin <- max(3, ceiling(n_iter / 500))
 n_burn <- ceiling(max(10, n_iter/2))
 n_sample <- ceiling(n_iter / n_thin)
@@ -43,7 +45,7 @@ inits <- replicate(3,
                         .RNG.seed = NA),
                    simplify = FALSE)
 
-for (i in 1:3) inits[[i]]$.RNG.seed <- i + 1
+for (i in 1:3) inits[[i]]$.RNG.seed <- i
 
     
 # run jags ----------------------------------------------------------------
@@ -62,9 +64,15 @@ post <- run.jags(m$model,
                  module = "glm")
 
 mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-max(mcmc_summary$Rhat)
 
-while(max(mcmc_summary$Rhat) > 1.09) {
+# cv, mu, sigma are derived parameters
+# exclude from convergence check
+r_hat <- filter(mcmc_summary,
+                !str_detect(rownames(mcmc_summary),
+                            pattern = "(^cv)|(^mu)|(^sigma)"))
+max(r_hat$Rhat)
+
+while(max(r_hat$Rhat) > 1.09) {
   post <- extend.jags(post,
                       burnin = 0,
                       sample = n_sample,
@@ -74,7 +82,7 @@ while(max(mcmc_summary$Rhat) > 1.09) {
                       combine = TRUE)
   
   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-  print(max(mcmc_summary$Rhat))
+  print(max(r_hat$Rhat))
 }
 
 n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
