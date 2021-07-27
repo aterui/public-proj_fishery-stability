@@ -48,7 +48,7 @@ d0 <- d0 %>%
 
 # summarize data to community level ---------------------------------------
 
-dat <- d0 %>% 
+df_fish <- d0 %>% 
   group_by(year,
            river,
            site,
@@ -59,7 +59,7 @@ dat <- d0 %>%
   ungroup() %>% 
   mutate(site_id_numeric = as.numeric(factor(site_id)))
 
-dat_year <- d0 %>% 
+df_year <- d0 %>% 
   group_by(site_id) %>% 
   summarize(St_year = min(year) - min(.$year) + 1,
             End_year = max(year) - min(.$year) + 1) %>% 
