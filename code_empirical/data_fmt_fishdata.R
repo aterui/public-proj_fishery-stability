@@ -9,6 +9,7 @@ setwd(here::here("code_empirical"))
 # read data ---------------------------------------------------------------
 
 d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>% 
+  filter(river != "onnebetsu") %>% 
   mutate(taxon = case_when(genus == "Cottus" ~ "Cottus_spp",
                            genus == "Pungitius" ~ "Pungitius_spp",
                            genus == "Tribolodon" ~ "Tribolodon_spp",
@@ -24,9 +25,9 @@ d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>%
             genus = unique(genus),
             taxon = unique(taxon)) %>% 
   ungroup() %>% 
-  filter(site_id != "usubetsu4",
-         site_id != "atsuta6",
-         site_id != "kokamotsu4")
+  filter(!(site_id %in% c("usubetsu4",
+                          "atsuta6",
+                          "kokamotsu4")))
 
 
 # select by number of observations ----------------------------------------
