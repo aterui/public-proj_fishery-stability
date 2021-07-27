@@ -37,7 +37,8 @@ dynsim <- function(n_timestep = 1000,
   
   # variables ---------------------------------------------------------------
   
-  # basic objects
+  ## basic objects ####
+  
   n_sim <- n_warmup + n_burnin + n_timestep
   n_discard <- n_warmup + n_burnin
   
@@ -54,7 +55,9 @@ dynsim <- function(n_timestep = 1000,
   
   v_n <- rpois(n = n_species, seed)
   
-  # parameter: species interaction
+  
+  ## parameter: species interaction ####
+  
   if (int_type == "random") {
     m_int <- matrix(runif(n_species * n_species,
                           min = alpha_min,
@@ -73,7 +76,9 @@ dynsim <- function(n_timestep = 1000,
   
   diag(m_int) <- 1
   
-  # parameter: population dynamics
+  
+  ## parameter: population dynamics ####
+  
   if (r_type == "random") {
     v_r <- runif(n= n_species,
                  min = r_min,
@@ -86,7 +91,9 @@ dynsim <- function(n_timestep = 1000,
     }
   }
   
-  # parameter: environmental stochasticity
+  
+  ## parameter: environmental stochasticity ####
+  
   m_eps <- matrix(rnorm(n = n_sim * n_species,
                         mean = 0,
                         sd = sd_env),
