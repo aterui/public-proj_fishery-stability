@@ -21,16 +21,16 @@ df_param <- expand.grid(n_timestep = 1000,
                         n_species = 10,
                         k = 100,
                         r_type = "constant",
-                        r = c(0.5, 1.5),
-                        sd_env = 0.1,
+                        r = c(0.5, 3),
+                        sd_env = 0.5,
                         phi = 0.6,
                         int_type = "random",
                         alpha_min = 0,
-                        alpha_max = c(0.75, 1.50),
-                        model = "bh",
+                        alpha_max = c(0.5, 1),
+                        model = "ricker",
                         seed = 5)
 
-n_rep <- 100
+n_rep <- 1000
 repeat {
   stock <- round(runif(n_rep, min = 0, max = 500))
   if(min(stock) == 0 & max(stock) == 500) break    
@@ -83,10 +83,10 @@ stopCluster(cl)
 
 result %>% 
   ggplot() +
-  geom_point(aes(y = sd_density / mean_density,
-                 x = stock,
-                 color = factor(alpha_max)),
-             alpha = 0.2) +
+  #geom_point(aes(y = sd_density / mean_density,
+  #               x = stock,
+  #               color = factor(alpha_max)),
+  #           alpha = 0.2) +
   facet_wrap(facets = ~ factor(r),
              ncol = 2) +
   geom_smooth(aes(y = sd_density / mean_density,
@@ -96,10 +96,23 @@ result %>%
 
 result %>% 
   ggplot() +
-  geom_point(aes(y = sd_density,
-                 x = stock,
-                 color = factor(alpha_max)),
-             alpha = 0.2) +
+  #geom_point(aes(y = sd_density / mean_density,
+  #               x = stock,
+  #               color = factor(alpha_max)),
+  #           alpha = 0.2) +
+  facet_wrap(facets = ~ factor(r),
+             ncol = 2) +
+  geom_smooth(aes(y = mean_density,
+                  x = stock,
+                  color = factor(alpha_max))) +
+  theme_bw()
+
+result %>% 
+  ggplot() +
+  #geom_point(aes(y = sd_density,
+  #               x = stock,
+  #               color = factor(alpha_max)),
+  #           alpha = 0.2) +
   facet_wrap(facets = ~ factor(r),
              ncol = 2) +
   geom_smooth(aes(y = sd_density,
