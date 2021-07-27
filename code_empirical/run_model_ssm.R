@@ -31,8 +31,8 @@ df_stock <- df_stock %>%
                    release_stage = "fry")
             ) %>% 
   group_by(year_release, river) %>% 
-  summarize(stock = sum(abundance),
-            stock_unit = unique(abundance_unit)) %>% 
+  summarize(stock = sum(abundance) * 0.001,
+            stock_unit = "million_fish") %>% 
   right_join(df_site_id, by = "river") %>% 
   pivot_wider(id_cols = c("year_release"),
               names_from = "site_id",
@@ -177,4 +177,4 @@ est <- mcmc_summary %>%
                             "site_id",
                             "site_id_numeric"))
   
-#write_csv(est, "data_fmt/data_ssm_est.csv")
+write_csv(est, "data_fmt/data_ssm_est.csv")
