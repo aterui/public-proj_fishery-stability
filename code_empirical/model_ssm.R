@@ -1,21 +1,23 @@
 model {
   
-  ninfo <- 0.01
+  ninfo <- 0.1
+  scale <- 2.5
+  df <- 1
 
 # prior -------------------------------------------------------------------
   
   for (j in 1:Nsite) {
-    tau_r_time[j] ~ dscaled.gamma(2.5, 1)
+    tau_r_time[j] ~ dscaled.gamma(scale, df)
     sd_r_time[j] <- sqrt(1 / tau_r_time[j])
     
-    tau_obs[j] ~ dscaled.gamma(2.5, 1)
+    tau_obs[j] ~ dscaled.gamma(scale, df)
     sd_obs[j] <- sqrt(1 / tau_obs[j])
     
     log_mu_r[j] ~ dnorm(log_global_r, tau_r_space)
   }
   
   log_global_r ~ dnorm(0, ninfo)
-  tau_r_space ~ dscaled.gamma(2.5, 1)
+  tau_r_space ~ dscaled.gamma(scale, df)
   sd_r_space <- sqrt(1 / tau_r_space)
   
   for (j in 1:Nsite) {
