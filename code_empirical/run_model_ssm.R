@@ -8,8 +8,46 @@ setwd(here::here("code_empirical"))
   
 # data --------------------------------------------------------------------
 
+## fish data ####
 source("data_fmt_fishdata.R")
 
+df_site_id <- df_fish %>% 
+  distinct(river, site_id, site_id_numeric)
+
+## stock data ####
+df_stock <- read_csv("data_fmt/data_hkd_prtwsd_stock_fmt.csv") %>% 
+  filter(between(year_release, 1999, 2019) & release_stage == "fry")
+
+unstocked_river <- pull(setdiff(distinct(df_site_id, river),
+                                distinct(df_stock, river)))
+
+df_stock <- df_stock %>% 
+  bind_rows(tibble(year_release = rep(1999:2019,
+                                      length(unstocked_river)),
+                   river = rep(unstocked_river,
+                               each = length(1999:2019)),
+                   abundance = 0,
+                   abundance_unit = "thousand_fish",
+                   release_stage = "fry")
+            ) %>% 
+  group_by(year_release, river) %>% 
+  summarize(stock = sum(abundance),
+            stock_unit = unique(abundance_unit)) %>% 
+  right_join(df_site_id, by = "river") %>% 
+  pivot_wider(id_cols = c("year_release"),
+              names_from = "site_id",
+              values_from = "stock",
+              values_fill = list(stock = 0)) %>% 
+  pivot_longer(cols = -year_release,
+               names_to = "site_id",
+               values_to = "stock") %>% 
+  left_join(df_site_id,
+            by = "site_id")
+
+
+# jags --------------------------------------------------------------------
+
+## data ####
 d_jags <- list(N = df_fish$abundance,
                Site = df_fish$site_id_numeric,
                Year = df_fish$year - min(df_fish$year) + 1,
@@ -17,22 +55,29 @@ d_jags <- list(N = df_fish$abundance,
                End_year = df_year$End_year,
                Area = df_fish$area,
                Nsample = nrow(df_fish),
-               Nsite = n_distinct(df_fish$site_id))
+               Nsite = n_distinct(df_fish$site_id),
                
+               Stock = df_stock$stock,
+               Year_stock = df_stock$year_release - min(df_stock$year_release) + 1,
+               Site_stock = df_stock$site_id_numeric,
+               Nsample_stock = nrow(df_stock))
+               
+## parameters ####
 para <- c("log_global_r",
           "sd_r_space",
           "log_mu_r",
           "sd_r_time",
           "sd_obs",
+          "b",
           "log_d",
           "cv",
           "mu",
           "sigma")
 
+## model file ####
 m <- read.jagsfile("model_ssm.R")
 
-
-# mcmc setup --------------------------------------------------------------
+## mcmc setup ####
 
 n_ad <- 100
 n_iter <- 1.0E+4
@@ -125,11 +170,11 @@ est <- mcmc_summary %>%
          year_id = as.numeric(year_id),
          year = year_id + 1998) %>% 
   select(-site_id) %>% 
-  left_join(dat_site, by = "site_id_numeric") %>% 
-  left_join(dat, by = c("year",
-                        "river",
-                        "site",
-                        "site_id",
-                        "site_id_numeric"))
+  left_join(df_site, by = "site_id_numeric") %>% 
+  left_join(df_fish, by = c("year",
+                            "river",
+                            "site",
+                            "site_id",
+                            "site_id_numeric"))
   
-write_csv(est, "data_fmt/data_ssm_est.csv")
+#write_csv(est, "data_fmt/data_ssm_est.csv")
