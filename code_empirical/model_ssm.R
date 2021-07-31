@@ -2,7 +2,7 @@ model {
   
   ninfo <- 0.1
   scale <- 2.5
-  df <- 1
+  df <- 2
   
   # prior -------------------------------------------------------------------
   
@@ -17,8 +17,6 @@ model {
     log_mu_r[j] ~ dnorm(log_global_r, tau_r_space)
   }
   
-  b ~ dnorm(0, ninfo)
-  
   for (j in 1:Nsite) {
     log_d[j, St_year[j]] ~ dnorm(0, ninfo)
   }
@@ -29,6 +27,14 @@ model {
   tau_r_space ~ dscaled.gamma(scale, df)
   sd_r_space <- sqrt(1 / tau_r_space)
     
+  ## regression parameters
+  for (j in 1:Nsite) {
+    b[j] ~ dnorm(mu_b, tau_b)
+  }
+  
+  mu_b ~ dnorm(0, ninfo)
+  tau_b ~ dscaled.gamma(scale, df)
+  sd_b <- sqrt(1 / tau_b)
   
   # likelihood --------------------------------------------------------------
   
@@ -39,7 +45,7 @@ model {
   
   for (j in 1:Nsite) {
     for (t in St_year[j]:End_year[j]) {
-      lambda[j, t] <- d_obs[j, t] + b * stock[j, t]
+      lambda[j, t] <- d_obs[j, t] + b[j] * stock[j, t]
       log(d_obs[j, t]) <- log_d_obs[j, t]
       log_d_obs[j, t] ~ dnorm(log_d[j, t], tau_obs[j])
       
