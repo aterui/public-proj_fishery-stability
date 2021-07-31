@@ -9,7 +9,6 @@ setwd(here::here("code_empirical"))
 # read data ---------------------------------------------------------------
 
 d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>% 
-  filter(river != "onnebetsu") %>% 
   mutate(taxon = case_when(genus == "Cottus" ~ "Cottus_spp",
                            genus == "Pungitius" ~ "Pungitius_spp",
                            genus == "Tribolodon" ~ "Tribolodon_spp",
