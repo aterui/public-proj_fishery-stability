@@ -43,19 +43,8 @@ selected_taxa <- df_m %>%
   pull(taxon)
 
 df_m <- df_m %>% 
-  group_by(site_id, taxon) %>% 
-  summarize(river = unique(river),
-            site = factor(unique(site)),
-            abundance = sum(abundance),
-            area = sum(area),
-            density = mean(abundance / area),
-            mean_stock = unique(mean_stock),
-            wsd_area = unique(wsd_area),
-            chr_a = unique(chr_a),
-            temp = unique(temp),
-            ppt = unique(ppt),
-            frac_forest = unique(frac_forest)) %>% 
-  filter(taxon %in% selected_taxa)
+  filter(taxon %in% selected_taxa) %>% 
+  mutate(site = factor(site))
 
 
 # analysis ----------------------------------------------------------------
@@ -71,28 +60,36 @@ list_m <- foreach(i = seq_len(n_distinct(df_m$taxon))) %do% {
   
   re <- df_m %>% 
     filter(river %in% river_subset) %>% 
-    lmer(density ~ scale(mean_stock) +
-                   scale(chr_a) +
-                   scale(wsd_area) + 
-                   scale(temp) + 
-                   scale(frac_forest) + 
-                   scale(ppt) +
-                   (1 | river),
-         REML = FALSE,
-         data = .)
+    glmer(abundance ~ scale(mean_stock) +
+                      scale(chr_a) +
+                      scale(wsd_area) + 
+                      scale(temp) + 
+                      scale(frac_forest) + 
+                      scale(ppt) +
+                      offset(log(area)) + 
+                      (1 | river) +
+                      (1 | site:river),
+          family = "poisson",
+          data = .)
   
   return(re)  
 }
 
 names(list_m) <- selected_taxa
 
+
+
 # plot --------------------------------------------------------------------
 
 df_m %>% 
-  mutate(density = abundance / area) %>% 
+  filter(taxon != "Oncorhynchus_masou_masou") %>% 
+  group_by(site_id) %>% 
+  summarize(mean_density = mean(abundance / area),
+            chr_a = unique(chr_a),
+            mean_stock = unique(mean_stock)) %>% 
   ggplot() +
-  geom_point(aes(y = density,
-                 x = mean_stock)) +
-  facet_wrap(facets = ~taxon,
-             scales = "free",
-             ncol = 4)
+  geom_point(aes(y = mean_density,
+                 x = mean_stock))# +
+  #facet_wrap(facets = ~taxon,
+  #           scales = "free",
+  #           ncol = 4)
