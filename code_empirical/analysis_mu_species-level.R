@@ -34,6 +34,7 @@ df_m <- d0 %>%
 
 # data selection ----------------------------------------------------------
 
+## taxon selection ####
 selected_taxa <- df_m %>% 
   group_by(taxon) %>% 
   summarize(n_obs = n(),
@@ -46,31 +47,69 @@ df_m <- df_m %>%
   filter(taxon %in% selected_taxa) %>% 
   mutate(site = factor(site))
 
+## watershed selection ####
+df_subset <- foreach(i = seq_len(n_distinct(df_m$taxon)),
+                     .combine = bind_rows) %do% {
+                       
+                       river_subset <- df_m %>% 
+                         filter(taxon == selected_taxa[i]) %>% 
+                         group_by(river) %>% 
+                         summarize(n = sum(abundance)) %>% 
+                         filter(n > 0) %>% 
+                         pull(river)
+                       
+                       df0 <- df_m %>% 
+                         filter(river %in% river_subset & taxon == selected_taxa[i])
+                       
+                       return(df0)  
+                     }
+
+df_subset <- df_subset %>% 
+  mutate(density = abundance / area)
+
+## taking average for watersheds ####
+df_river <- df_subset %>% 
+  group_by(river, taxon) %>% 
+  summarize(mean_density = mean(abundance / area),
+            mean_stock = unique(mean_stock))
+
 
 # analysis ----------------------------------------------------------------
 
 list_m <- foreach(i = seq_len(n_distinct(df_m$taxon))) %do% {
   
-  river_subset <- df_m %>% 
-    filter(taxon == selected_taxa[i]) %>% 
-    group_by(river) %>% 
-    summarize(n = sum(abundance)) %>% 
-    filter(n > 0) %>% 
-    pull(river)
+  #re <- df_subset %>% 
+  #  filter(taxon == selected_taxa[i]) %>% 
+  #  glmer(abundance ~ scale(mean_stock) +
+  #                    scale(chr_a) +
+  #                    scale(wsd_area) + 
+  #                    scale(temp) + 
+  #                    scale(frac_forest) + 
+  #                    scale(ppt) +
+  #                    offset(log(area)) + 
+  #                    (1 | river) +
+  #                    (1 | site:river),
+  #        family = "poisson",
+  #        data = .)
   
-  re <- df_m %>% 
-    filter(river %in% river_subset) %>% 
-    glmer(abundance ~ scale(mean_stock) +
-                      scale(chr_a) +
-                      scale(wsd_area) + 
-                      scale(temp) + 
-                      scale(frac_forest) + 
-                      scale(ppt) +
-                      offset(log(area)) + 
-                      (1 | river) +
-                      (1 | site:river),
-          family = "poisson",
-          data = .)
+  re <- df_subset %>% 
+    filter(taxon == selected_taxa[i]) %>% 
+    brm(abundance ~ scale(mean_stock) +
+                    scale(chr_a) +
+                    scale(wsd_area) + 
+                    scale(temp) + 
+                    scale(frac_forest) + 
+                    scale(ppt) +
+                    offset(log(area)) + 
+                    (1 | river) +
+                    (1 | site:river),
+        family = negbinomial(),
+        prior = c(prior(normal(0, 10), class = b),
+                  prior(student_t(3, 0, 10), class = Intercept),
+                  prior(student_t(3, 0, 10), class = sd)),
+        data = .,
+        cores = 8,
+        adapt_delta = 1.5)
   
   return(re)  
 }
@@ -78,18 +117,18 @@ list_m <- foreach(i = seq_len(n_distinct(df_m$taxon))) %do% {
 names(list_m) <- selected_taxa
 
 
-
 # plot --------------------------------------------------------------------
 
-df_m %>% 
-  filter(taxon != "Oncorhynchus_masou_masou") %>% 
-  group_by(site_id) %>% 
-  summarize(mean_density = mean(abundance / area),
-            chr_a = unique(chr_a),
-            mean_stock = unique(mean_stock)) %>% 
+df_river %>% 
   ggplot() +
   geom_point(aes(y = mean_density,
-                 x = mean_stock))# +
-  #facet_wrap(facets = ~taxon,
-  #           scales = "free",
-  #           ncol = 4)
+                 x = mean_stock)) +
+  geom_point(aes(y = density,
+                 x = mean_stock),
+             alpha = 0.1,
+             data = df_subset) +
+  facet_wrap(facets = ~taxon,
+             scales = "free",
+             ncol = 4) +
+  theme_bw()
+  
