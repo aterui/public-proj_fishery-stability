@@ -1,8 +1,10 @@
 
 # setup -------------------------------------------------------------------
 
+rm(list = ls())
 pacman::p_load(tidyverse,
-               MuMIn)
+               MuMIn,
+               glmmTMB)
 setwd(here::here("code_empirical"))
 
 
@@ -13,7 +15,9 @@ source("data_fmt_fishdata.R")
 df_sp <- d0 %>% 
   filter(abundance > 0) %>% 
   group_by(river, site, site_id) %>% 
-  summarize(n_species = n_distinct(taxon))
+  summarize(n_species = n_distinct(taxon)) %>% 
+  ungroup() %>% 
+  mutate(scl_n_species = c(scale(n_species)))
 
 df_ssm <- read_csv("data_fmt/data_ssm_est.csv") %>% 
   filter(param_name %in% c("cv", "mu", "sigma")) %>% 
@@ -28,15 +32,23 @@ df_ssm <- read_csv("data_fmt/data_ssm_est.csv") %>%
          high,
          low)
 
-df_env <- read_csv("data_fmt/data_env_fmt.csv")
+df_env <- read_csv("data_fmt/data_env_fmt.csv") %>% 
+  rename(wsd_area = area) %>% 
+  mutate(scl_wsd_area = c(scale(wsd_area)),
+         scl_ppt = c(scale(ppt)),
+         scl_temp = c(scale(temp)),
+         scl_forest = c(scale(frac_forest)))
 
-df_ocean <- read_csv("data_fmt/data_ocean_fmt.csv")
+df_ocean <- read_csv("data_fmt/data_ocean_fmt.csv") %>% 
+  mutate(scl_chr_a = c(scale(chr_a)),
+         scl_sst = c(scale(sst)))
 
 df_stock <- read_csv("data_fmt/data_hkd_prtwsd_stock_fmt.csv") %>% 
   filter(between(year_release, 1999, 2019)) %>% 
   group_by(river) %>% 
-  summarize(mean_stock = sum(abundance) / (2019 - 1999 + 1),
-            sd_stock = sqrt(sum((abundance - mean_stock)^2) / (2019 - 1999)))
+  summarize(mean_stock = sum(abundance) / (2019 - 1999 + 1)) %>% 
+  ungroup() %>% 
+  mutate(scl_mean_stock = c(scale(mean_stock)))
 
 df_m <- df_ssm %>% 
   left_join(df_env, by = c("river", "site")) %>% 
@@ -44,7 +56,7 @@ df_m <- df_ssm %>%
   left_join(df_stock, by = "river") %>% 
   left_join(df_ocean, by = "river") %>% 
   mutate(mean_stock = ifelse(is.na(mean_stock), 0, mean_stock),
-         sd_stock = ifelse(is.na(sd_stock), 0, sd_stock))
+         scl_mean_stock = ifelse(is.na(scl_mean_stock), 0, scl_mean_stock))
 
 
 # analysis ----------------------------------------------------------------
@@ -52,39 +64,22 @@ df_m <- df_ssm %>%
 dat <- df_m %>% 
   filter(param_name == "cv")
 
-fit <- lme4::lmer(median ~ scale(n_species) +
-                           scale(mean_stock) +
-                           scale(chr_a) +
-                           scale(area) + 
-                           scale(temp) + 
-                           scale(frac_forest) + 
-                           scale(ppt) + 
-                           (1 | river),
-                  REML = FALSE,
-                  data = dat)
+fit <- glmmTMB(median ~ scl_n_species +
+                        scl_mean_stock +
+                        scl_chr_a +
+                        scl_wsd_area + 
+                        scl_temp + 
+                        scl_forest + 
+                        scl_ppt + 
+                        (1 | river),
+               REML = FALSE,
+               data = dat)
 
 summary(fit)
 confint(fit)
 
-options(na.action = "na.fail")
-mavg <- dredge(fit, rank = AICc) %>% 
-  get.models(delta < 2) %>%
-  model.avg(m_subset) %>% 
-  summary()
-
-
-# plot --------------------------------------------------------------------
-
-df_m %>% 
-  group_by(river, param_name) %>% 
-  summarize(median = mean(median),
-            mean_stock = unique(mean_stock),
-            sd_stock = unique(sd_stock),
-            chr_a = unique(chr_a),
-            sst = unique(sst)) %>% 
-  ggplot() +
-  geom_point(aes(x = mean_stock, y = median)) +
-  facet_wrap(facets = ~ param_name,
-             ncol = 3)# + 
-#scale_y_continuous(trans = "log")
-
+#options(na.action = "na.fail")
+#mavg <- dredge(fit, rank = AICc) %>% 
+#  get.models(delta < 2) %>%
+#  model.avg(m_subset) %>% 
+#  summary()
