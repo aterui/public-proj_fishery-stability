@@ -17,7 +17,7 @@ d0 <- read_csv("data_fmt/data_ssm_est.csv") %>%
 
 # plot --------------------------------------------------------------------
 
-d0 %>% 
+g1 <- d0 %>% 
   ggplot() + 
   geom_line(aes(x = year_id,
                 y = est_density,
@@ -29,4 +29,9 @@ d0 %>%
   facet_wrap(facets = ~ river,
              ncol = 6,
              scales = "free_y") +
+  ylab("Community-wide density (ind/sq-m)") +
+  xlab("Year since 1999") +
+  labs(color = "Site") +
   theme_bw()
+
+print(g1)
