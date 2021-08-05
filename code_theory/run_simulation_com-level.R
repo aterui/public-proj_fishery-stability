@@ -20,8 +20,9 @@ df_param <- expand.grid(n_timestep = 1000,
                         n_burnin = 200,
                         n_species = 10,
                         k = 100,
-                        r_type = "constant",
-                        r = c(0.5, 3),
+                        r_type = "random",
+                        r_min = 0.1,
+                        r_max = 2,
                         sd_env = 0.5,
                         phi = 0.6,
                         int_type = "random",
@@ -81,42 +82,5 @@ result <- foreach(x = iter(df_param, by = 'row'),
 
 stopCluster(cl)
 
-result %>% 
-  ggplot() +
-  #geom_point(aes(y = sd_density / mean_density,
-  #               x = stock,
-  #               color = factor(alpha_max)),
-  #           alpha = 0.2) +
-  facet_wrap(facets = ~ factor(r),
-             ncol = 2) +
-  geom_smooth(aes(y = sd_density / mean_density,
-                  x = stock,
-                  color = factor(alpha_max))) +
-  theme_bw()
-
-result %>% 
-  ggplot() +
-  #geom_point(aes(y = sd_density / mean_density,
-  #               x = stock,
-  #               color = factor(alpha_max)),
-  #           alpha = 0.2) +
-  facet_wrap(facets = ~ factor(r),
-             ncol = 2) +
-  geom_smooth(aes(y = mean_density,
-                  x = stock,
-                  color = factor(alpha_max))) +
-  theme_bw()
-
-result %>% 
-  ggplot() +
-  #geom_point(aes(y = sd_density,
-  #               x = stock,
-  #               color = factor(alpha_max)),
-  #           alpha = 0.2) +
-  facet_wrap(facets = ~ factor(r),
-             ncol = 2) +
-  geom_smooth(aes(y = sd_density,
-                  x = stock,
-                  color = factor(alpha_max))) +
-  theme_bw()
-
+write_csv(result,
+          "result/result_ricker.csv")
