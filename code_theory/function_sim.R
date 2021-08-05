@@ -100,12 +100,16 @@ dynsim <- function(n_timestep = 1000,
                   nrow = n_sim,
                   ncol = n_species)
   
+  ## parameter: stock ####
+  
+  v_s <- rbinom(n = n_sim, size = stock, prob = phi)
+  
   # dynamics ----------------------------------------------------------------
   
   for (i in seq_len(n_sim)) {
     
     if (i > n_warmup) {
-      v_n[1] <- v_n[1] + phi * stock
+      v_n[1] <- v_n[1] + phi * v_s[i]
     }
     
     v_n_hat <- fun_dyn(r = v_r,
@@ -140,7 +144,7 @@ dynsim <- function(n_timestep = 1000,
     dplyr::mutate(species = seq_len(n_species),
                   k = k,
                   r = v_r,
-                  alpha1 = m_int[,1]) %>% 
+                  alpha_j1 = m_int[,1]) %>% 
     dplyr::relocate(species)
   
   
