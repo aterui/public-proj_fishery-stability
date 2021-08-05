@@ -5,6 +5,7 @@
 *old
 *tempdir
 *.Rmd
+*.html
 code_empirical/data_gis/albers_chelsa_clim.tif
 code_empirical/data_gis/albers_chelsa_clim.tif.aux.xml
 code_empirical/data_gis/CHELSA_bio10_01.tif
