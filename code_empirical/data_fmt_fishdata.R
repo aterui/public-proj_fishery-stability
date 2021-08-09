@@ -1,7 +1,7 @@
 
 # setup -------------------------------------------------------------------
 
-rm(list = ls())
+#rm(list = ls())
 pacman::p_load(tidyverse, foreach)
 setwd(here::here("code_empirical"))
 
