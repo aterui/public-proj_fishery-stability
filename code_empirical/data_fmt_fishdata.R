@@ -9,6 +9,7 @@ setwd(here::here("code_empirical"))
 # read data ---------------------------------------------------------------
 
 d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>% 
+  filter(river != "onnebetsu") %>% 
   mutate(taxon = case_when(genus == "Cottus" ~ "Cottus_spp",
                            genus == "Pungitius" ~ "Pungitius_spp",
                            genus == "Tribolodon" ~ "Tribolodon_spp",
@@ -47,6 +48,20 @@ d0 <- d0 %>%
 
 # summarize data to community level ---------------------------------------
 
+df_group <- d0 %>% 
+  mutate(group = case_when(taxon == "Oncorhynchus_masou_masou" ~ "masu_salmon",
+                           taxon != "Oncorhynchus_masou_masou" ~ "other")) %>% 
+  group_by(year,
+           river,
+           site,
+           site_id,
+           group) %>% 
+  summarize(abundance = sum(abundance, na.rm = TRUE),
+            area = unique(area),
+            density = abundance / area) %>% 
+  ungroup() %>% 
+  mutate(site_id_numeric = as.numeric(factor(site_id)))
+       
 df_fish <- d0 %>% 
   group_by(year,
            river,
@@ -56,7 +71,9 @@ df_fish <- d0 %>%
             area = unique(area),
             density = abundance / area) %>% 
   ungroup() %>% 
-  mutate(site_id_numeric = as.numeric(factor(site_id)))
+  mutate(site_id_numeric = as.numeric(factor(site_id)),
+         group = "all") %>% 
+  bind_rows(df_group)
 
 df_year <- d0 %>% 
   group_by(site_id) %>% 
