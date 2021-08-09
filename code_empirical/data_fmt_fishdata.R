@@ -47,11 +47,6 @@ d0 <- d0 %>%
 
 # summarize data to community level ---------------------------------------
 
-df_masu <- d0 %>% 
-  filter(taxon == "Oncorhynchus_masou_masou") %>% 
-  mutate(density_m = abundance / area) %>% 
-  rename(abundance_m = abundance)
-
 df_fish <- d0 %>% 
   group_by(year,
            river,
@@ -61,12 +56,7 @@ df_fish <- d0 %>%
             area = unique(area),
             density = abundance / area) %>% 
   ungroup() %>% 
-  mutate(site_id_numeric = as.numeric(factor(site_id))) %>% 
-  left_join(df_masu, by = c("year",
-                            "river",
-                            "site",
-                            "site_id",
-                            "area"))
+  mutate(site_id_numeric = as.numeric(factor(site_id)))
 
 df_year <- d0 %>% 
   group_by(site_id) %>% 

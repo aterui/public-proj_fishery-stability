@@ -49,8 +49,6 @@ df_stock <- df_stock %>%
 
 ## data ####
 d_jags <- list(N = df_fish$abundance,
-               N_m = df_fish$abundance_m,
-               
                Site = df_fish$site_id_numeric,
                Year = df_fish$year - min(df_fish$year) + 1,
                St_year = df_year$St_year,
@@ -181,4 +179,4 @@ est <- mcmc_summary %>%
                             "site_id",
                             "site_id_numeric"))
   
-#write_csv(est, "data_fmt/data_ssm_est.csv")
+write_csv(est, "data_fmt/data_ssm_est.csv")
