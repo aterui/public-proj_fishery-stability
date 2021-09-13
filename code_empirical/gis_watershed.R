@@ -11,7 +11,7 @@ pacman::p_load(tidyverse,
                maptools)
 
 setwd(here::here("code_empirical"))
-
+source("gis_crs_fmt.R")
 
 # define function ---------------------------------------------------------
 
@@ -36,7 +36,9 @@ st_snap_points = function(x, y, max_dist = 1000) {
 
 # snap to the nearest stremline -------------------------------------------
 
-albers_sf_channel <- st_read("data_gis/albers_channel_hkd.gpkg")
+albers_sf_channel <- st_read(dsn = "data_gis",
+                             layer = "epsg4326_channel_1sqkm") %>% 
+  st_transform(crs = wkt_jgd_albers)
 
 albers_sf_site <- read_csv("data_gis/site-coordinate_hogosuimen_terui-org-2019.csv") %>% 
   drop_na(longitude) %>% 

@@ -17,7 +17,7 @@ df_sp <- d0 %>%
   ungroup() %>% 
   mutate(scl_n_species = c(scale(n_species)))
 
-df_ssm <- read_csv("data_fmt/data_ssm_est.csv") %>% 
+df_ssm <- read_csv("data_fmt/data_ssm_est_all.csv") %>% 
   filter(param_name %in% c("cv", "mu", "sigma")) %>% 
   rename(median = '50%',
          high = '97.5%',

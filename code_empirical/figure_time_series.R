@@ -12,7 +12,8 @@ d0 <- read_csv("data_fmt/data_ssm_est.csv") %>%
   rename(median = "50%",
          lower = "2.5%",
          upper = "97.5%") %>% 
-  mutate(est_density = exp(median))
+  mutate(est_density = exp(median),
+         density = all / area)
 
 
 # plot --------------------------------------------------------------------

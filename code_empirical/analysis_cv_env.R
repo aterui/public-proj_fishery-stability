@@ -15,11 +15,13 @@ source("data_fmt_fishdata.R")
 df_sp <- d0 %>% 
   filter(abundance > 0) %>% 
   group_by(river, site, site_id) %>% 
-  summarize(n_species = n_distinct(taxon)) %>% 
+  summarize(n_species = n_distinct(taxon),
+            n_species_unstock = n_distinct(taxon[.data$taxon != "Oncorhynchus_masou_masou"])) %>% 
   ungroup() %>% 
-  mutate(scl_n_species = c(scale(n_species)))
+  mutate(scl_n_species = c(scale(n_species)),
+         scl_n_species_unstock = c(scale(n_species_unstock)))
 
-df_ssm <- read_csv("data_fmt/data_ssm_est.csv") %>% 
+df_ssm <- read_csv("data_fmt/data_ssm_est_all.csv") %>% 
   filter(param_name %in% c("cv", "mu", "sigma")) %>% 
   rename(median = '50%',
          high = '97.5%',
@@ -62,7 +64,7 @@ df_m <- df_ssm %>%
 # analysis ----------------------------------------------------------------
 
 dat <- df_m %>% 
-  filter(param_name == "cv")
+  filter(param_name == "mu")
 
 fit <- glmmTMB(median ~ scl_n_species +
                         scl_mean_stock +

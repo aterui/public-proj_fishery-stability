@@ -45,6 +45,7 @@ wgs84_rs_clim <- raster::stack(wgs84_rs_temp,
                                wgs84_rs_ppt)
 names(wgs84_rs_clim) <- c("temp", "ppt")
 
+# for point estimate
 df_clim <- raster::extract(wgs84_rs_clim, wgs84_sf_site) %>% 
   as_tibble() %>% 
   mutate(id = seq_len(nrow(.)),
@@ -56,15 +57,15 @@ df_clim <- raster::extract(wgs84_rs_clim, wgs84_sf_site) %>%
 #                             crs = st_crs(albers_sf_wsd)$wkt,
 #                             method = 'bilinear',
 #                             res = 1000)
-#
+
 #df_clim <- exact_extract(albers_clim,
 #                         albers_sf_wsd) %>% 
 #  bind_rows(.id = "id") %>% 
 #  drop_na(ppt) %>% 
 #  mutate(id = as.numeric(id)) %>% 
 #  dplyr::group_by(id) %>% 
-#  dplyr::summarise(mean_temp = sum(temp * 0.1 * coverage_fraction) / sum(coverage_fraction),
-#                   mean_ppt = sum(ppt * coverage_fraction) / sum(coverage_fraction))
+#  dplyr::summarise(temp = sum(temp * 0.1 * coverage_fraction) / sum(coverage_fraction),
+#                   ppt = sum(ppt * coverage_fraction) / sum(coverage_fraction))
 
 
 # land use ----------------------------------------------------------------

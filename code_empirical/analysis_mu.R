@@ -102,5 +102,6 @@ df_river %>%
   facet_wrap(facets = ~status,
              scales = "free",
              ncol = 4) +
+  scale_y_continuous(trans = "log10") +
   theme_bw()
 
