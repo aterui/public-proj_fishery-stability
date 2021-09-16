@@ -11,20 +11,21 @@ pacman::p_load(raster,
                exactextractr)  
 
 setwd(here::here("code_empirical"))
+source("gis_crs_fmt.R")
 
 
 # read polygons and points ------------------------------------------------
 
 ## watershed polygons
-albers_sf_wsd <- st_read(dsn = "data_gis/albers_wsd_prtwsd.gpkg") %>%
-  st_make_valid() %>% 
-  mutate(id = seq_len(nrow(.))) %>% # id: watershed polygon id (unit of analysis)
-  mutate(area = st_area(.)) %>% 
+albers_sf_wsd <- st_read(dsn = "data_gis/epsg4326_watershed.gpkg") %>%
+  select(-epsg4326_watershed) %>% 
+  st_transform(wkt_jgd_albers) %>% 
+  mutate(id = seq_len(nrow(.)),
+         area = st_area(.)) %>% 
   mutate(area = units::set_units(area, km^2))
 
 ## sampling sites
-albers_sf_site <- st_read(dsn = "data_gis/albers_point_snap_prtwsd.gpkg")
-wgs84_sf_site <- st_transform(albers_sf_site, crs = 4326)
+wgs84_sf_site <- st_read(dsn = "data_gis/epsg4326_point_snap_prtwsd_edit.gpkg")
 
 
 # climate -----------------------------------------------------------------
@@ -70,14 +71,14 @@ df_clim <- raster::extract(wgs84_rs_clim, wgs84_sf_site) %>%
 
 # land use ----------------------------------------------------------------
 
-wgs84_rs_lu <- raster("data_gis/wgs84_lu_hkd.tif")
+wgs84_rs_lu <- raster("data_gis/epsg4326_lu_hkd.tif")
 albers_rs_lu <- projectRaster(from = wgs84_rs_lu,
                               crs = st_crs(albers_sf_wsd)$wkt,
                               method = 'bilinear',
                               res = 1000)
 
 albers_rs_forest <- calc(albers_rs_lu,
-                      fun = function(x) ifelse(dplyr::between(x, 111, 126), 1, 0))
+                         fun = function(x) ifelse(dplyr::between(x, 111, 126), 1, 0))
 albers_rs_urban <- calc(albers_rs_lu,
                      fun = function(x) ifelse(x == 50, 1, 0))
 albers_rs_agri <- calc(albers_rs_lu,
@@ -88,30 +89,28 @@ albers_rs_fua <- raster::stack(albers_rs_forest,
 names(albers_rs_fua) <- c("forest", "urban", "agri")
 
 df_lu <- exact_extract(albers_rs_fua,
-                       albers_sf_wsd) %>% 
-  bind_rows(.id = "id") %>%
-  drop_na(forest | urban | agri) %>% 
-  mutate(id = as.numeric(id)) %>% 
-  dplyr::group_by(id) %>% 
-  summarise(frac_forest = sum(forest * coverage_fraction) / sum(coverage_fraction),
-            frac_urban = sum(urban * coverage_fraction) / sum(coverage_fraction),
-            frac_agri = sum(agri * coverage_fraction) / sum(coverage_fraction))
+                       albers_sf_wsd,
+                       "mean") %>% 
+  rename(frac_forest = mean.forest,
+         frac_urban = mean.urban,
+         frac_agri = mean.agri) %>% 
+  mutate(id = seq_len(nrow(.)))
 
 
 # merge data --------------------------------------------------------------
 
 albers_sf_wsd <- albers_sf_wsd %>% 
   left_join(df_lu, by = "id") %>% 
-  left_join(df_clim, by = "id")
+  left_join(df_clim, by = "id") %>% 
+  relocate(id)
 
 st_write(albers_sf_wsd,
-         dsn = "data_gis/albers_wsd_env_prtwsd.gpkg",
+         dsn = "data_gis/albers_watershed_env.gpkg",
          append = FALSE)
 
 df_albers_sf_wsd <- albers_sf_wsd %>% 
   as_tibble() %>% 
-  dplyr::select(-geom,
-                -raster.sdat)
+  dplyr::select(-geom)
 
 write_csv(df_albers_sf_wsd,
-          file = "data_fmt/data_env_fmt.csv")
+          file = "data_fmt/data_env_fmt_x.csv")
