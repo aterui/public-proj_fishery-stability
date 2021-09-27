@@ -113,4 +113,4 @@ df_albers_sf_wsd <- albers_sf_wsd %>%
   dplyr::select(-geom)
 
 write_csv(df_albers_sf_wsd,
-          file = "data_fmt/data_env_fmt_x.csv")
+          file = "data_fmt/data_env_fmt.csv")
