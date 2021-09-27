@@ -9,7 +9,6 @@ setwd(here::here("code_empirical"))
 # read data ---------------------------------------------------------------
 
 d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>% 
-  filter(river != "onnebetsu") %>% 
   mutate(taxon = case_when(genus == "Cottus" ~ "Cottus_spp",
                            genus == "Pungitius" ~ "Pungitius_spp",
                            genus == "Tribolodon" ~ "Tribolodon_spp",
@@ -24,22 +23,27 @@ d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>%
             area = unique(area),
             genus = unique(genus),
             taxon = unique(taxon)) %>% 
-  ungroup() %>% 
-  filter(!(site_id %in% c("usubetsu4",
-                          "atsuta6",
-                          "kokamotsu4")))
-
+  ungroup()
 
 # select by number of observations ----------------------------------------
 
+## selection criteria
+## 6 years of observations
+## at least 10 years of range
+## at least 2 observations of masu salmon
+
 n_obs_threshold <- 5
+n_obs_masu_threshold <- 1
 range_threshold <- 10
 
 site_selected <- d0 %>% 
   group_by(site_id) %>% 
   summarize(range_obs = max(year) - min(year) + 1,
-            n_obs = n_distinct(year)) %>% 
-  filter(range_obs > range_threshold & n_obs > n_obs_threshold) %>% 
+            n_obs = n_distinct(year),
+            n_obs_masu = sum(abundance[taxon == "Oncorhynchus_masou_masou"] > 0)) %>% 
+  filter(range_obs > range_threshold &
+         n_obs > n_obs_threshold &
+         n_obs_masu > n_obs_masu_threshold) %>% 
   pull(site_id)
 
 d0 <- d0 %>% 
