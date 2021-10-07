@@ -10,7 +10,7 @@ dynsim <- function(n_timestep = 1000,
                    r_max = 3.5,
                    sd_env = 0.1,
                    stock = 0,
-                   phi = 0.6,
+                   phi = 1,
                    int_type = "constant",
                    alpha = 0.5,
                    alpha_min = 0,
@@ -24,7 +24,7 @@ dynsim <- function(n_timestep = 1000,
   # ricker function
   if (model == "ricker") {
     fun_dyn <- function(r, n, k, m_int) {
-      n * exp(r * (1 - (m_int %*% n / k)))
+      n * exp(r * (1 - ((m_int %*% n) / k)))
     }   
   }
   
@@ -109,7 +109,7 @@ dynsim <- function(n_timestep = 1000,
   for (i in seq_len(n_sim)) {
     
     if (i > n_warmup) {
-      v_n[1] <- v_n[1] + phi * v_s[i]
+      v_n[1] <- v_n[1] + v_s[i]
     }
     
     v_n_hat <- fun_dyn(r = v_r,

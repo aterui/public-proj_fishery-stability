@@ -7,13 +7,12 @@ setwd(here::here("code_empirical"))
 
 # read data ---------------------------------------------------------------
 
-d0 <- read_csv("data_fmt/data_ssm_est.csv") %>% 
+d0 <- read_csv("data_fmt/data_ssm_est_all.csv") %>% 
   filter(param_name == "log_d") %>%
   rename(median = "50%",
          lower = "2.5%",
          upper = "97.5%") %>% 
-  mutate(est_density = exp(median),
-         density = all / area)
+  mutate(est_density = exp(median))
 
 
 # plot --------------------------------------------------------------------
@@ -35,4 +34,6 @@ g1 <- d0 %>%
   labs(color = "Site") +
   theme_bw()
 
-print(g1)
+ggsave("figure/figure_timeseries.pdf",
+       width = 15,
+       height = 9)

@@ -67,16 +67,17 @@ g1 <- df_m %>%
   geom_point(aes(x = mean_stock,
                  y = median),
              size = 2) +
-  #geom_point(aes(x = mean_stock,
-  #               y = median),
-  #           data = df_m,
-  #           alpha = 0.2,
-  #           size = 1) +
+  geom_smooth(aes(x = mean_stock,
+                  y = median),
+              method = "lm",
+              color = grey(0.3)) +
   facet_wrap(facets = ~ param_name,
-             ncol = 2,
+             ncol = 3,
              scales = "free_y") + 
   xlab("Fish stock (thousand fish)") +
   ylab("value") +
   theme_bw()
 
-print(g1)
+ggsave("figure/figure_cv_mu_sd.pdf",
+       width = 10,
+       height = 3)

@@ -1,7 +1,7 @@
 
 # setup -------------------------------------------------------------------
 
-rm(list = ls())
+#rm(list = ls())
 pacman::p_load(tidyverse,
                MuMIn,
                glmmTMB,
@@ -86,4 +86,5 @@ list_fit <- foreach(i = seq_len(length(param))) %do% {
 
 names(list_fit) <- param
 
+lapply(list_fit, summary)
 lapply(list_fit, confint)
