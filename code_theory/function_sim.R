@@ -13,8 +13,6 @@ dynsim <- function(n_timestep = 1000,
                    phi = 1,
                    int_type = "constant",
                    alpha = 0.5,
-                   alpha_min = 0,
-                   alpha_max = 0.5,
                    model = "ricker",
                    seed = 5
 ) {
@@ -59,9 +57,8 @@ dynsim <- function(n_timestep = 1000,
   ## parameter: species interaction ####
   
   if (int_type == "random") {
-    m_int <- matrix(runif(n_species * n_species,
-                          min = alpha_min,
-                          max = alpha_max),
+    m_int <- matrix(rexp(n_species * n_species,
+                         rate = 1/alpha),
                     nrow = n_species,
                     ncol = n_species)
   } else {
