@@ -17,19 +17,6 @@ df_sp <- d0 %>%
   ungroup() %>% 
   mutate(scl_n_species = c(scale(n_species)))
 
-df_ssm <- read_csv("data_fmt/data_ssm_est_all.csv") %>% 
-  filter(param_name %in% c("cv", "mu", "sigma")) %>% 
-  rename(median = '50%',
-         high = '97.5%',
-         low = '2.5%') %>% 
-  select(river,
-         site,
-         site_id,
-         param_name,
-         median,
-         high,
-         low)
-
 df_env <- read_csv("data_fmt/data_env_fmt.csv") %>% 
   rename(wsd_area = area) %>% 
   mutate(scl_wsd_area = c(scale(wsd_area)),
@@ -47,6 +34,36 @@ df_stock <- read_csv("data_fmt/data_hkd_prtwsd_stock_fmt.csv") %>%
   summarize(mean_stock = sum(abundance) / (2019 - 1999 + 1)) %>% 
   ungroup() %>% 
   mutate(scl_mean_stock = c(scale(mean_stock)))
+
+
+# plot --------------------------------------------------------------------
+
+x <- list.files(path = "data_fmt") %>% 
+  str_detect(pattern = "data_ssm")
+
+file_name <- paste0("data_fmt/",
+                    list.files(path = "data_fmt")[x])
+figure_name <- paste0("figure/figure_cv_mu_sd",
+                      str_remove(list.files(path = "data_fmt")[x],
+                                 "data_ssm_est")) %>% 
+  str_replace(".csv", ".pdf")
+
+foreach(i = seq_len(length(file_name))) %do% {
+  
+## ssm estimates ####
+
+df_ssm <- read_csv(file_name[i]) %>% 
+  filter(param_name %in% c("cv", "mu", "sigma")) %>% 
+  rename(median = '50%',
+         high = '97.5%',
+         low = '2.5%') %>% 
+  select(river,
+         site,
+         site_id,
+         param_name,
+         median,
+         high,
+         low)
 
 df_m <- df_ssm %>% 
   left_join(df_env, by = c("river", "site")) %>% 
@@ -78,6 +95,7 @@ g1 <- df_m %>%
   ylab("value") +
   theme_bw()
 
-ggsave("figure/figure_cv_mu_sd.pdf",
+ggsave(figure_name[i],
        width = 10,
        height = 3)
+}

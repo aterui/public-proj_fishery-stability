@@ -1,0 +1,141 @@
+
+# setup -------------------------------------------------------------------
+
+rm(list = ls())
+pacman::p_load(foreach,
+               tidyverse)
+setwd(here::here("code_empirical"))
+
+# data --------------------------------------------------------------------
+
+source("data_fmt_analysis.R")
+
+df_ssm <- read_csv("data_fmt/data_ssm_est_other.csv") %>% 
+  filter(param_name %in% c("cv", "mu", "sigma")) %>% 
+  rename(median = '50%',
+         high = '97.5%',
+         low = '2.5%') %>% 
+  select(river,
+         site,
+         site_id,
+         param_name,
+         median,
+         high,
+         low)
+
+df_m <- df_ssm %>% 
+  left_join(df_env, by = c("river", "site")) %>% 
+  left_join(df_sp, by = c("river", "site", "site_id")) %>% 
+  left_join(df_stock, by = "river") %>% 
+  left_join(df_ocean, by = "river") %>% 
+  mutate(mean_stock = ifelse(is.na(mean_stock), 0, mean_stock),
+         scl_mean_stock = ifelse(is.na(scl_mean_stock), 0, scl_mean_stock))
+
+
+# jags --------------------------------------------------------------------
+
+variable <- c("cv", "mu", "sigma")
+
+out <- foreach(i = seq_len(length(variable)),
+               .combine = bind_rows) %do% {
+
+  ## data ####
+  df_site <- df_m %>%
+    dplyr::filter(param_name == variable[i]) %>% 
+    mutate(river_id = as.numeric(factor(river)))
+
+  df_river <- df_site %>% 
+    group_by(river, river_id) %>% 
+    summarize(stock = unique(mean_stock),
+              chr_a = unique(chr_a))
+  
+  d_jags <- list(Y = df_site$median,
+                 N_species = df_site$n_species_unstock,
+                 Wsd_area = df_site$wsd_area,
+                 Temp = df_site$temp,
+                 Ppt = df_site$ppt,
+                 Forest = df_site$frac_forest,
+                 River = df_site$river_id,
+                 
+                 Stock = df_river$stock,
+                 Chr_a = df_river$chr_a,
+                 
+                 Nsite = nrow(df_site),
+                 Nriver = nrow(df_river))
+  
+  ## parameters ####
+  para <- c("a",
+            "b",
+            "sigma",
+            "sigma_r",
+            "b_raw")
+  
+  ## model file ####
+  m <- runjags::read.jagsfile("model_regression.R")
+  
+  ## mcmc setup ####
+  
+  n_ad <- 100
+  n_iter <- 1.0E+4
+  n_thin <- max(3, ceiling(n_iter / 500))
+  n_burn <- ceiling(max(10, n_iter/2))
+  n_sample <- ceiling(n_iter / n_thin)
+  
+  inits <- replicate(3,
+                     list(.RNG.name = "base::Mersenne-Twister",
+                          .RNG.seed = NA),
+                     simplify = FALSE)
+  
+  for (j in 1:3) inits[[j]]$.RNG.seed <- j
+  
+  
+  ## run jags ####
+  
+  post <- runjags::run.jags(m$model,
+                            monitor = para,
+                            data = d_jags,
+                            n.chains = 3,
+                            inits = inits,
+                            method = "parallel",
+                            burnin = n_burn,
+                            sample = n_sample,
+                            adapt = n_ad,
+                            thin = n_thin,
+                            n.sims = 3,
+                            module = "glm")
+  
+  mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+  
+  while(max(mcmc_summary$Rhat) > 1.09) {
+    post <- runjags::extend.jags(post,
+                                 burnin = 0,
+                                 sample = n_sample,
+                                 adapt = n_ad,
+                                 thin = n_thin,
+                                 n.sims = 3,
+                                 combine = TRUE)
+    
+    mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+  }
+  
+  ## output ####
+  n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
+  
+  re <- as_tibble(mcmc_summary) %>% 
+    rename(low = '2.5%',
+           median = '50%',
+           high = '97.5%') %>% 
+    mutate(parameter = rownames(mcmc_summary),
+           prob_positive = unlist(MCMCvis::MCMCpstr(post$mcmc,
+                                                    func = function(x) mean(x > 0))),
+           response = variable[i])
+  
+  return(re)
+}
+
+out <- relocate(out,
+                c(response, parameter))
+
+# export ------------------------------------------------------------------
+
+write_csv(out, "result/reg_other.csv")

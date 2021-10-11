@@ -16,8 +16,7 @@ d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>%
                            genus == "Lethenteron" ~ "Lethenteron_spp",
                            genus == "Rhinogobius" ~ "Rhinogobius_spp",
                            TRUE ~ as.character(latin)),
-         site_id = paste0(river, site)
-  ) %>% 
+         site_id = paste0(river, site)) %>% 
   group_by(year, river, site, site_id, taxon) %>% 
   summarize(abundance = sum(abundance, na.rm = T),
             area = unique(area),
