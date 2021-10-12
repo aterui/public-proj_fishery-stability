@@ -24,7 +24,8 @@ out <- foreach(i = seq_len(length(variable)),
     dplyr::filter(param_name == variable[i]) %>% 
     mutate(river_id = as.numeric(factor(river)))
 
-  df_river <- df_site %>% 
+  df_river <- df_m %>% 
+    mutate(river_id = as.numeric(factor(river))) %>% 
     group_by(river, river_id) %>% 
     summarize(stock = unique(mean_stock),
               chr_a = unique(chr_a))
