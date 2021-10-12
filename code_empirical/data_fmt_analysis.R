@@ -65,8 +65,8 @@ list_ssm <- foreach(i = seq_len(length(file_name))) %do% {
     left_join(df_sp, by = c("river", "site", "site_id")) %>% 
     left_join(df_stock, by = "river") %>% 
     left_join(df_ocean, by = "river") %>% 
-    mutate(mean_stock = ifelse(is.na(mean_stock), 0, mean_stock),
-           scl_mean_stock = ifelse(is.na(scl_mean_stock), 0, scl_mean_stock))
+    mutate(mean_stock = replace_na(mean_stock, 0),
+           scl_mean_stock = replace_na(scl_mean_stock, 0))
   
   return(df_m)
 }
