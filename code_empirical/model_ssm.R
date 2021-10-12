@@ -1,6 +1,6 @@
 model {
   
-  ninfo <- 0.1
+  ninfo <- 0.01
   scale <- 2.5
   df <- 2
   

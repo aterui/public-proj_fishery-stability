@@ -36,3 +36,39 @@ df_stock <- read_csv("data_fmt/data_hkd_prtwsd_stock_fmt.csv") %>%
   ungroup() %>% 
   mutate(scl_mean_stock = c(scale(mean_stock)))
 
+
+# ssm data ----------------------------------------------------------------
+
+id_ssm <- list.files("data_fmt") %>% 
+  str_detect("data_ssm")
+
+file_name <- paste0("data_fmt/",
+                    list.files("data_fmt")[id_ssm])
+
+list_ssm <- foreach(i = seq_len(length(file_name))) %do% {
+  
+  df_ssm <- read_csv(file_name[i]) %>% 
+    filter(param_name %in% c("cv", "mu", "sigma")) %>% 
+    rename(median = '50%',
+           high = '97.5%',
+           low = '2.5%') %>% 
+    select(river,
+           site,
+           site_id,
+           param_name,
+           median,
+           high,
+           low)
+  
+  df_m <- df_ssm %>% 
+    left_join(df_env, by = c("river", "site")) %>% 
+    left_join(df_sp, by = c("river", "site", "site_id")) %>% 
+    left_join(df_stock, by = "river") %>% 
+    left_join(df_ocean, by = "river") %>% 
+    mutate(mean_stock = ifelse(is.na(mean_stock), 0, mean_stock),
+           scl_mean_stock = ifelse(is.na(scl_mean_stock), 0, scl_mean_stock))
+  
+  return(df_m)
+}
+
+names(list_ssm) <- str_extract(file_name, c("all", "masu", "other"))
