@@ -23,16 +23,17 @@ list_fit <- foreach(i = seq_len(length(param))) %do% {
   dat <- df_m %>% 
     filter(param_name == param[i])
   
-  fit <- lme4::lmer(median ~ scl_n_species +
-                      scl_mean_stock +
-                      scl_chr_a +
-                      scl_wsd_area + 
-                      scl_temp + 
-                      scl_forest + 
-                      scl_ppt + 
-                      (1 | river),
-                    REML = FALSE,
-                    data = dat)
+  fit <- glmmTMB::glmmTMB(median ~ scl_n_species +
+                            scl_mean_stock +
+                            scl_chr_a +
+                            scl_n_species +
+                            scl_wsd_area + 
+                            scl_temp + 
+                            scl_ppt + 
+                            scl_forest + 
+                            (1 | river),
+                          REML = FALSE,
+                          data = dat)
   
   return(fit)    
 }
