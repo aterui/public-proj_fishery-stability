@@ -49,9 +49,15 @@ model {
       b[3] * scl_chr_a[j]
     
   }
-
   
-# standardization ---------------------------------------------------------
+  b_raw[1] <- b[1] - b[2] * mean(Stock[])
+  b_raw[2] <- b[2] / sd(Stock[])
+  
+}
+
+data {
+
+  # standardization ---------------------------------------------------------
   
   for(i in 1:Nsite) {
     scl_n_species[i] <- (N_species[i] - mean(N_species[])) / sd(N_species[])
@@ -66,7 +72,5 @@ model {
     scl_chr_a[j] <- (Chr_a[j] - mean(Chr_a[])) / sd(Chr_a[])
   }
   
-  b_raw[1] <- b[1] - b[2] * mean(Stock[])
-  b_raw[2] <- b[2] / sd(Stock[])
-    
 }
+  
