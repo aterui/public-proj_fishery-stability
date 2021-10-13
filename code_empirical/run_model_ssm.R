@@ -16,41 +16,9 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   
   ## fish data ####
   source("data_fmt_fishdata.R")
+  source("data_fmt_stock.R")
   df_fish <- filter(df_fish, group == fish_group)
-  
-  df_site_id <- df_fish %>% 
-    distinct(river, site_id, site_id_numeric)
-  
-  ## stock data ####
-  df_stock <- read_csv("data_fmt/data_hkd_prtwsd_stock_fmt.csv") %>% 
-    filter(between(year_release, 1999, 2019) & release_stage == "fry")
-  
-  unstocked_river <- pull(setdiff(distinct(df_site_id, river),
-                                  distinct(df_stock, river)))
-  
-  df_stock <- df_stock %>% 
-    bind_rows(tibble(year_release = rep(1999:2019,
-                                        length(unstocked_river)),
-                     river = rep(unstocked_river,
-                                 each = length(1999:2019)),
-                     abundance = 0,
-                     abundance_unit = "thousand_fish",
-                     release_stage = "fry")
-              ) %>% 
-    group_by(year_release, river) %>% 
-    summarize(stock = sum(abundance) * 0.001,
-              stock_unit = "million_fish") %>% 
-    right_join(df_site_id, by = "river") %>% 
-    pivot_wider(id_cols = c("year_release"),
-                names_from = "site_id",
-                values_from = "stock",
-                values_fill = list(stock = 0)) %>% 
-    pivot_longer(cols = -year_release,
-                 names_to = "site_id",
-                 values_to = "stock") %>% 
-    left_join(df_site_id,
-              by = "site_id")
-  
+
   
   # jags --------------------------------------------------------------------
   
@@ -65,10 +33,10 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                  Nsite = n_distinct(df_fish$site_id),
                  
                  Stock = case_when(fish_group == "other" ~ 0,
-                                   fish_group != "other" ~ df_stock$stock),
-                 Year_stock = df_stock$year_release - min(df_stock$year_release) + 1,
-                 Site_stock = df_stock$site_id_numeric,
-                 Nsample_stock = nrow(df_stock))
+                                   fish_group != "other" ~ df_fry$stock),
+                 Year_stock = df_fry$year_release - min(df_fry$year_release) + 1,
+                 Site_stock = df_fry$site_id_numeric,
+                 Nsample_stock = nrow(df_fry))
                  
   ## parameters ####
   para <- c("log_global_r",
