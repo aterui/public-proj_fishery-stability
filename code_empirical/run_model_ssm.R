@@ -154,7 +154,10 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                               "site",
                               "site_id",
                               "site_id_numeric"))
-    
+  
+
+  # export ------------------------------------------------------------------
+
   write_csv(est,
             paste0("data_fmt/data_ssm_est_", fish_group, ".csv"))
   
