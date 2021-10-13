@@ -42,7 +42,9 @@ df_fry <- df_stock %>%
   filter(release_stage == "fry") %>% 
   right_join(df_site_id, by = c("river", "year_release")) %>% 
   mutate(abundance = replace_na(abundance, 0),
+         stock = abundance * 0.001,
          abundance_unit = "thousand_fish",
+         stock_unit = "million_fish",
          release_stage = replace_na(release_stage, "fry"))
 
 #skimr::skim_without_charts(df_fry)
