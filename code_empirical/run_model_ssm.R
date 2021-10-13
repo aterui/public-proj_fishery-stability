@@ -15,7 +15,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   fish_group <- group[i]
   
   ## fish data ####
-  source("data_fmt_fishdata.R")
+  # "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
   source("data_fmt_stock.R")
   df_fish <- filter(df_fish, group == fish_group)
 
