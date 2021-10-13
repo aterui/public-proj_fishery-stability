@@ -9,7 +9,7 @@ setwd(here::here("code_empirical"))
 # data --------------------------------------------------------------------
 
 source("data_fmt_analysis.R")
-list_ssm$other
+df_m <- list_ssm$other
 
 
 # jags --------------------------------------------------------------------
