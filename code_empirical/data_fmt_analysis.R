@@ -9,40 +9,35 @@ setwd(here::here("code_empirical"))
 
 source("data_fmt_fishdata.R")
 
+river_id <- pull(distinct(df_fish, river))
+
 ## df for species richness
 df_sp <- d0 %>% 
   filter(abundance > 0) %>% 
   group_by(river, site, site_id) %>% 
   summarize(n_species = n_distinct(taxon),
             n_species_unstock = n_distinct(taxon[.data$taxon != "Oncorhynchus_masou_masou"])) %>% 
-  ungroup()
+  ungroup() %>% 
+  mutate(scl_n_species = c(scale(n_species)),
+         scl_n_species_unstock = c(scale(n_species_unstock)))
 
 ## df for environmental covariates
 df_env <- read_csv("data_fmt/data_env_fmt.csv") %>% 
-  rename(wsd_area = area)
+  rename(wsd_area = area) %>% 
+  filter(river %in% river_id) %>% 
+  mutate(scl_wsd_area = c(scale(wsd_area)),
+         scl_ppt = c(scale(ppt)),
+         scl_temp = c(scale(temp)),
+         scl_forest = c(scale(frac_forest)))
 
 ## df for ocean environments
-df_ocean <- read_csv("data_fmt/data_ocean_fmt.csv")
+df_ocean <- read_csv("data_fmt/data_ocean_fmt.csv") %>% 
+  filter(river %in% river_id) %>% 
+  mutate(scl_chr_a = c(scale(chr_a)),
+         scl_sst = c(scale(sst)))
 
 ## df for stock data
-df_stock <- read_csv("data_fmt/data_hkd_prtwsd_stock_fmt.csv") %>% 
-  filter(between(year_release, 1999, 2019)) %>% 
-  group_by(year_release, river) %>% 
-  summarize(abundance = sum(abundance),
-            unit = unique(abundance_unit))
-
-df_ys <- tibble(year_release = rep(1999:2019,
-                                   nrow(distinct(df_env, river))),
-                river = rep(pull(distinct(df_env, river)),
-                            each = length(1999:2019)))
-
-df_stock_mu <- df_stock %>%
-  right_join(df_ys, by = c("year_release", "river")) %>% 
-  mutate(abundance = replace_na(abundance, 0),
-         unit = replace_na(unit, "thousand_fish")) %>% 
-  group_by(river) %>% 
-  summarize(mean_stock = mean(abundance))
-
+source("data_fmt_stock")
 
 # ssm data ----------------------------------------------------------------
 
