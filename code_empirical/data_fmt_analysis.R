@@ -37,7 +37,7 @@ df_ocean <- read_csv("data_fmt/data_ocean_fmt.csv") %>%
          scl_sst = c(scale(sst)))
 
 ## df for stock data
-source("data_fmt_stock")
+source("data_fmt_stock.R")
 
 # ssm data ----------------------------------------------------------------
 
