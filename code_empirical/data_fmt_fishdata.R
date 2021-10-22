@@ -8,6 +8,10 @@ setwd(here::here("code_empirical"))
 
 # read data ---------------------------------------------------------------
 
+## six genera were aggregated as spp.
+## species under these genera were recorded as either species-level or as spp.
+## extra-care must be taken for species-level analysis for these species
+
 d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>% 
   mutate(taxon = case_when(genus == "Cottus" ~ "Cottus_spp",
                            genus == "Pungitius" ~ "Pungitius_spp",
@@ -51,6 +55,7 @@ d0 <- d0 %>%
 
 # summarize data to community level ---------------------------------------
 
+## summarize data by group - stocked or unstocked
 df_group <- d0 %>% 
   mutate(group = case_when(taxon == "Oncorhynchus_masou_masou" ~ "masu_salmon",
                            taxon != "Oncorhynchus_masou_masou" ~ "other")) %>% 
@@ -65,6 +70,8 @@ df_group <- d0 %>%
   ungroup() %>% 
   mutate(site_id_numeric = as.numeric(factor(site_id)))
        
+## summarize data as community
+## combine with group data
 df_fish <- d0 %>% 
   group_by(year,
            river,
@@ -78,6 +85,7 @@ df_fish <- d0 %>%
          group = "all") %>% 
   bind_rows(df_group)
 
+## year information for state-space model
 df_year <- d0 %>% 
   group_by(site_id) %>% 
   summarize(St_year = min(year) - min(.$year) + 1,
