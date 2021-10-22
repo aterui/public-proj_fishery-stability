@@ -2,7 +2,7 @@ model {
   
   ninfo <- 0.01
   scale <- 2.5
-  df <- 2
+  df <- 3
   
   # prior -------------------------------------------------------------------
   
@@ -61,17 +61,22 @@ model {
     }
   }
   
-  ## stock data conversion ####
-  for (n in 1:Nsample_stock) {
-    stock[Site_stock[n], Year_stock[n]] <- Stock[n]
-  }
-  
   # statistical quantity ----------------------------------------------------
   
   for (j in 1:Nsite) {
     sigma[j] <- sd(d[j, St_year[j]:End_year[j]])
     mu[j] <- mean(d[j, St_year[j]:End_year[j]])
     cv[j] <- sigma[j] / mu[j]
+  }
+  
+}
+
+
+data {
+  
+  ## stock data conversion ####
+  for (n in 1:Nsample_stock) {
+    stock[Site_stock[n], Year_stock[n]] <- Stock[n]
   }
   
 }
