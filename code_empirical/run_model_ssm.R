@@ -32,6 +32,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                  Nsample = nrow(df_fish),
                  Nsite = n_distinct(df_fish$site_id),
                  
+                 # Stock = 0 for fish group "other" because no stocking effect would be expected
                  Stock = case_when(fish_group == "other" ~ 0,
                                    fish_group != "other" ~ df_fry$stock),
                  Year_stock = df_fry$year_release - min(df_fry$year_release) + 1,
