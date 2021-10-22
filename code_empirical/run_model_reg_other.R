@@ -120,4 +120,3 @@ out <- relocate(out,
 # export ------------------------------------------------------------------
 
 write_csv(out, "result/reg_other.csv")
-save(out, file = "result/reg_other.RData")
