@@ -46,10 +46,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
             "log_mu_r",
             "sd_r_time",
             "mu_b",
-            "log_d",
-            "cv",
-            "mu",
-            "sigma")
+            "log_d")
   
   ## model file ####
   m <- read.jagsfile("model_ssm.R")
