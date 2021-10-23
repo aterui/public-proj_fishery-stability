@@ -1,14 +1,15 @@
 model {
   
   scale <- 2.5
-  df <- 2
+  df <- 3
   ninfo <- 0.01
   
 # prior -------------------------------------------------------------------
   
   tau ~ dscaled.gamma(scale, df)
   sigma <- sqrt(1 / tau)
-
+  nu ~ dexp(0.01)T(2,)
+  
   tau_r ~ dscaled.gamma(scale, df)
   sigma_r <- sqrt(1 / tau_r)
     
@@ -26,7 +27,7 @@ model {
   ## site-level
   for(i in 1:Nsite) {
     
-    Y[i] ~ dnorm(mu[i], tau)
+    Y[i] ~ dt(mu[i], tau, nu)
     
     mu[i] <-
       a0[River[i]] + 
