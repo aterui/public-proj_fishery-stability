@@ -61,14 +61,6 @@ model {
     }
   }
   
-  # statistical quantity ----------------------------------------------------
-  
-  for (j in 1:Nsite) {
-    sigma[j] <- sd(d[j, St_year[j]:End_year[j]])
-    mu[j] <- mean(d[j, St_year[j]:End_year[j]])
-    cv[j] <- sigma[j] / mu[j]
-  }
-  
 }
 
 
