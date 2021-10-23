@@ -5,32 +5,32 @@ rm(list = ls())
 pacman::p_load(tidyverse, runjags, foreach)
 setwd(here::here("code_empirical"))
   
-  
-# data --------------------------------------------------------------------
 
+# analysis ----------------------------------------------------------------
+
+## fish data
+## "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
+source("data_fmt_stock.R")
 group <- c("all", "masu_salmon", "other")
 
 list_est <- foreach(i = seq_len(length(group))) %do% {
   
   fish_group <- group[i]
   
-  ## fish data ####
-  # "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
-  source("data_fmt_stock.R")
-  df_fish <- filter(df_fish, group == fish_group)
+  df_subset <- filter(df_fish, group == fish_group)
 
   
   # jags --------------------------------------------------------------------
   
-  ## data ####
-  d_jags <- list(N = df_fish$abundance,
-                 Site = df_fish$site_id_numeric,
-                 Year = df_fish$year - min(df_fish$year) + 1,
+  ## data for jags ####
+  d_jags <- list(N = df_subset$abundance,
+                 Site = df_subset$site_id_numeric,
+                 Year = df_subset$year - min(df_subset$year) + 1,
                  St_year = df_year$St_year,
                  End_year = df_year$End_year,
-                 Area = df_fish$area,
-                 Nsample = nrow(df_fish),
-                 Nsite = n_distinct(df_fish$site_id),
+                 Area = df_subset$area,
+                 Nsample = nrow(df_subset),
+                 Nsite = n_distinct(df_subset$site_id),
                  
                  # Stock = 0 for fish group "other" because no stocking effect would be expected
                  Stock = case_when(fish_group == "other" ~ 0,
@@ -42,12 +42,10 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   ## parameters ####
   para <- c("log_global_r",
             "sd_r_space",
+            "sd_obs",
             "log_mu_r",
             "sd_r_time",
-            "sd_obs",
-            "b",
             "mu_b",
-            "sd_b",
             "log_d",
             "cv",
             "mu",
@@ -94,7 +92,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   r_hat <- filter(mcmc_summary,
                   !str_detect(rownames(mcmc_summary),
                               pattern = "(^cv)|(^mu)|(^sigma)"))
-  max(r_hat$Rhat)
+  print(max(r_hat$Rhat))
   
   while(max(r_hat$Rhat) > 1.09) {
     post <- extend.jags(post,
@@ -129,11 +127,11 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   param_name <- str_remove(param,
                            pattern = "\\[.{1,}\\]")
   
-  df_site <- df_fish %>% 
-    group_by(site_id_numeric) %>% 
-    summarize(river = unique(river),
-              site = unique(site),
-              site_id = unique(site_id))
+  df_site <- df_subset %>% 
+    distinct(site_id_numeric,
+             river,
+             site,
+             site_id)
   
   est <- mcmc_summary %>% 
     as_tibble() %>% 
@@ -150,11 +148,11 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
            year = year_id + 1998) %>% 
     select(-site_id) %>% 
     left_join(df_site, by = "site_id_numeric") %>% 
-    left_join(df_fish, by = c("year",
-                              "river",
-                              "site",
-                              "site_id",
-                              "site_id_numeric"))
+    left_join(df_subset, by = c("year",
+                                "river",
+                                "site",
+                                "site_id",
+                                "site_id_numeric"))
   
 
   # export ------------------------------------------------------------------
