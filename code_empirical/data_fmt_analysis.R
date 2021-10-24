@@ -50,23 +50,23 @@ file_name <- paste0("data_fmt/",
 list_ssm <- foreach(i = seq_len(length(file_name))) %do% {
   
   df_ssm <- read_csv(file_name[i]) %>% 
-    filter(param_name %in% c("cv", "mu", "sigma")) %>% 
     rename(median = '50%',
            high = '97.5%',
            low = '2.5%') %>% 
-    select(river,
-           site,
-           site_id,
-           param_name,
-           median,
-           high,
-           low)
+    filter(str_detect(param_name, "log_d")) %>% 
+    group_by(river, site, site_id) %>% 
+    summarize(mu = mean(exp(median)),
+              sigma = sd(exp(median)),
+              cv = sigma / mu)
   
   df_m <- df_ssm %>% 
     left_join(df_env, by = c("river", "site")) %>% 
     left_join(df_sp, by = c("river", "site", "site_id")) %>% 
     left_join(df_stock_mu, by = "river") %>% 
-    left_join(df_ocean, by = "river")
+    left_join(df_ocean, by = "river") %>% 
+    pivot_longer(cols = c(mu, sigma, cv),
+                 names_to = "param_name",
+                 values_to = "value")
   
   return(df_m)
 }
