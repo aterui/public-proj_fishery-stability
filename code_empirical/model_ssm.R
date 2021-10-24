@@ -18,6 +18,10 @@ model {
     log_d[j, St_year[j]] ~ dnorm(0, ninfo)
   }
   
+  for (j in 1:Nsite) {
+    tau_obs[j] ~ dscaled.gamma(scale, df)
+    sd_obs[j] <- sqrt(1 / tau_obs[j])
+  }  
   
   ## hyper-parameters ####
   log_global_r ~ dnorm(0, ninfo)
@@ -25,16 +29,15 @@ model {
   tau_r_space ~ dscaled.gamma(scale, df)
   sd_r_space <- sqrt(1 / tau_r_space)
   
-  tau_obs ~ dscaled.gamma(scale, df)
-  sd_obs <- sqrt(1 / tau_obs)
-  
   ## regression parameters
   
   for (j in 1:Nsite) {
-    b[j] <- mu_b
+    b[j] ~ dnorm(mu_b, tau_b)
   }
   
   mu_b ~ dnorm(0, ninfo)
+  tau_b ~ dscaled.gamma(scale, df)
+  sd_b <- sqrt(1 / tau_b)
   
   # likelihood --------------------------------------------------------------
   
@@ -47,7 +50,7 @@ model {
     for (t in St_year[j]:End_year[j]) {
       lambda[j, t] <- d_obs[j, t] + b[j] * stock[j, t]
       log(d_obs[j, t]) <- log_d_obs[j, t]
-      log_d_obs[j, t] ~ dnorm(log_d[j, t], tau_obs)
+      log_d_obs[j, t] ~ dnorm(log_d[j, t], tau_obs[j])
       
       log(d[j, t]) <- log_d[j, t]
     }
