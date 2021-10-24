@@ -22,7 +22,7 @@ list_fit <- foreach(i = seq_len(length(param))) %do% {
   dat <- df_m %>% 
     filter(param_name == param[i])
 
-  fit <- glmmTMB::glmmTMB(median ~ 
+  fit <- glmmTMB::glmmTMB(value ~ 
                             scl_mean_stock +
                             scl_chr_a +
                             scl_n_species +
