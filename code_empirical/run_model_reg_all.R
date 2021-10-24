@@ -23,14 +23,14 @@ out <- foreach(i = seq_len(length(variable)),
   df_site <- df_m %>%
     dplyr::filter(param_name == variable[i]) %>% 
     mutate(river_id = as.numeric(factor(river)))
-
+  
   df_river <- df_m %>% 
     mutate(river_id = as.numeric(factor(river))) %>% 
     group_by(river, river_id) %>% 
     summarize(stock = unique(mean_stock),
               chr_a = unique(chr_a))
   
-  d_jags <- list(Y = df_site$median,
+  d_jags <- list(Y = df_site$value,
                  N_species = df_site$n_species,
                  Wsd_area = df_site$wsd_area,
                  Temp = df_site$temp,
@@ -115,8 +115,7 @@ out <- foreach(i = seq_len(length(variable)),
   return(re)
 }
 
-out <- relocate(out,
-                c(response, parameter))
+out <- relocate(out, c(response, parameter))
 
 # export ------------------------------------------------------------------
 
