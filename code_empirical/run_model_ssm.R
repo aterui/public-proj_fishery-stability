@@ -5,22 +5,51 @@ rm(list = ls())
 pacman::p_load(tidyverse, runjags, foreach)
 setwd(here::here("code_empirical"))
   
+fn_brrm <- function(x) {
+  y <- lapply(str_extract_all(x, pattern = "\\[.{1,}\\]"),
+              FUN = function(z) ifelse(identical(z, character(0)),
+                                       NA,
+                                       z))
+  str_remove_all(y, pattern = "\\[|\\]")
+}
 
-# analysis ----------------------------------------------------------------
 
-## fish data
+# common setup ------------------------------------------------------------
+
+## fish data ####
 ## "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
 source("data_fmt_stock.R")
 group <- c("all", "masu_salmon", "other")
 
+## mcmc setup ####
+n_ad <- 100
+n_iter <- 1.0E+4
+n_thin <- max(3, ceiling(n_iter / 500))
+n_burn <- ceiling(max(10, n_iter/2))
+n_sample <- ceiling(n_iter / n_thin)
+
+inits <- replicate(3,
+                   list(.RNG.name = "base::Mersenne-Twister",
+                        .RNG.seed = NA),
+                   simplify = FALSE)
+
+for (j in 1:3) inits[[j]]$.RNG.seed <- j
+
+## parameters ####
+para <- c("log_global_r",
+          "sd_r_space",
+          "sd_obs",
+          "log_mu_r",
+          "sd_r_time",
+          "mu_b",
+          "log_d")
+
+# jags --------------------------------------------------------------------
+
 list_est <- foreach(i = seq_len(length(group))) %do% {
   
   fish_group <- group[i]
-  
   df_subset <- filter(df_fish, group == fish_group)
-
-  
-  # jags --------------------------------------------------------------------
   
   ## data for jags ####
   d_jags <- list(N = df_subset$abundance,
@@ -39,36 +68,10 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                  Site_stock = df_fry$site_id_numeric,
                  Nsample_stock = nrow(df_fry))
                  
-  ## parameters ####
-  para <- c("log_global_r",
-            "sd_r_space",
-            "sd_obs",
-            "log_mu_r",
-            "sd_r_time",
-            "mu_b",
-            "log_d")
-  
   ## model file ####
   m <- read.jagsfile("model_ssm.R")
   
-  ## mcmc setup ####
-  
-  n_ad <- 100
-  n_iter <- 1.0E+4
-  n_thin <- max(3, ceiling(n_iter / 500))
-  n_burn <- ceiling(max(10, n_iter/2))
-  n_sample <- ceiling(n_iter / n_thin)
-  
-  inits <- replicate(3,
-                     list(.RNG.name = "base::Mersenne-Twister",
-                          .RNG.seed = NA),
-                     simplify = FALSE)
-  
-  for (i in 1:3) inits[[i]]$.RNG.seed <- i
-  
-      
-  # run jags ----------------------------------------------------------------
-  
+  ## run jags ####
   post <- run.jags(m$model,
                    monitor = para,
                    data = d_jags,
@@ -83,43 +86,25 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                    module = "glm")
   
   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+  print(max(mcmc_summary$Rhat))
   
-  # cv, mu, sigma are derived parameters
-  # exclude from convergence check
-  r_hat <- filter(mcmc_summary,
-                  !str_detect(rownames(mcmc_summary),
-                              pattern = "(^cv)|(^mu)|(^sigma)"))
-  print(max(r_hat$Rhat))
+  while(max(mcmc_summary$Rhat) > 1.09) {
+     post <- extend.jags(post,
+                         burnin = 0,
+                         sample = n_sample,
+                         adapt = n_ad,
+                         thin = n_thin,
+                         n.sims = 3,
+                         combine = TRUE)
   
-  while(max(r_hat$Rhat) > 1.09) {
-    post <- extend.jags(post,
-                        burnin = 0,
-                        sample = n_sample,
-                        adapt = n_ad,
-                        thin = n_thin,
-                        n.sims = 3,
-                        combine = TRUE)
-    
-    mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-    r_hat <- filter(mcmc_summary,
-                    !str_detect(rownames(mcmc_summary),
-                                pattern = "(^cv)|(^mu)|(^sigma)"))
-    print(max(r_hat$Rhat))
+     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+     print(max(mcmc_summary$Rhat))
   }
   
   n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
     
     
-  # format output -----------------------------------------------------------
-    
-  fn_brrm <- function(x) {
-    y <- lapply(str_extract_all(x, pattern = "\\[.{1,}\\]"),
-                FUN = function(z) ifelse(identical(z, character(0)),
-                                         NA,
-                                         z))
-    str_remove_all(y, pattern = "\\[|\\]")
-  }
-  
+  ## format output ####
   param <- rownames(mcmc_summary)
   param_name <- str_remove(param,
                            pattern = "\\[.{1,}\\]")
@@ -152,8 +137,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                                 "site_id_numeric"))
   
 
-  # export ------------------------------------------------------------------
-
+  ## export ####
   write_csv(est,
             paste0("data_fmt/data_ssm_est_", fish_group, ".csv"))
   
