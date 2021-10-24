@@ -49,7 +49,8 @@ out <- foreach(i = seq_len(length(variable)),
             "b",
             "sigma",
             "sigma_r",
-            "b_raw")
+            "b_raw",
+            "nu")
   
   ## model file ####
   m <- runjags::read.jagsfile("model_regression.R")
