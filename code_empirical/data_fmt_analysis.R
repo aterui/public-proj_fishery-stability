@@ -57,7 +57,8 @@ list_ssm <- foreach(i = seq_len(length(file_name))) %do% {
     group_by(river, site, site_id) %>% 
     summarize(mu = mean(exp(median)),
               sigma = sd(exp(median)),
-              cv = sigma / mu)
+              cv = sigma / mu) %>% 
+    ungroup()
   
   df_m <- df_ssm %>% 
     left_join(df_env, by = c("river", "site")) %>% 
