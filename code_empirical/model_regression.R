@@ -2,9 +2,9 @@ model {
   
   scale <- 2.5
   df <- 3
-  ninfo <- 0.01
+  ninfo <- 0.1
   
-# prior -------------------------------------------------------------------
+  # prior -------------------------------------------------------------------
   
   tau ~ dscaled.gamma(scale, df)
   sigma <- sqrt(1 / tau)
@@ -12,7 +12,7 @@ model {
   
   tau_r ~ dscaled.gamma(scale, df)
   sigma_r <- sqrt(1 / tau_r)
-    
+  
   for(i in 1:5) {
     a[i] ~ dnorm(0, ninfo)
   }
@@ -21,8 +21,8 @@ model {
     b[i] ~ dnorm(0, ninfo)
   }
   
-
-# likelihood --------------------------------------------------------------
+  
+  # likelihood --------------------------------------------------------------
   
   ## site-level
   for(i in 1:Nsite) {
@@ -36,7 +36,7 @@ model {
       a[3] * scl_ppt[i] +
       a[4] * scl_forest[i] +
       a[5] * scl_n_species[i]
-      
+    
   }
   
   ## watershed-level
@@ -57,7 +57,7 @@ model {
 }
 
 data {
-
+  
   # standardization ---------------------------------------------------------
   
   for(i in 1:Nsite) {
@@ -74,4 +74,4 @@ data {
   }
   
 }
-  
+
