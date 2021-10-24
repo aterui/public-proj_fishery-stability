@@ -24,7 +24,7 @@ group <- c("all", "masu_salmon", "other")
 ## mcmc setup ####
 n_ad <- 100
 n_iter <- 1.0E+4
-n_thin <- max(3, ceiling(n_iter / 500))
+n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
 n_sample <- ceiling(n_iter / n_thin)
 
@@ -42,6 +42,8 @@ para <- c("log_global_r",
           "log_mu_r",
           "sd_r_time",
           "mu_b",
+          "b",
+          "sd_b",
           "log_d")
 
 # jags --------------------------------------------------------------------
@@ -106,8 +108,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
     
   ## format output ####
   param <- rownames(mcmc_summary)
-  param_name <- str_remove(param,
-                           pattern = "\\[.{1,}\\]")
+  param_name <- str_remove(param, pattern = "\\[.{1,}\\]")
   
   df_site <- df_subset %>% 
     distinct(site_id_numeric,
