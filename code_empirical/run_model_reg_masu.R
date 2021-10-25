@@ -30,8 +30,7 @@ out <- foreach(i = seq_len(length(variable)),
     summarize(stock = unique(mean_stock),
               chr_a = unique(chr_a))
   
-  d_jags <- list(Y = df_site$median,
-                 N_species = df_site$n_species,
+  d_jags <- list(Y = df_site$value,
                  Wsd_area = df_site$wsd_area,
                  Temp = df_site$temp,
                  Ppt = df_site$ppt,
@@ -49,10 +48,11 @@ out <- foreach(i = seq_len(length(variable)),
             "b",
             "sigma",
             "sigma_r",
-            "b_raw")
+            "b_raw",
+            "nu")
   
   ## model file ####
-  m <- runjags::read.jagsfile("model_regression.R")
+  m <- runjags::read.jagsfile("model_regression_masu.R")
   
   ## mcmc setup ####
   
