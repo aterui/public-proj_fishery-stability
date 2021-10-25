@@ -8,7 +8,7 @@ model {
   
   tau ~ dscaled.gamma(scale, df)
   sigma <- sqrt(1 / tau)
-  nu ~ dexp(0.01)T(2,)
+  nu ~ dexp(0.01)T(1,)
   
   tau_r ~ dscaled.gamma(scale, df)
   sigma_r <- sqrt(1 / tau_r)
