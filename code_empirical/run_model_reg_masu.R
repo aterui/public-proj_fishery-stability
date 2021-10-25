@@ -6,10 +6,36 @@ pacman::p_load(foreach,
                tidyverse)
 setwd(here::here("code_empirical"))
 
-# data --------------------------------------------------------------------
+
+# jags setup --------------------------------------------------------------
 
 source("data_fmt_analysis.R")
 df_m <- list_ssm$masu
+
+## parameters ####
+para <- c("a",
+          "b",
+          "sigma",
+          "sigma_r",
+          "b_raw",
+          "nu")
+
+## model file ####
+m <- runjags::read.jagsfile("model_regression_masu.R")
+
+## mcmc setup ####
+n_ad <- 100
+n_iter <- 1.0E+4
+n_thin <- max(3, ceiling(n_iter / 500))
+n_burn <- ceiling(max(10, n_iter/2))
+n_sample <- ceiling(n_iter / n_thin)
+
+inits <- replicate(3,
+                   list(.RNG.name = "base::Mersenne-Twister",
+                        .RNG.seed = NA),
+                   simplify = FALSE)
+
+for (j in 1:3) inits[[j]]$.RNG.seed <- j
 
 
 # jags --------------------------------------------------------------------
@@ -19,11 +45,11 @@ variable <- c("cv", "mu", "sigma")
 out <- foreach(i = seq_len(length(variable)),
                .combine = bind_rows) %do% {
 
-  ## data ####
+  ## data format ####
   df_site <- df_m %>%
     dplyr::filter(param_name == variable[i]) %>% 
     mutate(river_id = as.numeric(factor(river)))
-
+  
   df_river <- df_m %>% 
     mutate(river_id = as.numeric(factor(river))) %>% 
     group_by(river, river_id) %>% 
@@ -42,36 +68,8 @@ out <- foreach(i = seq_len(length(variable)),
                  
                  Nsite = nrow(df_site),
                  Nriver = nrow(df_river))
-  
-  ## parameters ####
-  para <- c("a",
-            "b",
-            "sigma",
-            "sigma_r",
-            "b_raw",
-            "nu")
-  
-  ## model file ####
-  m <- runjags::read.jagsfile("model_regression_masu.R")
-  
-  ## mcmc setup ####
-  
-  n_ad <- 100
-  n_iter <- 1.0E+4
-  n_thin <- max(3, ceiling(n_iter / 500))
-  n_burn <- ceiling(max(10, n_iter/2))
-  n_sample <- ceiling(n_iter / n_thin)
-  
-  inits <- replicate(3,
-                     list(.RNG.name = "base::Mersenne-Twister",
-                          .RNG.seed = NA),
-                     simplify = FALSE)
-  
-  for (j in 1:3) inits[[j]]$.RNG.seed <- j
-  
-  
+                 
   ## run jags ####
-  
   post <- runjags::run.jags(m$model,
                             monitor = para,
                             data = d_jags,
