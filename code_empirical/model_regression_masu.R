@@ -8,7 +8,7 @@ model {
   
   tau ~ dscaled.gamma(scale, df)
   sigma <- sqrt(1 / tau)
-  nu ~ dexp(0.01)T(2,)
+  nu ~ dexp(0.01)T(1,)
   
   tau_r ~ dscaled.gamma(scale, df)
   sigma_r <- sqrt(1 / tau_r)
@@ -60,7 +60,6 @@ data {
   # standardization ---------------------------------------------------------
   
   for(i in 1:Nsite) {
-    scl_n_species[i] <- (N_species[i] - mean(N_species[])) / sd(N_species[])
     scl_wsd_area[i] <- (Wsd_area[i] - mean(Wsd_area[])) / sd(Wsd_area[])
     scl_temp[i] <- (Temp[i] - mean(Temp[])) / sd(Temp[])
     scl_ppt[i] <- (Ppt[i] - mean(Ppt[])) / sd(Ppt[])
