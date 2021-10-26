@@ -27,7 +27,7 @@ model {
   ## site-level
   for(i in 1:Nsite) {
     
-    Y[i] ~ dt(mu[i], tau, nu)
+    log_y[i] ~ dt(mu[i], tau, nu)
     
     mu[i] <-
       a0[River[i]] + 
@@ -51,7 +51,7 @@ model {
     
   }
   
-  b_raw[1] <- b[1] - b[2] * mean(Stock[])
+  b_raw[1] <- b[1] - b_raw[2] * mean(Stock[])
   b_raw[2] <- b[2] / sd(Stock[])
   
 }
@@ -61,6 +61,8 @@ data {
   # standardization ---------------------------------------------------------
   
   for(i in 1:Nsite) {
+    log_y[i] <- log(Y[i])
+    
     scl_n_species[i] <- (N_species[i] - mean(N_species[])) / sd(N_species[])
     scl_wsd_area[i] <- (Wsd_area[i] - mean(Wsd_area[])) / sd(Wsd_area[])
     scl_temp[i] <- (Temp[i] - mean(Temp[])) / sd(Temp[])
