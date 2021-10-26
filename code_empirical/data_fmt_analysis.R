@@ -39,6 +39,9 @@ df_ocean <- read_csv("data_fmt/data_ocean_fmt.csv") %>%
 ## df for stock data
 source("data_fmt_stock.R")
 
+## group name
+group <- c("all", "masu", "other")
+
 # ssm data ----------------------------------------------------------------
 
 id_ssm <- list.files("data_fmt") %>% 
@@ -66,8 +69,9 @@ list_ssm <- foreach(i = seq_len(length(file_name))) %do% {
     left_join(df_stock_mu, by = "river") %>% 
     left_join(df_ocean, by = "river") %>% 
     pivot_longer(cols = c(mu, sigma, cv),
-                 names_to = "param_name",
-                 values_to = "value")
+                 names_to = "response",
+                 values_to = "value") %>%
+    mutate(group = group[i])
   
   return(df_m)
 }
