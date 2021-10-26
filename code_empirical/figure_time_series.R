@@ -18,6 +18,12 @@ figure_name <- paste0("figure/figure_timeseries",
                                  "data_ssm_est")) %>% 
   str_replace(".csv", ".pdf")
 
+
+# plot --------------------------------------------------------------------
+
+source("figure_set_theme.R")
+theme_set(plt_theme)
+
 foreach(i = seq_len(length(file_name))) %do% {
   
   d0 <- read_csv(file_name[i]) %>% 
@@ -25,10 +31,8 @@ foreach(i = seq_len(length(file_name))) %do% {
     rename(median = "50%",
            lower = "2.5%",
            upper = "97.5%") %>% 
-    mutate(est_density = exp(median))
-  
-  
-  # plot --------------------------------------------------------------------
+    mutate(est_density = exp(median),
+           river = str_to_sentence(river))
   
   g1 <- d0 %>% 
     ggplot() + 
@@ -44,11 +48,10 @@ foreach(i = seq_len(length(file_name))) %do% {
                scales = "free_y") +
     ylab("Community-wide density (ind/sq-m)") +
     xlab("Year since 1999") +
-    labs(color = "Site") +
-    theme_bw()
+    labs(color = "Site")
   
   ggsave(figure_name[i],
-         width = 15,
+         width = 14,
          height = 9)
   
 }
