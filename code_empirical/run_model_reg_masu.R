@@ -17,8 +17,7 @@ para <- c("a",
           "b",
           "sigma",
           "sigma_r",
-          "b_raw",
-          "nu")
+          "b_raw")
 
 ## model file ####
 m <- runjags::read.jagsfile("model_regression_masu.R")
@@ -41,13 +40,16 @@ for (j in 1:3) inits[[j]]$.RNG.seed <- j
 # jags --------------------------------------------------------------------
 
 variable <- c("cv", "mu", "sigma")
+mcmc_file <- paste0("mcmc_masu_", variable) %>%
+  paste0("result/", ., ".RData")
+
 
 out <- foreach(i = seq_len(length(variable)),
                .combine = bind_rows) %do% {
 
   ## data format ####
   df_site <- df_m %>%
-    dplyr::filter(param_name == variable[i]) %>% 
+    dplyr::filter(response == variable[i]) %>% 
     mutate(river_id = as.numeric(factor(river)))
   
   df_river <- df_m %>% 
@@ -96,6 +98,9 @@ out <- foreach(i = seq_len(length(variable)),
     
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
   }
+  
+  mcmc_sample <- post$mcmc
+  save(mcmc_sample, file = mcmc_file[i])
   
   ## output ####
   n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn

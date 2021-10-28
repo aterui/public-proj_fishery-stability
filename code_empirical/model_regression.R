@@ -8,7 +8,6 @@ model {
   
   tau ~ dscaled.gamma(scale, df)
   sigma <- sqrt(1 / tau)
-  nu ~ dexp(0.01)T(1,)
   
   tau_r ~ dscaled.gamma(scale, df)
   sigma_r <- sqrt(1 / tau_r)
@@ -27,7 +26,7 @@ model {
   ## site-level
   for(i in 1:Nsite) {
     
-    log_y[i] ~ dt(mu[i], tau, nu)
+    log_y[i] ~ dnorm(mu[i], tau)
     
     mu[i] <-
       a0[River[i]] + 
