@@ -1,22 +1,23 @@
 
 # setup -------------------------------------------------------------------
 
-rm(list = ls())
+#rm(list = ls())
 pacman::p_load(tidyverse)
 setwd(here::here("code_empirical"))
 
 
 # data --------------------------------------------------------------------
 
+## raw data
 source("data_fmt_analysis.R")
 df_m <- do.call(bind_rows, list_ssm) %>%
-  mutate(response = case_when(response == "cv" ~ "CV",
-                              TRUE ~ as.character(response)))
-
-## raw data
-figure_name <- paste0("figure/figure_cv_mu_sd_",
-                      c("all", "masu", "other"),
-                      ".pdf")
+  filter(!(group != "all" & response == "cv")) %>%
+  mutate(response = case_when(response == "cv" ~ "CV~sigma/mu",
+                              response == "mu" ~ "Mean~mu~(ind.~m^-2)",
+                              response == "sigma" ~ "SD~sigma~(ind.~m^-2)"),
+         group = case_when(group == "all" ~ "All",
+                           group == "masu" ~ "Enhanced",
+                           group == "other" ~ "Unenhanced"))
 
 ## parameter estimates
 file_name <- list.files(path = "result", full.names = TRUE) %>%
@@ -30,8 +31,13 @@ df_beta <- lapply(file_name,
                            group = str_extract(x, "all|masu|other"))
                   }) %>%
   do.call(bind_rows, .) %>%
-  mutate(response = case_when(response == "cv" ~ "CV",
-                              TRUE ~ as.character(response)),
+  filter(!(group != "all" & response == "cv")) %>%
+  mutate(response = case_when(response == "cv" ~ "CV~sigma/mu",
+                              response == "mu" ~ "Mean~mu~(ind.~m^-2)",
+                              response == "sigma" ~ "SD~sigma~(ind.~m^-2)"),
+         group = case_when(group == "all" ~ "All",
+                           group == "masu" ~ "Enhanced",
+                           group == "other" ~ "Unenhanced"),
          pp = prob_positive,
          pn = 1 - prob_positive) %>%
   filter(str_detect(parameter, "b_raw")) %>%
@@ -66,7 +72,7 @@ df_y <- df_beta %>%
 ## plot
 g_obs <- df_m %>% 
   group_by(river, response, group) %>% 
-  summarize(value = mean(value),
+  summarize(value = exp(mean(log(value))),
             mean_stock = unique(mean_stock)) %>% 
   ggplot(aes(x = mean_stock,
              y = value,
@@ -83,12 +89,16 @@ g_obs <- df_m %>%
              nrow = 3,
              scales = "free_y",
              labeller = label_parsed) + 
-  labs(x = "Annual fish stock (thousand fish)",
-       y = "Value",
+  labs(x = expression("Number of release (thousand fish year"^-1*")"),
        color = "Fish group",
-       alpha = "Prob.")
+       alpha = "Prob.") +
+  guides(color = "none",
+         alpha = "none") +
+  theme(axis.title.y = element_blank())
   
 ## export
-ggsave("figure/figure_cv_mu_sd.pdf",
-       width = 4,
-       height = 8)
+#ggsave("figure/figure_cv_mu_sd.pdf",
+#       width = 4,
+#       height = 8)
+
+setwd(here::here())
