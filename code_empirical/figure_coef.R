@@ -1,9 +1,10 @@
 
 # setup -------------------------------------------------------------------
 
-rm(list = ls())
+#rm(list = ls())
 pacman::p_load(foreach,
-               tidyverse)
+               tidyverse,
+               see)
 setwd(here::here("code_empirical"))
 
 
@@ -39,11 +40,13 @@ df_mcmc <- foreach(i = seq_len(length(variable)),
 }
 
 df_mcmc <- df_mcmc %>%
+  filter(!(group != "all" & response == "cv")) %>%
   mutate(group = case_when(group == "all" ~ "All",
                            group == "masu" ~ "Enhanced",
                            group == "other" ~ "Unenhanced"),
          response = case_when(response == "cv" ~ "CV",
-                              TRUE ~ as.character(response))) %>%
+                              response == "mu" ~ "Mean",
+                              response == "sigma" ~ "SD")) %>%
   mutate(group = factor(group, levels = c("All", "Enhanced", "Unenhanced")))
 
 # plot --------------------------------------------------------------------
@@ -52,23 +55,20 @@ source("figure_set_theme.R")
 theme_set(plt_theme)
 
 g_coef <- df_mcmc %>% 
-  ggplot(aes(x = b2,
-             y = group,
+  ggplot(aes(x = response,
+             y = b2,
              fill = group)) +
-  geom_vline(aes(xintercept = 0),
-             alpha = 0.5,
+  geom_hline(aes(yintercept = 0),
+             size = 0.25,
+             alpha = 0.25,
              linetype = "dotted") +
   geom_violin(alpha = 0.5,
               draw_quantiles = 0.5) +
-  facet_wrap(facets = ~response,
-             nrow = 3,
-             labeller = label_parsed) +
-  #scale_fill_manual(values = c("All" = "black",
-  #                             "Enhanced" = "salmon",
-  #                             "Unenhanced" = "steelblue")) +
-  labs(x = "Effect of fish stocking",
-       y = "Fish group",
-       fill = "Fish group") +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank())
+  labs(x = "Response",
+       y = "Effect of enhancement",
+       fill = "Species group")
+
+ggsave(g_coef,
+       filename = here::here("document_output/figure_coef.pdf"),
+       width = 6,
+       height = 3)
