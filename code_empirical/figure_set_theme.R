@@ -1,11 +1,9 @@
-
-
-# set plot theme ----------------------------------------------------------
+library(tidyverse)
 
 plt_theme <- theme_bw() + theme(
   plot.background = element_blank(),
   
-  panel.background = element_blank(),
+  panel.background = element_rect(grey(0.98)),
   panel.border = element_rect(fill = NA),
   
   panel.grid = element_blank(),
