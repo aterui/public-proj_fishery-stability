@@ -4,7 +4,7 @@
 #rm(list = ls())
 pacman::p_load(foreach,
                tidyverse,
-               see)
+               ggridges)
 setwd(here::here("code_empirical"))
 
 
@@ -51,22 +51,16 @@ df_mcmc <- df_mcmc %>%
 
 # plot --------------------------------------------------------------------
 
-source("figure_set_theme.R")
-theme_set(plt_theme)
-
 g_coef <- df_mcmc %>% 
   ggplot(aes(x = response,
              y = b2,
              fill = group)) +
-  geom_hline(aes(yintercept = 0),
-             size = 0.25,
-             alpha = 0.25,
-             linetype = "dotted") +
   geom_violin(alpha = 0.5,
               draw_quantiles = 0.5) +
   labs(x = "Response",
        y = "Effect of enhancement",
-       fill = "Species group")
+       fill = "Species group") +
+  theme_ridges()
 
 ggsave(g_coef,
        filename = here::here("document_output/figure_coef.pdf"),
