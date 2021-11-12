@@ -1,0 +1,109 @@
+---
+title: "8/6 Meeting"
+author: Akira Terui
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+## Captive breeding
+
+- Form of conservation of critically endangered species
+- Restore declining natural populations
+- Effective in certain circumstances
+
+![](image/img-florida-panther.jpg)
+Photo - Wikipedia
+
+- Increased awareness of "downside"
+
+## Knowledge gap
+
+Community-level impact of captive breeding is unknown
+
+- Effects spread through species interactions?
+- Enhancement with captive-reared organisms sometimes excessive
+- Fish stocking is an example
+
+## Question
+
+How does fish stocking influence long-term stability of fish communities?
+
+- Theory: community model with a Ricker formula + stocking
+- Data: empirical test with long term data
+
+## Question
+
+How does fish stocking influence long-term stability of fish communities?
+
+- **Theory: community model with a Ricker formula + stocking**
+- Data: empirical test with long term data
+
+## Theory
+
+Community Ricker model
+
+$$
+N_{i,t+1} = N_{i,t}exp(r_i[1-\frac{\sum_{j=1}^n\alpha_{ij}N_{j,t}}{K}])
+$$
+$N$ - density  
+$r$ - intrinsic population growth rate  
+$K$ - carrying capacity  
+$\alpha$ - competition coefficient  
+$i,j$ - species  
+$t$ - time  
+
+
+## Theory
+
+Community Ricker model + stocking
+
+$$
+N_{i,t+1} = (N_{i,t} + s_t)exp(r_i[1-\frac{\sum_{j=1}^n\alpha_{ij}N_{j,t} + \alpha_{i1}s_t}{K}])
+$$
+
+$N$ - density  
+$r$ - intrinsic population growth rate  
+$K$ - carrying capacity  
+$\alpha$ - competition coefficient  
+$i,j$ - species  
+$t$ - time  
+
+## Theoretical prediction
+
+Community-level CV increased with stocking even with weak species interactions
+
+```{r figure1, fig.width = 7, fig.height = 4}
+source("code_theory/figure_theory.R")
+```
+
+## Question
+
+How does fish stocking influence long-term stability of fish communities?
+
+- Theory: community model with a Ricker formula + stocking
+- **Data: empirical test with long term data**
+
+## Data
+
+- Fish data collected in protected watersheds in Hokkaido
+- Data compiled for 1999-2019
+
+---
+
+```{r figure2, fig.width = 8, fig.height = 6}
+source("code_empirical/figure_time_series.R")
+```
+
+## Results
+
+Community-level CV increased with stocking
+
+```{r figure3, fig.width = 7, fig.height = 5}
+source("code_empirical/figure_cv_stock.R")
+```
+

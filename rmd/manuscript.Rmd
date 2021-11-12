@@ -1,0 +1,47 @@
+---
+title: "Excessive release of captive-bred animals destabilizes ecological communities"
+output:
+  word_document:
+    reference_docx: word_format.docx
+csl: pnas.csl
+knit: (function(inputFile, encoding) {
+        rmarkdown::render(inputFile, encoding = encoding, output_dir = "document_output")
+      })
+bibliography: reference.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Authors:** Akira Terui^1,\*^, Hirokazu Urabe^2^, Masayuki Senzaki^3^, Bungo Nishizawa^4^
+
+\*Corresponding author: hanabi0111\@gmail.com
+
+**Affiliations:** ^1^ Department of Biology, University of North Carolina at Greensboro, Greensboro, NC 27412, USA ^2^ Department of Ecology, Evolution and Behavior, University of Minnesota, St. Paul, MN 55108, USA ^3^ National Institute for Environmental Studies, Tsukuba, Ibaraki 305-8506, Japan ^4^ Shiraume Gakuen College, Kodaira, Tokyo 187-8570, Japan
+
+## Maintext
+
+## Methods
+
+### Theory
+
+We developed a multispecies Ricker model to simulate community dynamics with selective enhancement of a particular species. SUPPLEMENTAL EXPLANATION HERE. Population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
+
+$$
+N_{i,t+1} = [N_{i,t}+\phi R_t]exp[r_i(1-\frac{N_{i,t}+\alpha_{i1} R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i})]exp(\epsilon_{i,t})
+$$
+
+where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient (intraspecific if $i=j$, interspecific otherwise), $K_i$ the carrying capacity, $R_t$ the number of released individuals for enhancement of species 1, and $\epsilon_{i,t}$ the species responses to stochastic environmental fluctuations. The parameter $\phi$ takes a value of one when $i=1$ (otherwise zero) to represent the reproductive contribution of released individuals to the next generation of the enhanced species.
+
+### Empirical analysis
+
+#### Data
+
+#### Statistical analysis
+
+## Data availability
+
+## Acknowledgments
+
+## References
