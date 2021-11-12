@@ -8,15 +8,16 @@ setwd(here::here("code_empirical"))
 
 # read data ---------------------------------------------------------------
 
-x <- list.files(path = "data_fmt") %>% 
-  str_detect(pattern = "data_ssm")
+file_name <- list.files(path = "data_fmt") %>% 
+  as_tibble() %>% 
+  filter(str_detect(value, pattern = "data_ssm")) %>% 
+  pull() %>% 
+  paste0("data_fmt/", .)
 
-file_name <- paste0("data_fmt/",
-                    list.files(path = "data_fmt")[x])
 figure_name <- paste0("figure/figure_timeseries",
-                      str_remove(list.files(path = "data_fmt")[x],
-                                 "data_ssm_est")) %>% 
-  str_replace(".csv", ".pdf")
+                      str_extract(file_name,
+                                  c("_all", "_masu", "_other")),
+                      ".pdf")
 
 
 # plot --------------------------------------------------------------------
@@ -50,7 +51,7 @@ foreach(i = seq_len(length(file_name))) %do% {
     xlab("Year since 1999") +
     labs(color = "Site")
   
-  ggsave(figure_name[i],
+  ggsave(g1, filename = here::here(figure_name[i]),
          width = 14,
          height = 9)
   
