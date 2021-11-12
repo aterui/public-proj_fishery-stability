@@ -44,11 +44,11 @@ group <- c("all", "masu", "other")
 
 # ssm data ----------------------------------------------------------------
 
-id_ssm <- list.files("data_fmt") %>% 
-  str_detect("data_ssm")
-
-file_name <- paste0("data_fmt/",
-                    list.files("data_fmt")[id_ssm])
+file_name <- list.files("data_fmt") %>% 
+  as_tibble() %>% 
+  filter(str_detect(value, "data_ssm")) %>% 
+  pull() %>% 
+  paste0("data_fmt/", .)
 
 list_ssm <- foreach(i = seq_len(length(file_name))) %do% {
   
