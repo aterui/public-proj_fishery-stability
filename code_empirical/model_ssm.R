@@ -6,7 +6,7 @@ model {
   
   # prior -------------------------------------------------------------------
   
-  ## low-level parameters ####
+  ## low-level parameters
   for (j in 1:Nsite) {
     tau_r_time[j] ~ dscaled.gamma(scale, df)
     sd_r_time[j] <- sqrt(1 / tau_r_time[j])
@@ -23,7 +23,7 @@ model {
     sd_obs[j] <- sqrt(1 / tau_obs[j])
   }  
   
-  ## hyper-parameters ####
+  ## hyper-parameters
   log_global_r ~ dnorm(0, ninfo)
   
   tau_r_space ~ dscaled.gamma(scale, df)
@@ -41,7 +41,7 @@ model {
   
   # likelihood --------------------------------------------------------------
   
-  ## observation ####
+  ## observation
   for (i in 1:Nsample) {
     N[i] ~ dpois(lambda[Site[i], Year[i]] * Area[i])
   }
@@ -56,7 +56,7 @@ model {
     }
   }  
   
-  ## state ####
+  ## state
   for (j in 1:Nsite) {
     for (t in St_year[j]:(End_year[j] - 1)) {
       log_d[j, t + 1] <- log_r[j, t] + log_d[j, t]
@@ -69,7 +69,7 @@ model {
 
 data {
   
-  ## stock data conversion ####
+  ## stock data conversion
   for (n in 1:Nsample_stock) {
     stock[Site_stock[n], Year_stock[n]] <- Stock[n]
   }
