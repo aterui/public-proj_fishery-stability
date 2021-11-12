@@ -18,6 +18,6 @@ g <- g_theory + ggtitle("Theoretical prediction") +
   plot_layout(guides = "collect")
 
 ggsave(g,
-       filename = "document_output/figure_theory_obs.pdf",
+       filename = here::here("figure/figure_theory_obs.pdf"),
        width = 8,
        height = 9)
