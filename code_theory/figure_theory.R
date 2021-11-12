@@ -39,10 +39,17 @@ g_theory <- df0 %>%
              x = stock,
              color = factor(status_name),
              fill = factor(status_name))) +
+  geom_point(data = filter(df0, status == "stocked"),
+             size = 0.25,
+             color = "darkseagreen2") +
+  geom_point(data = filter(df0, status == "unstocked"),
+             size = 0.25,
+             color = "lightskyblue2") +
+  geom_point(data = filter(df0, status == "all"),
+             size = 0.25,
+             color = "pink") +
   geom_smooth(size= 0.1,
               method = "loess") +
-  geom_point(size = 0.75,
-             alpha = 0.125) +
   labs(x = "Number of release (individuals)",
        y = "Value") +
   scale_color_hue(name = "Species group") +
@@ -52,10 +59,6 @@ g_theory <- df0 %>%
              labeller = label_parsed) +
   guides(color = guide_legend(override.aes = list(fill = NA)),
          fill = "none")
-
-#ggsave("figure/figure_theory.pdf",
-#       width = 4.5,
-#       height = 8)
 
 setwd(here::here())
 
