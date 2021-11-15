@@ -1,5 +1,5 @@
 ---
-title: "Excessive release of captive-bred animals destabilizes ecological communities"
+title: "Selective enhancement of an exploited species destabilizes ecological communities"
 output:
   word_document:
     reference_docx: word_format.docx
@@ -12,6 +12,25 @@ bibliography: reference.bib
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse)
+
+# theory infomation
+df_theory <- read_csv(here::here("code_theory/result/result_ricker.csv"))
+
+param_set <- df_theory %>% 
+  filter(r_min == 0.5) %>% 
+  distinct(n_species,
+           k,
+           r_type,
+           r_min,
+           r_max,
+           sd_env,
+           phi,
+           int_type,
+           alpha,
+           model,
+           seed)
+
 ```
 
 **Authors:** Akira Terui^1,\*^, Hirokazu Urabe^2^, Masayuki Senzaki^3^, Bungo Nishizawa^4^
@@ -26,13 +45,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Theory
 
-We developed a multispecies Ricker model to simulate community dynamics with selective enhancement of a particular species. SUPPLEMENTAL EXPLANATION HERE. Population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
+We developed a multispecies Ricker model to simulate community dynamics with selective enhancement of a particular species. Population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
 
 $$
-N_{i,t+1} = [N_{i,t}+\phi R_t]exp[r_i(1-\frac{N_{i,t}+\alpha_{i1} R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i})]exp(\epsilon_{i,t})
+N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp[r_i(1-\frac{N_{i,t}+\alpha_{i1} R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i})]exp(\epsilon_{i,t})
 $$
 
-where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient (intraspecific if $i=j$, interspecific otherwise), $K_i$ the carrying capacity, $R_t$ the number of released individuals for enhancement of species 1, and $\epsilon_{i,t}$ the species responses to stochastic environmental fluctuations. The parameter $\phi$ takes a value of one when $i=1$ (otherwise zero) to represent the reproductive contribution of released individuals to the next generation of the enhanced species.
+where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient between species $i$ and $j$ (intraspecific competition if $i=j$; $\alpha_{ii}=1$), $K_i$ the carrying capacity, $R_t$ the number of released individuals for the enhancement of species 1, and $\epsilon_{i,t}$ the species responses to stochastic environmental fluctuations. The parameter $\phi_i$ takes a value of one when $i=1$ (otherwise zero) to represent the reproductive contribution of released individuals to the next generation of the enhanced species. The species-specific intrinsic growth rates and competition coefficients were drawn randomly from a uniform and exponential distribution, respectively, to allow for interspecific variation as $r_i \sim Unif(0.5, r_{max})$ and $\alpha_{ij, i \ne j} \sim Exp(\mu_{\alpha})$. Environmental stochasticity is random and was expressed as $\epsilon_{i,t} \sim Normal(\mu_{\epsilon}, \sigma_{\epsilon}^2)$
+
+We varied values of `r sum(unlist(lapply(sapply(param_set, unique), length)) > 1)` parameters: $S =$ `r unique(param_set$n_species)`; $r_{max}=$ `r unique(param_set$r_max)`; $\mu_{\alpha} =$ `r unique(param_set$alpha)`; $\sigma_\epsilon =$ `r unique(param_set$sd_env)`. For simplicity, we assumed identical carrying capacities among simulated species as $K_i =$ `r unique(param_set$k)`. This setup results in `r nrow(param_set)` sets of parameter combinations that cover a range of ecological scenarios.
+
+Under each parameter combination, we ran 1400 generations to obtain the relative temporal fluctuations (i.e., the coefficient of variation) of the whole community ($\sum_i^SN_j$), the enhanced species ($N_1$), and the unenhanced species ($\sum_{i,i \ne 1}^S N_i$). We also calculated temporal means and standard deviations for each species group.
 
 ### Empirical analysis
 
