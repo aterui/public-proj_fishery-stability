@@ -1,4 +1,6 @@
 
+library(tidyverse)
+
 dynsim <- function(n_timestep = 1000,
                    n_warmup = 100,
                    n_burnin = 100,
