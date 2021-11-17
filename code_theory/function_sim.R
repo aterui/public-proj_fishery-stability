@@ -16,7 +16,8 @@ dynsim <- function(n_timestep = 1000,
                    int_type = "constant",
                    alpha = 0.5,
                    model = "ricker",
-                   seed = 5
+                   seed = 5,
+                   seed_interval = 10
 ) {
   
   # function ----------------------------------------------------------------
@@ -103,10 +104,26 @@ dynsim <- function(n_timestep = 1000,
   
   v_s <- rbinom(n = n_sim, size = stock, prob = phi)
   
+  ## seed interval ####
+  
+  if (seed_interval > n_warmup) stop("n_warmup must be larger than seed_interval")
+  
+  seeding <- seq(from = seed_interval,
+                 to = max(c(1, n_warmup)),
+                 by = seed_interval)
+  
   # dynamics ----------------------------------------------------------------
   
   for (i in seq_len(n_sim)) {
     
+    # seeding
+    if (n_warmup > 0) {
+      if (i %in% seeding) {
+        v_n <- v_n + rpois(n_species, seed)
+      }
+    }
+    
+    # enhancement
     if (i > n_warmup) {
       v_n[1] <- v_n[1] + v_s[i]
     }
