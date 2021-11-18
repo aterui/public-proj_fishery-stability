@@ -28,7 +28,8 @@ df_param <- expand.grid(n_timestep = 1000,
                         int_type = "random",
                         alpha = c(0.1, 0.3, 0.5),
                         model = "ricker",
-                        seed = 5) %>% 
+                        seed = 5,
+                        seed_interval = 10) %>% 
   filter(r_max >= r_min)
 
 n_rep <- 1000
