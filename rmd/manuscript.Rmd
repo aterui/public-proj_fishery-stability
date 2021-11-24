@@ -1,5 +1,5 @@
 ---
-title: "Selective enhancement of an exploited species destabilizes ecological communities"
+title: "Selective enhancement of an exploited species undermines the long-term stability of ecological communities"
 output:
   word_document:
     reference_docx: word_format.docx
@@ -41,6 +41,12 @@ param_set <- df_theory %>%
 
 ## Maintext
 
+Anthropogenic influences have caused global biodiversity crisis, such that active human interventions are critical to sustainable ecosystem management. Captive breeding is a pervasive method aiming to conserve or enhance wild populations of diverse plant and animal taxa. In fisheries for example, XXX have been spent annually to support hatchery programs globally. While there is growing recognition that the selective enhancement with captive-bred organisms entails ecological risks (e.g., the accumulation of deleterious alleles), this method is still widespread in conservation and fisheries perhaps because of the "myth" that numerical benefits of released individuals may exceed the associated risks. However, a crucial yet overlooked perspective in this research area is the community-wide impact of selective enhancement through species interaction networks. Species are all embedded in the web of interacting organisms. Excessive release of particular species may therefore have unforeseen consequences for ecological communities in the long term. We lack quantitative evidence for this hypothesis, however.
+
+Here, we use a simple, general theory to show that selective enhancement of a particular species undermines the long-term stability of ecological communities. We then demonstrate the relevance of this general theory to natural systems by illustrating its congruence with Japanese stream fish communities, in which an exploited species, masu salmon (*Oncorhynchus masou masou*), is selectively enhanced through captive breeding programs.
+
+We developed...
+
 ## Methods
 
 ### Theory
@@ -61,15 +67,57 @@ Under each parameter combination, we ran 1400 time steps of 1000 independent com
 
 #### Data
 
-**Time-series data of fish abundance.** We assembled time-series data across XX sites within XX protected watersheds of Hokkaido Island, Japan. At these sites, long-term monitoring of fish abundance began in 1971 but effective sampling methods (a combination of electrofishing and cast net sampling) were implemented in 1999. Data were collected in summer to fall with irregular sampling intervals (0 to 3 year intervals for most cases). After careful data selection (Supporting Information), we used time-series data of fish abundance at XX sites during a period of 1999-2019.
+**Time-series data.** We assembled time-series data of fish abundance across XX sites within XX protected watersheds of Hokkaido Island, Japan. In these watersheds, aquatic species are protected and no harvest is allowed. At these sites, the long-term monitoring program began in 1971 but effective sampling methods (a combination of electrofishing and cast net sampling) were implemented in 1999. Data were collected in summer to fall with irregular sampling intervals (0 to 3 year intervals for most cases). After careful data selection (Supporting Information), we used time-series data of fish abundance at XX sites during a period of 1999-2019. ADD SOME DETAILS
 
-**Fish stocking data of masu salmon.** Ask Urabe to write this part
+**Fish stocking.** At the protected watersheds, masu salmon were stocked to enhance the wild populations since XXX. A mixture of captive-bred and wild-born individuals were released in spring (fry [age 0+] and smolt [age 1+] stages) and fall (juvenile stage [age 0+]). We examined historical records of fish stocking and obtained annual stocking data (the number of individuals released) for a period of 1999-2019 at each watershed. We were unable to extract stocking data at the site level.
 
 **Environmental data.** At each sampling site,we collected the following data as potential covariates: upstream watershed area (km^2^; a proxy for stream size), proportional land use in the upstream watershed (forest, agriculture, urban), local species richness, local climates (annual mean air temperature [unit] and cumulative precipitation [mm]), and ocean productivity (Chlorophyll a [unit]).
 
 #### Statistical analysis
 
-We quantified the coefficient of variation (CV), temporal mean ($\mu$) and standard deviation ($\sigma$) of these local fish communities through the following procedure.
+Our goal is to compare temporal dynamics of fish communities across sites. However, the data are not directly comparable because of artificial observation errors (e.g., different observers) and missing observations. To confront this challenge, we developed Bayesian state space models for three species groups separately: (1) whole community, summed abundance of all species, (2) enhanced species, abundance of masu salmon, (3) unenhanced species, summed abundance of all species except masu salmon. Bayesian state space models is best suited for our analysis because it can account for observation errors while imputing missing values given the long-term trend at the site. The model is composed of observation and state models as described below.
+
+In the observation model, we model observation processes. Summed fish abundance of either whole community, enhanced species (masu salmon only), and unenhanced species at site $s$ in year $t$, $N_{s,t}$, was assumed to follow a Poisson distribution:
+
+$$
+N_{s,t} \sim Poisson(\lambda_{s,t} A_{s,t})
+$$
+
+where $\lambda_{s,t}$ is the expected fish density (individual m^-2^) and $A_{s,t}$ the sampling area (m^2^). Since fish sampling was conducted after the spring stocking of masu salmon, captured fish may include individuals released in the observation year. To avoid biases in estimating temporal community trends, we explicitly modeled this observation process:
+
+$$
+\lambda_{s,t} = n_{s,t}e^{\epsilon_{s,t}^{obs}} + \psi \beta_s~Fry_{w(s),t}
+$$
+
+$n_{s,t}$ is the "true" fish density excluding fish released in the spring, $Fry_{w(s),t}$ the number of salmon fry released in spring in watershed $w$ within which site $s$ is located, and $\beta_s$ the site-specific effect of released salmon fry on the observed fish density. The parameter $e^{\epsilon_{s,t}^{obs}}$ is a random error variable drawn from a log-normal distribution as $\epsilon_{s,t}^{obs} \sim Normal(0, \sigma_{obs,s}^2)$. The inclusion of this random variable allows us to account for site-specific and year-specific observation errors. The parameter $\psi$ equals one when we model the unenhanced species group (otherwise $\psi = 1$). We included $\psi$ to exclude the term $\beta~Fry_{w(j),t}$ because the unenhanced species group does not include masu salmon.
+
+In the state model, we model temporal dynamics of fish density $n_{s,t}$ as follows:
+
+$$
+ln~n_{s,t+1} = ln~r_{s} + ln~n_{s,t} + \epsilon_{s,t}^{state}
+$$where $ln~r_{s}$ is the average rate of change at site $s$ and $\epsilon_{s,t}^{state}$ is the process error that is assumed to follow a normal distribution as $\epsilon_{s,t}^{state} \sim Normal(0, \sigma_{state,s}^2)$. The site-specific rate of change is random draws from a normal distribution as $ln~r_s \sim Normal(\mu_r, \sigma_r^2)$, assuming that community dynamics across Hokkaido have a shared temporal trend to some degree (the degree of shared trend is controlled by the standard deviation $\sigma_r$). This hierarchical structure allows for improved estimates of $ln~r_s$ by sharing information across sites. We used median estimates of fish density $n_{s,t}$ to calculate temporal CV, mean ($\mu$), and SD ($\sigma$).
+
+We developed the following linear regression models taking either log-transformed CV, mean, or SD as a response variable $ln~y_s$ with a normal error distribution.
+
+$$
+\begin{aligned}
+ln~y_s &\sim Normal(\mu_{y,s},\sigma_y^2)\\
+\mu_{y,s} &= \beta_{0,w(s)} + \sum_k \beta_kx_{k,s}
+\end{aligned}
+$$
+
+where $\beta_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$ nested within watershed $w$) and $\beta_k (k > 0)$ is the regression coefficient of site-level predictor $x_k$. The site-level predictors include upstream watershed area, air temperature, precipitation, forest land use, and local species richness (we excluded local species richness from the masu salmon model). The watershed-specific intercept was related to watershed-level predictors as:
+
+$$
+\begin{aligned}
+\beta_{0,w} &\sim Normal(\mu_{\beta,w},\sigma_{\beta}^2)\\
+\mu_{\beta,w} &=\gamma_0+\sum_k\gamma_k z_{k,w}
+\end{aligned}
+$$
+
+The watershed-level predictors include the number of released masu salmon and ocean productivity (sea surface chlorophyll a).
+
+We fitted the models to the data using JAGS version 4.1.0 through *runjags* package in R. Priors were summarized in XXX. Data manipulation and analysis were performed in R version 4.1.0.
 
 ## Data availability
 
