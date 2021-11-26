@@ -1,5 +1,5 @@
 ---
-title: "Selective enhancement of an exploited species undermines the long-term stability of ecological communities"
+title: "Selective enhancement of an exploited species undermines the community stability"
 output:
   word_document:
     reference_docx: word_format.docx
@@ -41,9 +41,9 @@ param_set <- df_theory %>%
 
 ## Maintext
 
-Anthropogenic influences have caused global biodiversity crisis, such that active human interventions are critical to sustainable ecosystem management. Captive breeding is a pervasive method aiming to conserve or enhance wild populations of diverse plant and animal taxa. In fisheries for example, XXX have been spent annually to support hatchery programs globally. While there is growing recognition that the selective enhancement with captive-bred organisms entails ecological risks (e.g., the accumulation of deleterious alleles), this method is still widespread in conservation and fisheries perhaps because of the "myth" that numerical benefits of released individuals may exceed the associated risks. However, a crucial yet overlooked perspective in this research area is the community-wide impact of selective enhancement through species interaction networks. Species are all embedded in the web of interacting organisms. Excessive release of particular species may therefore have unforeseen consequences for ecological communities in the long term. We lack quantitative evidence for this hypothesis, however.
+Anthropogenic influences have caused global biodiversity crisis, such that human interventions are critical to sustainable management of natural resources. Captive breeding is a pervasive method to conserve or enhance wild populations of diverse plant and animal taxa. In fisheries for example, XXX have been spent annually to support hatchery programs globally. There is growing recognition that the selective enhancement with captive-bred organisms entails ecological risks (e.g., the accumulation of deleterious alleles); nevertheless, captive breeding is still widespread in conservation and fisheries perhaps because of the "myth" that numerical benefits of released individuals may exceed the associated risks. However, a crucial yet overlooked perspective in this research area is the community-wide impact of selective enhancement through species interaction networks. Species are all embedded in the web of interacting organisms, and excessive release of particular species may have cascading consequences for ecological communities in the long term. Evidence for this hypothesis is lacking, however.
 
-Here, we use a simple, general theory to show that selective enhancement of a particular species undermines the long-term stability of ecological communities. We then demonstrate the relevance of this general theory to natural systems by illustrating its congruence with Japanese stream fish communities, in which an exploited species, masu salmon (*Oncorhynchus masou masou*), is selectively enhanced through captive breeding programs.
+Here, we use a simple, general theory to show that the selective enhancement of a particular species undermines the community stability, which is defined here by the relative size of fluctuations in summed community density over time. The present study further demonstrates the relevance of this general theory to natural systems by illustrating its congruence with Japanese stream fish communities, in which an exploited species, masu salmon (*Oncorhynchus masou masou*), is supplemented through captive breeding programs.
 
 We developed...
 
