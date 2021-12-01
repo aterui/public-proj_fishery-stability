@@ -45,6 +45,8 @@ Anthropogenic influences have caused global biodiversity crisis, such that human
 
 Here, we use a simple, general theory to show that the selective enhancement of a particular species undermines long-term community stability, which we define here as the relative size of fluctuations in total community density over time. The present study further demonstrates the relevance of this general theory to natural systems by illustrating its congruence with stream fish communities, in which an exploited species, masu salmon (*Oncorhynchus masou masou*), is supplemented by hatchery programs. Our findings paint a bleak picture for this form of ecosystem management, reinforcing the recurrent calls for alternative strategies.
 
+## Theory
+
 We use a multispecies Ricker model to simulate community dynamics with selective enhancement of a constituent species. Specifically, population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
 
 $$
@@ -57,7 +59,11 @@ Our model predicted a destabilizing effect of selective enhancement on ecologica
 
 Importantly, the reduced mean of community density may arise as long as humans control the number of releases. The stability of ecological communities rests on internal density regulation that allows for stable coexistence of competing species. For example, significant niche difference in resource use ($\alpha_{ij, i \ne j} < 1$) enables competing species to grow from low population densities because the numerically dominant species undergoes stronger intraspecific competition. However, the number of release is not subject to density-dependent feedback. The excessive individuals released by humans impose competition that would otherwise not exist and undermine the self-regulation process of stable communities. This argument is supported by the fact that the destabilizing effect of selective enhancement manifested even with weak interspecific competition that allows for stable coexistence of competing species. Perhaps, the only exception would be a scenario in which the species of interest is on the verge of local extinction with little or no density regulation (i.e., very large carrying capacity).
 
-EMPIRICAL ANALYSIS
+## Empirical evidence
+
+To demonstrate the relevance of our general theory to natural systems, we assessed the potential impacts of selective enhancement of masu salmon on long-term stability of stream fish communities. Masu salmon represents one of the most valuable freshwater resources in Hokkaido Island, Japan, and XX leads extensive hatchery programs across the island. In protected watersheds where any form of exploitation is prohibited (including recreational angling), long-term monitoring has been conducted over the past two decades along with official records of the number of released fish. Hence, this dataset provides an excellent opportunity to evaluate how the selective enhancement influences long-term stability of stream fish communities. In this study, we assembled long-term data of stream fish communities at XX sites within XX protected watersheds (see Methods for selection criterion).
+
+## Implications
 
 # Methods
 
