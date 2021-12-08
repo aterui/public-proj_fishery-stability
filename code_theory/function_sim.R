@@ -24,15 +24,15 @@ dynsim <- function(n_timestep = 1000,
   
   # ricker function
   if (model == "ricker") {
-    fun_dyn <- function(r, n, k, m_int) {
-      n * exp(r * (1 - ((m_int %*% n) / k)))
+    fun_dyn <- function(r, n1, n2, k, m_int) {
+      n1 * exp(r * (1 - ((m_int %*% n2) / k)))
     }   
   }
   
   # beverton-holt function
   if (model == "bh") {
-    fun_dyn <- function(r, n, k, m_int) {
-      (n * r) / (1 + ((r - 1) / k) * (m_int %*% n))
+    fun_dyn <- function(r, n1, n2, k, m_int) {
+      (n1 * r) / (1 + ((r - 1) / k) * (m_int %*% n2))
     }   
   }
   
@@ -61,17 +61,24 @@ dynsim <- function(n_timestep = 1000,
   
   if (int_type == "random") {
     m_int <- matrix(rexp(n_species * n_species,
-                         rate = 1/alpha),
+                         rate = 1 / alpha),
                     nrow = n_species,
                     ncol = n_species)
-  } else {
-    if (int_type == "constant") {
-      m_int <- matrix(alpha,
-                      nrow = n_species,
-                      ncol = n_species)
-    } else {
-      message("int_type must be either random or constant")
-    }
+  }
+  
+  if (int_type == "constant") {
+    m_int <- matrix(alpha,
+                    nrow = n_species,
+                    ncol = n_species)
+  }
+  
+  if (int_type == "manual") {
+    if(!is.matrix(alpha)) stop("alpha must be a matrix")
+    m_int <- alpha
+  }
+    
+  if (!(int_type %in% c("random", "constant", "manual"))) {
+    stop("int_type must be either random, constant, or manual")
   }
   
   diag(m_int) <- 1
@@ -100,10 +107,6 @@ dynsim <- function(n_timestep = 1000,
                   nrow = n_sim,
                   ncol = n_species)
   
-  ## parameter: stock ####
-  
-  v_s <- rbinom(n = n_sim, size = stock, prob = phi)
-  
   ## seed interval ####
   
   if (seed_interval > n_warmup) stop("n_warmup must be larger than seed_interval")
@@ -123,13 +126,15 @@ dynsim <- function(n_timestep = 1000,
       }
     }
     
-    # enhancement
+    # stock enhancement
     if (i > n_warmup) {
-      v_n[1] <- v_n[1] + v_s[i]
+      v_n1[1] <- v_n[1] + phi * stock # for reproduction
+      v_n2[1] <- v_n[1] + stock # for competition
     }
     
     v_n_hat <- fun_dyn(r = v_r,
-                       n = v_n,
+                       n1 = v_n1,
+                       n2 = v_n2,
                        k = k,
                        m_int = m_int)
     v_n <- v_n_hat * exp(m_eps[i, ])
