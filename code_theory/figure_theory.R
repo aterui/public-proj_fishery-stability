@@ -13,12 +13,13 @@ df0 <- read_csv("result/result_ricker.csv") %>%
   pivot_longer(cols = mean_density:cv,
                names_to = "param",
                values_to = "value") %>% 
-  filter(r_max == 2,
-         r_min == 0.5,
+  filter(r_max == 0.5,
+         r_min == 0.3,
          sd_env == 0.5,
          alpha == 0.5,
+         phi == 0.8,
          param %in% c("cv", "mean_density", "sd_density"),
-         n_species == 10) %>% 
+         n_species == 20) %>% 
   filter(!(param == "cv" & status != "all")) %>%
   mutate(param_name = case_when(param == "cv" ~ "CV~sigma/mu",
                                 param == "mean_density" ~ "Mean~mu~(ind.)",

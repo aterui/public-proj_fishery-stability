@@ -34,6 +34,6 @@ dyn %>%
        x = "Time") +
   scale_color_discrete(name = "Species")
 
-ggsave("figure/sample_dynamics.pdf",
-       width = 6,
-       height = 3)
+#ggsave("figure/sample_dynamics.pdf",
+#       width = 6,
+#       height = 3)
