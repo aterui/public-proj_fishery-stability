@@ -2,13 +2,15 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls(all.names = TRUE))
+
 pacman::p_load(here,
+               cdyns,
                tidyverse,
                foreach,
                doParallel,
                doSNOW)
+
 setwd(here::here("code_theory"))
-source("function_sim.R")
 
 cl <- makeCluster(detectCores())
 registerDoSNOW(cl)
@@ -16,15 +18,15 @@ registerDoSNOW(cl)
 # set parameters ----------------------------------------------------------
 
 df_param <- expand.grid(n_timestep = 1000,
-                        n_warmup = 200,
-                        n_burnin = 200,
+                        n_warmup = 500,
+                        n_burnin = 500,
                         n_species = c(10, 20),
                         k = 100,
-                        r_type = "constant",
-                        r_min = c(0.5, 1, 2),
-                        r_max = c(1, 2),
+                        r_type = "random",
+                        r_min = c(0.3, 1, 2),
+                        r_max = c(0.5, 1, 2),
                         sd_env = c(0.1, 0.5),
-                        phi = 1,
+                        phi = c(0.8, 1),
                         int_type = "random",
                         alpha = c(0.1, 0.3, 0.5),
                         model = "ricker",
@@ -46,27 +48,27 @@ opts <- list(progress = fun_progress)
 
 result <- foreach(x = iter(df_param, by = 'row'),
                   .combine = "bind_rows",
-                  .packages = c("foreach", "dplyr"),
+                  .packages = c("foreach", "dplyr", "cdyns"),
                   .options.snow = opts) %dopar% {
                     
                     df_set <- foreach(j = seq_len(n_rep),
                                       .combine = "bind_rows") %do% {
                                         
-                                        dyn <- dynsim(n_timestep = x$n_timestep,
-                                                      n_warmup = x$n_warmup,
-                                                      n_burnin = x$n_burnin,
-                                                      n_species = x$n_species,
-                                                      k = x$k,
-                                                      r_type = x$r_type,
-                                                      r_min = x$r_min,
-                                                      r_max = x$r_max,
-                                                      sd_env = x$sd_env,
-                                                      stock = stock[j],
-                                                      phi = x$phi,
-                                                      int_type = x$int_type,
-                                                      alpha = x$alpha,
-                                                      model = x$model,
-                                                      seed = x$seed)
+                                        dyn <- cdynsim(n_timestep = x$n_timestep,
+                                                       n_warmup = x$n_warmup,
+                                                       n_burnin = x$n_burnin,
+                                                       n_species = x$n_species,
+                                                       k = x$k,
+                                                       r_type = x$r_type,
+                                                       r_min = x$r_min,
+                                                       r_max = x$r_max,
+                                                       sd_env = x$sd_env,
+                                                       stock = stock[j],
+                                                       phi = x$phi,
+                                                       int_type = x$int_type,
+                                                       alpha = x$alpha,
+                                                       model = x$model,
+                                                       seed = x$seed)
                                         
                                         dyn_summary <- dyn$df_dyn %>% 
                                           mutate(status = case_when(species == 1 ~ "stocked",
@@ -79,10 +81,22 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                           bind_rows(tibble(status = "all",
                                                            dyn$df_community))
                                         
+                                        var_sum <- sum(diag(dyn$vcov_matrix))
+                                        cov_sum <- sum(dyn$vcov_matrix[upper.tri(dyn$vcov_matrix)]) * 2
+                                        
+                                        n_sp_persist <- df_dyn %>% 
+                                          filter(density > 0,
+                                                 timestep == max(timestep)) %>% 
+                                          n_distinct(.$species)
+                                        
                                         df <- tibble(n_rep = j,
                                                      x,
+                                                     r1 = dyn$df_species$r[1],
                                                      stock = stock[j],
-                                                     dyn_summary)
+                                                     dyn_summary,
+                                                     n_sp_persist = n_sp_persist,
+                                                     var_sum = var_sum,
+                                                     cov_sum = cov_sum)
                                         
                                         return(df)
                                       }
