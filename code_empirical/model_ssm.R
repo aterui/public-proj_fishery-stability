@@ -39,6 +39,7 @@ model {
   tau_b ~ dscaled.gamma(scale, df)
   sd_b <- sqrt(1 / tau_b)
   
+  
   # likelihood --------------------------------------------------------------
   
   ## observation
@@ -48,7 +49,7 @@ model {
   
   for (j in 1:Nsite) {
     for (t in St_year[j]:End_year[j]) {
-      lambda[j, t] <- d_obs[j, t] + b[j] * stock[j, t]
+      lambda[j, t] <- d_obs[j, t] + Psi * b[j] * stock[j, t]
       log(d_obs[j, t]) <- log_d_obs[j, t]
       log_d_obs[j, t] ~ dnorm(log_d[j, t], tau_obs[j])
       
@@ -64,6 +65,24 @@ model {
     }
   }
   
+
+  # Bayesian p-value --------------------------------------------------------
+
+  ## observation
+  for (i in 1:Nsample) {
+    y_predict[i] <- lambda[Site[i], Year[i]] * Area[i]
+    
+    residual[i] <- N[i] - y_predict[i]
+    sq[i] <- pow(residual[i], 2)
+    
+    y_new[i] ~ dpois(lambda[Site[i], Year[i]] * Area[i])
+    sq_new[i] <- pow(y_new[i] - y_predict[i], 2)
+  }
+  
+  fit <- sum(sq[])
+  fit_new <- sum(sq_new[])
+  bp_value <- step(fit_new - fit)
+    
 }
 
 
