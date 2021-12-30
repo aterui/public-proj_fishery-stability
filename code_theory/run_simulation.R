@@ -18,8 +18,8 @@ registerDoSNOW(cl)
 # set parameters ----------------------------------------------------------
 
 df_param <- expand.grid(n_timestep = 1000,
-                        n_warmup = 500,
-                        n_burnin = 500,
+                        n_warmup = 200,
+                        n_burnin = 400,
                         n_species = c(10, 20),
                         k = 100,
                         r_type = "random",
@@ -84,8 +84,8 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                         var_sum <- sum(diag(dyn$vcov_matrix))
                                         cov_sum <- sum(dyn$vcov_matrix[upper.tri(dyn$vcov_matrix)]) * 2
                                         
-                                        n_sp_persist <- df_dyn %>% 
-                                          filter(density > 0,
+                                        n_sp_persist <- dyn$df_dyn %>% 
+                                          filter(density > 0.01,
                                                  timestep == max(timestep)) %>% 
                                           n_distinct(.$species)
                                         
