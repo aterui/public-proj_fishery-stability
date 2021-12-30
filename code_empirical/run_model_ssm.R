@@ -44,7 +44,8 @@ para <- c("log_global_r",
           "mu_b",
           "b",
           "sd_b",
-          "log_d")
+          "log_d",
+          "bp_value")
 
 # jags --------------------------------------------------------------------
 
@@ -63,9 +64,9 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                  Nsample = nrow(df_subset),
                  Nsite = n_distinct(df_subset$site_id),
                  
-                 # Stock = 0 for fish group "other" because no stocking effect would be expected
-                 Stock = case_when(fish_group == "other" ~ 0,
-                                   fish_group != "other" ~ df_fry$stock),
+                 # Psi = 0 for fish group "other" because no stocking effect would be expected
+                 Psi = ifelse(fish_group == "other", 0, 1),
+                 Stock = df_fry$stock,
                  Year_stock = df_fry$year_release - min(df_fry$year_release) + 1,
                  Site_stock = df_fry$site_id_numeric,
                  Nsample_stock = nrow(df_fry))
