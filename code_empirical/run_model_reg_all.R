@@ -58,7 +58,6 @@ out <- foreach(i = seq_len(length(variable)),
               chr_a = unique(chr_a))
                  
   d_jags <- list(Y = df_site$value,
-                 N_species = df_site$n_species,
                  Wsd_area = df_site$wsd_area,
                  Temp = df_site$temp,
                  Ppt = df_site$ppt,
