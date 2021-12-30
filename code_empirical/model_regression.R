@@ -33,8 +33,7 @@ model {
       a[1] * scl_wsd_area[i] +
       a[2] * scl_temp[i] +
       a[3] * scl_ppt[i] +
-      a[4] * scl_forest[i] +
-      a[5] * scl_n_species[i]
+      a[4] * scl_forest[i]
     
   }
   
@@ -62,7 +61,6 @@ data {
   for(i in 1:Nsite) {
     log_y[i] <- log(Y[i])
     
-    scl_n_species[i] <- (N_species[i] - mean(N_species[])) / sd(N_species[])
     scl_wsd_area[i] <- (Wsd_area[i] - mean(Wsd_area[])) / sd(Wsd_area[])
     scl_temp[i] <- (Temp[i] - mean(Temp[])) / sd(Temp[])
     scl_ppt[i] <- (Ppt[i] - mean(Ppt[])) / sd(Ppt[])
