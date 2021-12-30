@@ -3,7 +3,6 @@
 
 rm(list = ls())
 pacman::p_load(tidyverse,
-               tmbstan,
                glmmTMB,
                foreach)
 setwd(here::here("code_empirical"))
@@ -14,18 +13,18 @@ setwd(here::here("code_empirical"))
 source("data_fmt_analysis.R")
 df_m <- list_ssm$all
 
+
 # analysis ----------------------------------------------------------------
 
 param <- c("cv", "mu", "sigma")
 
 list_fit <- foreach(i = seq_len(length(param))) %do% {
   dat <- df_m %>% 
-    filter(param_name == param[i])
+    filter(response == param[i])
 
   fit <- glmmTMB::glmmTMB(value ~ 
                             scl_mean_stock +
                             scl_chr_a +
-                            scl_n_species +
                             scl_wsd_area + 
                             scl_temp + 
                             scl_ppt + 
