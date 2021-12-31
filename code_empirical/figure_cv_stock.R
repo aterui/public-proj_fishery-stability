@@ -67,33 +67,42 @@ df_y <- df_beta %>%
   group_by(response, group) %>%
   summarize(y = exp(b1 + b2 * x),
             x = x,
-            prob = prob)
+            prob = prob,
+            lty = case_when(prob > 0.95 ~ "a",
+                            between(prob, 0.90, 0.95) ~ "b",
+                            prob < 0.90 ~ "c"))
   
 ## plot
-g_obs <- df_m %>% 
+df_plot <- df_m %>% 
   group_by(river, response, group) %>% 
   summarize(value = exp(mean(log(value))),
-            mean_stock = unique(mean_stock)) %>% 
+            mean_stock = unique(mean_stock))
+
+g_obs <- df_plot %>% 
   ggplot(aes(x = mean_stock,
-             y = value,
-             color = group)) +
-  geom_point(alpha = 0.3) +
-  geom_line(aes(y = y,
-                x = x,
-                alpha = prob),
-            size = 1,
-            lineend = "round",
-            linejoin = "round",
-            data = df_y) +
+             y = value)) +
   facet_wrap(facets = ~ response,
              nrow = 3,
              scales = "free_y",
              labeller = label_parsed) + 
+  geom_point(data = filter(df_plot, group == "Enhanced"),
+             color = "darkseagreen2") +
+  geom_point(data = filter(df_plot, group == "Unenhanced"),
+             color = "lightskyblue2") +
+  geom_point(data = filter(df_plot, group == "All"),
+             color = "pink") +
+  geom_line(aes(y = y,
+                x = x,
+                color = group,
+                linetype = lty),
+            lineend = "round",
+            linejoin = "round",
+            data = df_y) +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted")) +
   labs(x = expression("Number of release (thousand fish year"^-1*")"),
-       color = "Fish group",
-       alpha = "Prob.") +
+       color = "Fish group") +
   guides(color = "none",
-         alpha = "none") +
+         linetype = "none") +
   theme(axis.title.y = element_blank())
   
 ## export
