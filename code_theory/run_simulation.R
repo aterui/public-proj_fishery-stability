@@ -22,9 +22,10 @@ df_param <- expand.grid(n_timestep = 1000,
                         n_burnin = 400,
                         n_species = c(10, 20),
                         k = 100,
-                        r_type = "random",
-                        r_min = c(0.3, 1, 2),
-                        r_max = c(0.5, 1, 2),
+                        r_type = "constant",
+                        r1 = c(0.5, 1, 2),
+                        r_min = 0.5,
+                        r_max = c(1, 2),
                         sd_env = c(0.1, 0.5),
                         phi = c(0.8, 1),
                         int_type = "random",
@@ -60,8 +61,8 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                                        n_species = x$n_species,
                                                        k = x$k,
                                                        r_type = x$r_type,
-                                                       r_min = x$r_min,
-                                                       r_max = x$r_max,
+                                                       r = c(x$r1, runif(n = x$n_species - 1,
+                                                                         x$r_min, x$r_max)),
                                                        sd_env = x$sd_env,
                                                        stock = stock[j],
                                                        phi = x$phi,
@@ -71,8 +72,8 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                                        seed = x$seed)
                                         
                                         dyn_summary <- dyn$df_dyn %>% 
-                                          mutate(status = case_when(species == 1 ~ "stocked",
-                                                                    species != 1 ~ "unstocked")) %>% 
+                                          mutate(status = case_when(species == 1 ~ "enhanced",
+                                                                    species != 1 ~ "unenhanced")) %>% 
                                           group_by(status,
                                                    timestep) %>% 
                                           summarize(summed_density = sum(density)) %>% 
@@ -91,7 +92,6 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                         
                                         df <- tibble(n_rep = j,
                                                      x,
-                                                     r1 = dyn$df_species$r[1],
                                                      stock = stock[j],
                                                      dyn_summary,
                                                      n_sp_persist = n_sp_persist,
