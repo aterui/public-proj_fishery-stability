@@ -25,8 +25,8 @@ df0 <- read_csv("result/result_ricker.csv") %>%
                                 param == "mean_density" ~ "Mean~mu~(ind.)",
                                 param == "sd_density" ~ "SD~sigma~(ind.)"),
          status_name = case_when(status == "all" ~ "All",
-                                 status == "stocked" ~ "Enhanced",
-                                 status == "unstocked" ~ "Unenhanced"))
+                                 status == "enhanced" ~ "Enhanced",
+                                 status == "unenhanced" ~ "Unenhanced"))
 
 
 # plot --------------------------------------------------------------------
