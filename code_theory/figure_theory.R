@@ -14,7 +14,7 @@ df0 <- read_csv("result/result_ricker.csv") %>%
                names_to = "param",
                values_to = "value") %>% 
   filter(r_max == 2,
-         r_min == 0.3,
+         r1 == 1,
          sd_env == 0.5,
          alpha == 0.5,
          phi == 0.8,
@@ -40,10 +40,10 @@ g_theory <- df0 %>%
              x = stock,
              color = factor(status_name),
              fill = factor(status_name))) +
-  geom_point(data = filter(df0, status == "stocked"),
+  geom_point(data = filter(df0, status == "enhanced"),
              size = 0.25,
              color = "darkseagreen2") +
-  geom_point(data = filter(df0, status == "unstocked"),
+  geom_point(data = filter(df0, status == "unenhanced"),
              size = 0.25,
              color = "lightskyblue2") +
   geom_point(data = filter(df0, status == "all"),
