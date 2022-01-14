@@ -6,6 +6,7 @@ pacman::p_load(tidyverse,
                patchwork)
 setwd(here::here("code_theory"))
 
+
 # data --------------------------------------------------------------------
 
 df0 <- read_csv("result/result_ricker.csv") %>% 
@@ -29,13 +30,14 @@ df0 <- read_csv("result/result_ricker.csv") %>%
                                  status == "unenhanced" ~ "Unenhanced"))
 
 
-# plot --------------------------------------------------------------------
+# plot1 cv mean sd --------------------------------------------------------
 
 source("figure_set_theme.R")
 theme_set(plt_theme)
 
 # cv plot ####
 g_theory <- df0 %>% 
+  filter(param != "n_sp_persist") %>% 
   ggplot(aes(y = value,
              x = stock,
              color = factor(status_name),
@@ -62,4 +64,8 @@ g_theory <- df0 %>%
          fill = "none")
 
 setwd(here::here())
+
+
+# plot2 species richness --------------------------------------------------
+
 
