@@ -7,10 +7,10 @@
 *.html
 *figure
 readme.Rmd
-code_empirical/data_gis/albers_chelsa_clim.tif
-code_empirical/data_gis/albers_chelsa_clim.tif.aux.xml
-code_empirical/data_gis/CHELSA_bio10_01.tif
-code_empirical/data_gis/CHELSA_bio10_01.tif.aux.xml
-code_empirical/data_gis/CHELSA_bio10_12.tif
-code_empirical/data_gis/epsg4326_lu_hkd.tif.aux.xml
+code/data_gis/albers_chelsa_clim.tif
+code/data_gis/albers_chelsa_clim.tif.aux.xml
+code/data_gis/CHELSA_bio10_01.tif
+code/data_gis/CHELSA_bio10_01.tif.aux.xml
+code/data_gis/CHELSA_bio10_12.tif
+code/data_gis/epsg4326_lu_hkd.tif.aux.xml
 rmd/document_output/manuscript.docx
