@@ -2,12 +2,11 @@
 # setup -------------------------------------------------------------------
 
 pacman::p_load(tidyverse)
-setwd(here::here("code_empirical"))
 
 
 # data --------------------------------------------------------------------
 
-source("data_fmt_fishdata.R")
+source("code/data_fmt_fishdata.R")
 
 river_id <- pull(distinct(df_fish, river))
 
@@ -37,7 +36,7 @@ df_ocean <- read_csv("data_fmt/data_ocean_fmt.csv") %>%
          scl_sst = c(scale(sst)))
 
 ## df for stock data
-source("data_fmt_stock.R")
+source("code/data_fmt_stock.R")
 
 ## group name
 group <- c("all", "masu", "other")

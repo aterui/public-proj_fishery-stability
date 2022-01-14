@@ -10,15 +10,14 @@ pacman::p_load(raster,
                stars,
                exactextractr)  
 
-setwd(here::here("code_empirical"))
-source("gis_crs_fmt.R")
+source("code/gis_crs_fmt.R")
 
 
 # read polygons and points ------------------------------------------------
 
 ## watershed polygons
 albers_sf_wsd <- st_read(dsn = "data_gis/epsg4326_watershed.gpkg") %>%
-  select(-epsg4326_watershed) %>% 
+  dplyr::select(-epsg4326_watershed) %>% 
   st_transform(wkt_jgd_albers) %>% 
   mutate(id = seq_len(nrow(.)),
          area = st_area(.)) %>% 

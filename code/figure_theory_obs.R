@@ -9,8 +9,8 @@ setwd(here::here())
 
 # data --------------------------------------------------------------------
 
-source("code_theory/figure_theory.R")
-source("code_empirical/figure_cv_stock.R")
+source("code/figure_theory.R")
+source("code/figure_cv_stock.R")
 
 g <- g_theory + ggtitle("Theoretical prediction") +
   g_obs + ggtitle("Empirical observation") + 

@@ -5,7 +5,6 @@
 pacman::p_load(foreach,
                tidyverse,
                ggridges)
-setwd(here::here("code_empirical"))
 
 
 # data --------------------------------------------------------------------

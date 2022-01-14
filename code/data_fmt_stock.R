@@ -3,7 +3,6 @@
 
 #rm(list = ls())
 pacman::p_load(tidyverse)
-setwd(here::here("code_empirical"))
 
 
 # format data -------------------------------------------------------------
@@ -13,7 +12,7 @@ setwd(here::here("code_empirical"))
 ## df_year_river - 31 rivers x 21 years = 651 combo
 ## df_stock - raw stock data
 
-source("data_fmt_fishdata.R")
+source("code/data_fmt_fishdata.R")
 river_id <- pull(distinct(df_fish, river))
 
 df_site_id <- df_fish %>% 

@@ -4,7 +4,6 @@
 #rm(list = ls(all.names = TRUE))
 pacman::p_load(tidyverse,
                patchwork)
-setwd(here::here("code_theory"))
 
 
 # data --------------------------------------------------------------------
@@ -32,7 +31,7 @@ df0 <- read_csv("result/result_ricker.csv") %>%
 
 # plot1 cv mean sd --------------------------------------------------------
 
-source("figure_set_theme.R")
+source("code/figure_set_theme.R")
 theme_set(plt_theme)
 
 # cv plot ####
@@ -62,8 +61,6 @@ g_theory <- df0 %>%
              labeller = label_parsed) +
   guides(color = guide_legend(override.aes = list(fill = NA)),
          fill = "none")
-
-setwd(here::here())
 
 
 # plot2 species richness --------------------------------------------------

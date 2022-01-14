@@ -14,9 +14,8 @@ pacman::p_load(tidyverse,
 
 wbt_init()
 
-setwd(here::here("code_empirical"))
-source("gis_crs_fmt.R")
-source("function_arc2d8.R")
+source("code/gis_crs_fmt.R")
+source("code/function_arc2d8.R")
 
 
 # define function ---------------------------------------------------------

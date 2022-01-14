@@ -2,8 +2,9 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-pacman::p_load(tidyverse, runjags, foreach)
-setwd(here::here("code_empirical"))
+pacman::p_load(tidyverse,
+               runjags,
+               foreach)
   
 fn_brrm <- function(x) {
   y <- lapply(str_extract_all(x, pattern = "\\[.{1,}\\]"),
@@ -18,7 +19,7 @@ fn_brrm <- function(x) {
 
 ## fish data ####
 ## "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
-source("data_fmt_stock.R")
+source("code/data_fmt_stock.R")
 group <- c("all", "masu_salmon", "other")
 
 ## mcmc setup ####
@@ -72,7 +73,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                  Nsample_stock = nrow(df_fry))
                  
   ## model file ####
-  m <- read.jagsfile("model_ssm.R")
+  m <- read.jagsfile("code/model_ssm.R")
   
   ## run jags ####
   post <- run.jags(m$model,

@@ -5,12 +5,11 @@ rm(list = ls())
 pacman::p_load(tidyverse,
                glmmTMB,
                foreach)
-setwd(here::here("code_empirical"))
 
 
 # data --------------------------------------------------------------------
 
-source("data_fmt_analysis.R")
+source("code/data_fmt_analysis.R")
 df_m <- list_ssm$all
 
 

@@ -3,7 +3,6 @@
 
 rm(list = ls(all.names = T))
 pacman::p_load(tidyverse)
-setwd(here::here("code_empirical"))
 
 
 # combine data ------------------------------------------------------------

@@ -3,7 +3,6 @@
 
 pacman::p_load(tidyverse,
                foreach)
-setwd(here::here("code_empirical"))
 
 
 # read data ---------------------------------------------------------------
@@ -22,7 +21,7 @@ figure_name <- paste0("figure/figure_timeseries",
 
 # plot --------------------------------------------------------------------
 
-source("figure_set_theme.R")
+source("code/figure_set_theme.R")
 theme_set(plt_theme)
 
 foreach(i = seq_len(length(file_name))) %do% {

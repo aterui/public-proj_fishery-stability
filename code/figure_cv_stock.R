@@ -3,13 +3,12 @@
 
 #rm(list = ls())
 pacman::p_load(tidyverse)
-setwd(here::here("code_empirical"))
 
 
 # data --------------------------------------------------------------------
 
 ## raw data
-source("data_fmt_analysis.R")
+source("code/data_fmt_analysis.R")
 df_m <- do.call(bind_rows, list_ssm) %>%
   filter(!(group != "all" & response == "cv")) %>%
   mutate(response = case_when(response == "cv" ~ "CV~sigma/mu",
@@ -54,7 +53,7 @@ df_beta <- lapply(file_name,
 
 # plot --------------------------------------------------------------------
 
-source("figure_set_theme.R")
+source("code/figure_set_theme.R")
 theme_set(plt_theme)
 
 ## regression estimates
@@ -110,4 +109,3 @@ g_obs <- df_plot %>%
 #       width = 4,
 #       height = 8)
 
-setwd(here::here())

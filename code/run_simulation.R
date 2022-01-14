@@ -10,8 +10,6 @@ pacman::p_load(here,
                doParallel,
                doSNOW)
 
-setwd(here::here("code_theory"))
-
 cl <- makeCluster(detectCores())
 registerDoSNOW(cl)
 

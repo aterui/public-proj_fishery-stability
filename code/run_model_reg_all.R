@@ -4,12 +4,11 @@
 rm(list = ls())
 pacman::p_load(foreach,
                tidyverse)
-setwd(here::here("code_empirical"))
 
 
 # jags setup --------------------------------------------------------------
 
-source("data_fmt_analysis.R")
+source("code/data_fmt_analysis.R")
 df_m <- list_ssm$all
 
 ## parameters ####
@@ -20,7 +19,7 @@ para <- c("a",
           "b_raw")
 
 ## model file ####
-m <- runjags::read.jagsfile("model_regression.R")
+m <- runjags::read.jagsfile("code/model_regression.R")
 
 ## mcmc setup ####
 n_ad <- 100
