@@ -14,10 +14,11 @@ df0 <- read_csv("result/result_ricker.csv") %>%
                names_to = "param",
                values_to = "value") %>% 
   filter(r_max == 2,
-         r1 == 1,
+         r1 == 0.5,
          sd_env == 0.5,
          alpha == 0.5,
          phi == 0.8,
+         k == 100,
          param %in% c("cv", "mean_density", "sd_density"),
          n_species == 10) %>% 
   filter(!(param == "cv" & status != "all")) %>%
