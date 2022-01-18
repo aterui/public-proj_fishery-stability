@@ -73,8 +73,8 @@ df_clim <- raster::extract(wgs84_rs_clim, wgs84_sf_site) %>%
 wgs84_rs_lu <- raster("data_gis/epsg4326_lu_hkd.tif")
 albers_rs_lu <- projectRaster(from = wgs84_rs_lu,
                               crs = st_crs(albers_sf_wsd)$wkt,
-                              method = 'bilinear',
-                              res = 1000)
+                              method = 'ngb',
+                              res = 100)
 
 albers_rs_forest <- calc(albers_rs_lu,
                          fun = function(x) ifelse(dplyr::between(x, 111, 126), 1, 0))
