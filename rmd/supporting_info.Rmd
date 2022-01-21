@@ -1,0 +1,83 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: true
+    includes:
+        before_body: title.tex
+bibliography: reference.bib
+knit: (function(inputFile, encoding) {
+        rmarkdown::render(inputFile, encoding = encoding, output_dir = "document_output")
+      })
+header-includes:
+  \pagenumbering{gobble}
+---
+
+```{r setup, include=FALSE}
+
+pacman::p_load(knitr)
+
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE)
+options(knitr.kable.NA = '')
+
+```
+
+\newpage
+
+# Tables
+
+```{r table_set1}
+
+## load data for tables
+source(here::here("code/table_reg.R"))
+
+table_legend <- "Median estimates and standard errors (SEs) are shown. Pr(> 0) and Pr(< 0) represent the proportion of parameter estimates (MCMC samples) being positive and negative, respectively (i.e., posterior probability)."
+
+table_reg <- NULL
+
+for(i in seq_len(length(df_est))) {
+  
+  if(name[i] == "all") {
+    knit_chunk <- paste0("## Table S", i, " Parameter estimates for the regression model of whole community \n",
+                         table_legend,
+                         "\n```{r table_s", i,"}
+                         \n\n
+                         kable(df_est[[",i,"]], format = 'markdown')
+                         \n\n
+                         ```\n",
+                         "\n\\pagebreak\n")
+  }
+
+  if(name[i] == "masu") {
+    knit_chunk <- paste0("## Table S", i, " Parameter estimates for the regression model of masu salmon \n",
+                         table_legend,
+                         "\n```{r table_s", i,"}
+                         \n\n
+                         kable(df_est[[",i,"]], format = 'markdown')
+                         \n\n
+                         ```\n",
+                         "\n\\pagebreak\n")
+  }
+
+  if(name[i] == "other") {
+    knit_chunk <- paste0("## Table S", i, " Parameter estimates for the regression model of unenhanced species \n",
+                         table_legend,
+                         "\n```{r table_s", i,"}
+                         \n\n
+                         kable(df_est[[",i,"]], format = 'markdown')
+                         \n\n```
+                         \n",
+                         "\n\\pagebreak\n")
+  }
+
+  table_reg <- c(table_reg, knit_chunk)
+}
+
+
+```
+
+`r paste(knit(text = table_reg), collapse = '\n')`
+
+# Figures
+
