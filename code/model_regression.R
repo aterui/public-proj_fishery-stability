@@ -12,7 +12,7 @@ model {
   tau_r ~ dscaled.gamma(scale, df)
   sigma_r <- sqrt(1 / tau_r)
   
-  for(i in 1:5) {
+  for(i in 1:4) {
     a[i] ~ dnorm(0, ninfo)
   }
   
