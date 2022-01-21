@@ -145,5 +145,5 @@ wgs84_watershed <- wgs84_watershed %>%
          site = wgs84_outlet$site)
 
 st_write(wgs84_watershed,
-         dsn = "data_gis/epsg4326_watershed.gpkg",
+         dsn = "data_gis/epsg4326_upstr_watershed.gpkg",
          append = FALSE)

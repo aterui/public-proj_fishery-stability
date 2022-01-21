@@ -16,7 +16,7 @@ source("code/gis_crs_fmt.R")
 # read polygons and points ------------------------------------------------
 
 ## watershed polygons
-albers_sf_wsd <- st_read(dsn = "data_gis/epsg4326_watershed.gpkg") %>%
+albers_sf_wsd <- st_read(dsn = "data_gis/epsg4326_upstr_watershed.gpkg") %>%
   dplyr::select(-epsg4326_watershed) %>% 
   st_transform(wkt_jgd_albers) %>% 
   mutate(id = seq_len(nrow(.)),
@@ -79,9 +79,9 @@ albers_rs_lu <- projectRaster(from = wgs84_rs_lu,
 albers_rs_forest <- calc(albers_rs_lu,
                          fun = function(x) ifelse(dplyr::between(x, 111, 126), 1, 0))
 albers_rs_urban <- calc(albers_rs_lu,
-                     fun = function(x) ifelse(x == 50, 1, 0))
+                        fun = function(x) ifelse(x == 50, 1, 0))
 albers_rs_agri <- calc(albers_rs_lu,
-                    fun = function(x) ifelse(x == 40, 1, 0))
+                       fun = function(x) ifelse(x == 40, 1, 0))
 albers_rs_fua <- raster::stack(albers_rs_forest,
                                albers_rs_urban,
                                albers_rs_agri)
@@ -104,7 +104,7 @@ albers_sf_wsd <- albers_sf_wsd %>%
   relocate(id)
 
 st_write(albers_sf_wsd,
-         dsn = "data_gis/albers_watershed_env.gpkg",
+         dsn = "data_gis/albers_upstr_watershed_env.gpkg",
          append = FALSE)
 
 df_albers_sf_wsd <- albers_sf_wsd %>% 
