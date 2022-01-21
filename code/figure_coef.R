@@ -1,7 +1,7 @@
 
 # setup -------------------------------------------------------------------
 
-#rm(list = ls())
+rm(list = ls())
 pacman::p_load(foreach,
                tidyverse,
                ggridges)

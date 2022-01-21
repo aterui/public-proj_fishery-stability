@@ -48,7 +48,7 @@ df_beta <- lapply(file_name,
                        `pn_b_raw[2]`)) %>%
   rename(b1 = `median_b_raw[1]`,
          b2 = `median_b_raw[2]`) %>%
-  select(response, group, b1, b2, prob)
+  dplyr::select(response, group, b1, b2, prob)
 
 
 # plot --------------------------------------------------------------------
@@ -99,13 +99,6 @@ g_obs <- df_plot %>%
             data = df_y) +
   scale_linetype_manual(values = c("solid", "dashed", "dotted")) +
   labs(x = expression("Number of release (thousand fish year"^-1*")"),
-       color = "Fish group") +
-  guides(color = "none",
-         linetype = "none") +
+       color = "Species group") +
+  guides(linetype = "none") +
   theme(axis.title.y = element_blank())
-  
-## export
-#ggsave("figure/figure_cv_mu_sd.pdf",
-#       width = 4,
-#       height = 8)
-

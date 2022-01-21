@@ -8,13 +8,16 @@ pacman::p_load(tidyverse,
 
 # data --------------------------------------------------------------------
 
-df0 <- read_csv("result/result_ricker.csv") %>% 
+## call `df0`
+load(file = "result/result_ricker.RData")
+
+df0 <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 
   pivot_longer(cols = mean_density:cv,
                names_to = "param",
                values_to = "value") %>% 
   filter(r_max == 2,
-         r1 == 0.5,
+         r1 == 1,
          sd_env == 0.5,
          alpha == 0.5,
          phi == 0.8,
@@ -37,7 +40,6 @@ theme_set(plt_theme)
 
 # cv plot ####
 g_theory <- df0 %>% 
-  filter(param != "n_sp_persist") %>% 
   ggplot(aes(y = value,
              x = stock,
              color = factor(status_name),
@@ -60,10 +62,5 @@ g_theory <- df0 %>%
              nrow = 3,
              scales = "free_y",
              labeller = label_parsed) +
-  guides(color = guide_legend(override.aes = list(fill = NA)),
+  guides(color = "none",#guide_legend(override.aes = list(fill = NA)),
          fill = "none")
-
-
-# plot2 species richness --------------------------------------------------
-
-
