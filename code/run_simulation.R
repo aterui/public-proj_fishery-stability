@@ -105,5 +105,6 @@ result <- foreach(x = iter(df_param, by = 'row'),
 
 stopCluster(cl)
 
-write_csv(result,
-          "result/result_ricker.csv")
+sim_result <- result
+save(sim_result, file = "result/result_ricker.RData")
+#write_csv(result, "result/result_ricker.csv")
