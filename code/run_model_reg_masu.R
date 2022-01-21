@@ -12,8 +12,8 @@ source("code/data_fmt_analysis.R")
 df_m <- list_ssm$masu
 
 ## parameters ####
-para <- c("a",
-          "b",
+para <- c("b",
+          "a",
           "sigma",
           "sigma_r",
           "b_raw")
