@@ -21,20 +21,53 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE)
 options(knitr.kable.NA = '')
 
+source(here::here("code/table_stvy_analysis.R"))
+
 ```
 
 \newpage
 
 # Tables
 
-```{r table_set1}
+```{r table_sensitivity, results="asis"}
+
+conditional_text <- c("whole community",
+                      "enhanced species",
+                      "unenhanced species")
+
+table_sense <- knit_chunk <- NULL
+
+for(i in 1:length(table_stvy)) {
+  
+  table_legend <- paste0("Sensitivity analysis of the community simulation. Parameter estimates of linear regression models (standard errors in parenthesis) are shown. Response variables are the effects of stock enhancement on temporal mean density ($\\mu$) and SD ($\\sigma$) of ", conditional_text[i],". Explanatory variables (i.e., simulation parameters) were standardized to a mean of zero and a standard deviation of one prior to the analysis.")
+  
+  knit_chunk <- paste0("## Table S", i, " Sensitivity analysis (", conditional_text[i],") \n",
+                       table_legend,
+                       "\n```{r table_s", i,", results='asis'}
+                       \n\n
+                       cat(table_stvy[[", i,"]], sep = '\n')
+                       \n\n
+                       ```\n",
+                       "\n\\pagebreak\n")
+  
+  table_sense <- c(table_sense, knit_chunk)  
+  
+}
+
+```
+
+`r paste(knit(text = table_sense), collapse = '\n')`
+
+
+
+```{r table_reg}
 
 ## load data for tables
 source(here::here("code/table_reg.R"))
 
-table_legend <- "Median estimates and standard errors (SEs) are shown. Pr(> 0) and Pr(< 0) represent the proportion of parameter estimates (MCMC samples) being positive and negative, respectively (i.e., posterior probability)."
+table_legend <- "Median estimates and standard errors (SEs) are shown. Pr(> 0) and Pr(< 0) represent the proportion of positive and negative estimates (MCMC samples), respectively (i.e., posterior probability)."
 
-table_reg <- NULL
+table_reg <- knit_chunk <- NULL
 
 for(i in seq_len(length(df_est))) {
   
@@ -78,6 +111,7 @@ for(i in seq_len(length(df_est))) {
 ```
 
 `r paste(knit(text = table_reg), collapse = '\n')`
+
 
 # Figures
 
