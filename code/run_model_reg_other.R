@@ -19,7 +19,7 @@ para <- c("b",
           "b_raw")
 
 ## model file ####
-m <- runjags::read.jagsfile("code/model_regression.R")
+m <- runjags::read.jagsfile("code/model_reg_cv.R")
 
 ## mcmc setup ####
 n_ad <- 100
