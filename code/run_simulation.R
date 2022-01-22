@@ -18,20 +18,19 @@ registerDoSNOW(cl)
 df_param <- expand.grid(n_timestep = 1000,
                         n_warmup = 200,
                         n_burnin = 400,
-                        n_species = c(10, 20),
+                        n_species = 10,
                         k = c(100, 500),
                         r_type = "constant",
                         r1 = c(0.5, 1, 2),
                         r_min = 0.5,
-                        r_max = c(1, 2),
+                        r_max = 2,
                         sd_env = c(0.1, 0.5),
                         phi = c(0.8, 1),
                         int_type = "random",
                         alpha = c(0.1, 0.5),
                         model = "ricker",
                         seed = 5,
-                        seed_interval = 10) %>% 
-  filter(r_max >= r_min)
+                        seed_interval = 10)
 
 n_rep <- 1000
 repeat {
