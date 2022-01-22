@@ -7,8 +7,9 @@ pacman::p_load(tidyverse)
 
 # data --------------------------------------------------------------------
 
-## raw data
+## raw data for cv, mean, sd
 source("code/data_fmt_analysis.R")
+
 df_m <- do.call(bind_rows, list_ssm) %>%
   filter(!(group != "all" & response == "cv")) %>%
   mutate(response = case_when(response == "cv" ~ "CV~sigma/mu",
