@@ -21,96 +21,115 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE)
 options(knitr.kable.NA = '')
 
-source(here::here("code/table_stvy_analysis.R"))
+```
+
+```{=tex}
+\newpage
+\pagenumbering{arabic}
+```
+# Tables
+
+## Table S1 Parameter values used in the main simulation
+See Methods for model description.
+
+```{r table_param_main_sim}
+
+source(here::here("code/table_param_set.R"))
+kable(df_param, format = "markdown")
 
 ```
 
 \newpage
 
-# Tables
+## Table S2 Parameter values used in the sensitivity analysis
+In the sensitivity analysis, parameter values were randomly drawn from uniform distributions. Discrete parameters (number of species, carrying capacity) were rounded to the nearest integer prior to the analysis.
+
+```{r table_param_stvy}
+
+source(here::here("code/table_param_set.R"))
+kable(df_param_stvy, format = "markdown")
+
+```
+
+\newpage
+
+```{r data_stvy, include=FALSE}
+
+## load table for sensitivity analysis
+source(here::here("code/table_stvy_analysis.R"))
+
+```
 
 ```{r table_sensitivity, results="asis"}
 
-conditional_text <- c("whole community",
-                      "enhanced species",
-                      "unenhanced species")
+j <- 2
 
-table_sense <- knit_chunk <- NULL
+## conditional text
+c_text <- c("whole community",
+            "enhanced species",
+            "unenhanced species")
+
+table_stvy_chunk <- knit_chunk <- NULL
 
 for(i in 1:length(table_stvy)) {
   
-  table_legend <- paste0("Sensitivity analysis of the community simulation. Parameter estimates of linear regression models (standard errors in parenthesis) are shown. Response variables are the effects of stock enhancement on temporal mean density ($\\mu$) and SD ($\\sigma$) of ", conditional_text[i],". Explanatory variables (i.e., simulation parameters) were standardized to a mean of zero and a standard deviation of one prior to the analysis.")
+  table_legend <- paste0("Sensitivity analysis of the community simulation. Parameter estimates of linear regression models (standard errors in parenthesis) are shown. Response variables are the effects of stock enhancement on temporal mean density ($\\mu$) and SD ($\\sigma$) of ", c_text[i],". Both response and explanatory variables (i.e., simulation parameters) were standardized to a mean of zero and a standard deviation of one prior to the analysis.")
   
-  knit_chunk <- paste0("## Table S", i, " Sensitivity analysis (", conditional_text[i],") \n",
+  knit_chunk <- paste0("## Table S", i + j, " Sensitivity analysis (", c_text[i],") \n",
                        table_legend,
-                       "\n```{r table_s", i,", results='asis'}
+                       "\n```{r table_s", i + j,", results='asis'}
                        \n\n
                        cat(table_stvy[[", i,"]], sep = '\n')
                        \n\n
                        ```\n",
                        "\n\\pagebreak\n")
   
-  table_sense <- c(table_sense, knit_chunk)  
+  table_stvy_chunk <- c(table_stvy_chunk, knit_chunk)  
   
 }
 
 ```
 
-`r paste(knit(text = table_sense), collapse = '\n')`
+`r paste(knit(text = table_stvy_chunk), collapse = '\n')`
 
 
 
 ```{r table_reg}
 
-## load data for tables
+j <- 5
+
+## load regression tables
 source(here::here("code/table_reg.R"))
 
-table_legend <- "Median estimates and standard errors (SEs) are shown. Pr(> 0) and Pr(< 0) represent the proportion of positive and negative estimates (MCMC samples), respectively (i.e., posterior probability)."
+## conditional text
+c_text <- case_when(name == "all" ~ "whole community",
+                    name == "masu" ~ "masu salmon",
+                    name == "other" ~ "unenhanced species")
 
-table_reg <- knit_chunk <- NULL
+## common text
+table_legend <- "Median estimates and standard errors (SEs) of regression coefficients are shown. Pr(> 0) and Pr(< 0) represent the proportion of positive and negative estimates (MCMC samples), respectively (i.e., posterior probability)."
+
+table_reg_chunk <- knit_chunk <- NULL
 
 for(i in seq_len(length(df_est))) {
   
-  if(name[i] == "all") {
-    knit_chunk <- paste0("## Table S", i, " Parameter estimates for the regression model of whole community \n",
-                         table_legend,
-                         "\n```{r table_s", i,"}
-                         \n\n
-                         kable(df_est[[",i,"]], format = 'markdown')
-                         \n\n
-                         ```\n",
-                         "\n\\pagebreak\n")
-  }
+  knit_chunk <- paste0("## Table S", i + j, " Parameter estimates for the regression model of ", c_text[i], " \n",
+                       table_legend,
+                       "\n```{r table_s", i + j,"}
+                       \n\n
+                       kable(df_est[[",i,"]], format = 'markdown')
+                       \n\n
+                       ```\n",
+                       "\n\\pagebreak\n")
 
-  if(name[i] == "masu") {
-    knit_chunk <- paste0("## Table S", i, " Parameter estimates for the regression model of masu salmon \n",
-                         table_legend,
-                         "\n```{r table_s", i,"}
-                         \n\n
-                         kable(df_est[[",i,"]], format = 'markdown')
-                         \n\n
-                         ```\n",
-                         "\n\\pagebreak\n")
-  }
-
-  if(name[i] == "other") {
-    knit_chunk <- paste0("## Table S", i, " Parameter estimates for the regression model of unenhanced species \n",
-                         table_legend,
-                         "\n```{r table_s", i,"}
-                         \n\n
-                         kable(df_est[[",i,"]], format = 'markdown')
-                         \n\n```
-                         \n",
-                         "\n\\pagebreak\n")
-  }
-
-  table_reg <- c(table_reg, knit_chunk)
+  table_reg_chunk <- c(table_reg_chunk, knit_chunk)
+  
 }
 
 
 ```
 
-`r paste(knit(text = table_reg), collapse = '\n')`
+`r paste(knit(text = table_reg_chunk), collapse = '\n')`
 
 
 # Figures
