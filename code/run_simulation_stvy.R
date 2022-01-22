@@ -106,4 +106,4 @@ result <- foreach(x = iter(df_param, by = 'row'),
 stopCluster(cl)
 
 sim_stvy_result <- result
-save(sim_stvy_result, file = "result/result_ricker_stvy.RData")
+save(sim_stvy_result, file = "result/result_ricker_for_stvy.RData")
