@@ -3,7 +3,6 @@
 
 rm(list = ls())
 pacman::p_load(tidyverse)
-
 op <- function(x, d = 2) sprintf(paste0("%1.", d, "f"), x) 
 
 

@@ -4,6 +4,9 @@
 rm(list = ls())
 pacman::p_load(tidyverse)
 
+
+# table for main simulation -----------------------------------------------
+
 load(file = here::here("result/result_ricker.RData"))
 
 df_param <- sim_result %>% 
@@ -47,4 +50,14 @@ df_param <- sim_result %>%
   dplyr::select(-id) %>% 
   relocate(Parameter, Interpretation)
 
+
+# table for sensitivity analysis ------------------------------------------
             
+df_param_stvy <- df_param %>% 
+  mutate(Value = case_when(Parameter == "$S$" ~ "Unif(5, 20)",
+                           Parameter == "$K$" ~ "Unif(100, 1000)",
+                           Parameter == "$r_1$" ~ "Unif(0.5, 2.5)",
+                           Parameter == "$r_{max}$" ~ "Unif(0.5, 2.5)",
+                           Parameter == "$\\sigma_{env}$" ~ "Unif(0.05, 0.5)",
+                           Parameter == "$f_R$" ~ "Unif(0.5, 1)",
+                           Parameter == "$\\bar{\\alpha}$" ~ "Unif(0.05, 0.5)"))
