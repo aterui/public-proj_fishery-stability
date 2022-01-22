@@ -8,13 +8,13 @@ pacman::p_load(tidyverse,
 
 # data --------------------------------------------------------------------
 
-## call `df0`
+## call `sim_result`
 load(file = "result/result_ricker.RData")
 
 df0 <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 
   pivot_longer(cols = mean_density:cv,
-               names_to = "param",
+               names_to = "response",
                values_to = "value") %>% 
   filter(r_max == 2,
          r1 == 1,
@@ -22,12 +22,13 @@ df0 <- sim_result %>%
          alpha == 0.5,
          phi == 0.8,
          k == 100,
-         param %in% c("cv", "mean_density", "sd_density"),
-         n_species == 10) %>% 
-  filter(!(param == "cv" & status != "all")) %>%
-  mutate(param_name = case_when(param == "cv" ~ "CV~sigma/mu",
-                                param == "mean_density" ~ "Mean~mu~(ind.)",
-                                param == "sd_density" ~ "SD~sigma~(ind.)"),
+         response %in% c("n_sp_persist", "cv", "mean_density", "sd_density")) %>% 
+  filter(!(response == "cv" & status != "all")) %>%
+  filter(!(response == "n_sp_persist" & status != "all")) %>%
+  mutate(response_name = case_when(response == "n_sp_persist" ~ "Number~of~species~persist",
+                                   response == "cv" ~ "CV~sigma/mu",
+                                   response == "mean_density" ~ "Mean~mu~(ind.)",
+                                   response == "sd_density" ~ "SD~sigma~(ind.)"),
          status_name = case_when(status == "all" ~ "All",
                                  status == "enhanced" ~ "Enhanced",
                                  status == "unenhanced" ~ "Unenhanced"))
@@ -58,8 +59,8 @@ g_theory <- df0 %>%
   labs(x = "Number of release (individuals)",
        y = "Value") +
   scale_color_hue(name = "Species group") +
-  facet_wrap(facets = ~ param_name,
-             nrow = 3,
+  facet_wrap(facets = ~ response_name,
+             nrow = 2,
              scales = "free_y",
              labeller = label_parsed) +
   guides(color = "none",#guide_legend(override.aes = list(fill = NA)),
