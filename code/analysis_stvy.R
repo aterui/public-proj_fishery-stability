@@ -1,0 +1,68 @@
+
+# setup -------------------------------------------------------------------
+
+rm(list = ls())
+pacman::p_load(tidyverse)
+
+
+# data --------------------------------------------------------------------
+
+## load results of sensitivity analysis 
+load("result/result_ricker_for_stvy.RData")
+
+## unique parameter set
+df_param <- sim_stvy_result %>% 
+  distinct(across(n_species:seed_interval)) %>% 
+  mutate(group_id = seq_len(nrow(.)))
+
+## effect size estimate
+df_psi <- sim_stvy_result %>% 
+  left_join(df_param,
+            by = c("r1"),
+            suffix = c("", ".y")) %>%
+  select(-ends_with(".y")) %>% 
+  pivot_wider(names_from = status,
+              values_from = c(mean_density,
+                              sd_density)) %>% 
+  group_by(group_id) %>% 
+  do(slope_mean_enhanced = coef(lm(mean_density_enhanced ~ stock, data = .))[2],
+     slope_mean_unenhanced = coef(lm(mean_density_unenhanced ~ stock, data = .))[2],
+     slope_mean_all = coef(lm(mean_density_all ~ stock, data = .))[2],
+     slope_sd_enhanced = coef(lm(sd_density_enhanced ~ stock, data = .))[2],
+     slope_sd_unenhanced = coef(lm(sd_density_unenhanced ~ stock, data = .))[2],
+     slope_sd_all = coef(lm(sd_density_all ~ stock, data = .))[2]) %>% 
+  mutate(across(.fns = as.numeric)) %>% 
+  ungroup()
+
+## combine
+df_m <- df_psi %>% 
+  left_join(df_param, by = "group_id") %>% 
+  dplyr::select(-r_type,
+                -r_min,
+                -int_type,
+                -model,
+                -seed,
+                -seed_interval) %>% 
+  mutate(across(n_species:alpha,
+                .fns = function(x) (x - mean(x)) / sd(x))
+         ) %>% # standardize parameter values
+  pivot_longer(cols = starts_with("slope"),
+               names_to = "response",
+               values_to = "slope")
+
+
+# analysis ----------------------------------------------------------------
+
+fit_sense <- df_m %>% 
+  group_by(response) %>% 
+  do(fit = lm(scale(slope) ~ 
+                n_species +
+                k +
+                r1 +
+                r_max +
+                sd_env +
+                phi +
+                alpha,
+              data = .))
+
+save(fit_sense, file = "result/result_stvy_analysis.RData")
