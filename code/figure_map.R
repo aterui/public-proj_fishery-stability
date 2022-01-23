@@ -42,20 +42,26 @@ albers_sf_point <- st_read("data_gis/epsg4326_point_snap_prtwsd_edit.gpkg") %>%
 
 # figure: map -------------------------------------------------------------
   
-g_hkd <- ggplot() +
-  geom_sf(data = albers_sf_hkd) +
-  geom_sf(data = albers_sf_point,
-          size = 0.5) +
-  theme_bw()
-
 g_example <- ggplot() +
-  geom_sf(data = albers_sf_wsd_example) +
+  geom_sf(data = albers_sf_wsd_example,
+          fill = grey(0.97)) +
   geom_sf(data = albers_sf_channel_example,
           color = grey(0.4)) +
   geom_sf(data = filter(albers_sf_point, river == "okushibetsu"),
           size = 2) +
   annotation_scale() +
-  theme_void()
+  theme_void() +
+  theme(plot.background = element_rect(fill = "white"))
+
+g_hkd <- ggplot() +
+  geom_sf(data = albers_sf_hkd,
+          fill = grey(0.97)) +
+  geom_sf(data = albers_sf_point,
+          size = 0.5) +
+  theme_bw() +
+  inset_element(g_example,
+                ignore_tag = TRUE,
+                0.7, 0.7, 0.98, 0.98)
 
 g_masu <- ggdraw() +
   draw_image("image/masu_salmon.jpg") +
