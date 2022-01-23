@@ -29,9 +29,15 @@ df0 <- sim_result %>%
                                    response == "cv" ~ "CV~sigma/mu",
                                    response == "mean_density" ~ "Mean~mu~(ind.)",
                                    response == "sd_density" ~ "SD~sigma~(ind.)"),
-         status_name = case_when(status == "all" ~ "All",
-                                 status == "enhanced" ~ "Enhanced",
-                                 status == "unenhanced" ~ "Unenhanced"))
+         group_id = case_when(status == "all" ~ "a",
+                              status == "enhanced" ~ "b",
+                              status == "unenhanced" ~ "c")) %>% 
+  mutate(response_name = factor(response_name,
+                                levels = c("CV~sigma/mu",
+                                           "Number~of~species~persist",
+                                           "Mean~mu~(ind.)",
+                                           "SD~sigma~(ind.)")))
+
 
 
 # plot1 cv mean sd --------------------------------------------------------
@@ -43,8 +49,8 @@ theme_set(plt_theme)
 g_theory <- df0 %>% 
   ggplot(aes(y = value,
              x = stock,
-             color = factor(status_name),
-             fill = factor(status_name))) +
+             color = group_id,
+             fill = group_id)) +
   geom_point(data = filter(df0, status == "enhanced"),
              size = 0.25,
              color = "darkseagreen2") +
@@ -56,12 +62,13 @@ g_theory <- df0 %>%
              color = "pink") +
   geom_smooth(size= 0.1,
               method = "loess") +
+  scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
   labs(x = "Number of release (individuals)",
-       y = "Value") +
-  scale_color_hue(name = "Species group") +
+       y = "Value",
+       color = "Species group") +
   facet_wrap(facets = ~ response_name,
              nrow = 2,
              scales = "free_y",
              labeller = label_parsed) +
-  guides(color = "none",#guide_legend(override.aes = list(fill = NA)),
+  guides(color = guide_legend(override.aes = list(fill = NA)),
          fill = "none")
