@@ -6,7 +6,7 @@ pacman::p_load(tidyverse,
                foreach)
 
 
-# sensitivity analysis ----------------------------------------------------
+# theoretical prediction --------------------------------------------------
 
 ## call `sim_result`
 load(here::here(file = "result/result_ricker.RData"))
@@ -41,7 +41,7 @@ df_param <- df0 %>%
 source(here::here("code/figure_set_theme.R"))
 theme_set(plt_theme)
 
-list_g <- foreach(i = seq_len(nrow(df_param))) %do% {
+list_g_theory <- foreach(i = seq_len(nrow(df_param))) %do% {
   
   ## choose one parameter set
   df_set <- df0 %>% 
@@ -73,3 +73,49 @@ list_g <- foreach(i = seq_len(nrow(df_param))) %do% {
   
   return(g)
 }
+
+
+# time series data --------------------------------------------------------
+
+## read data
+
+file_name <- list.files(path = "data_fmt", full.names = TRUE) %>%
+  as_tibble() %>% 
+  filter(str_detect(value, pattern = "data_ssm")) %>% 
+  pull()
+
+
+## plot
+
+source(here::here("code/figure_set_theme.R"))
+theme_set(plt_theme)
+
+list_g_dyns <- foreach(i = seq_len(length(file_name))) %do% {
+  
+  df0 <- read_csv(file_name[i]) %>% 
+    filter(param_name == "log_d") %>%
+    rename(median = "50%",
+           lower = "2.5%",
+           upper = "97.5%") %>% 
+    mutate(est_density = exp(median),
+           river = str_to_sentence(river))
+  
+  g <- df0 %>% 
+    ggplot() + 
+    geom_line(aes(x = year_id + 1998,
+                  y = est_density,
+                  color = factor(site))) +
+    geom_point(aes(x = year_id + 1998,
+                   y = density,
+                   color = factor(site)),
+               alpha = 0.5) +
+    facet_wrap(facets = ~ river,
+               ncol = 6,
+               scales = "free_y") +
+    ylab("Density (ind/sq-m)") +
+    xlab("Year") +
+    labs(color = "Site")
+  
+  return(g)
+}
+
