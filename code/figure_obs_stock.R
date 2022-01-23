@@ -131,17 +131,17 @@ g_obs <- df_plot %>%
        color = "Species group") +
   scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
   guides(linetype = "none") +
-  theme(axis.title.y = element_blank(),
-        legend.position = "bottom")
+  theme(axis.title.y = element_blank())
 
 
 # export ------------------------------------------------------------------
 
 source("code/figure_map.R")
 
-g <- g_hkd + g_obs + plot_annotation(tag_levels = 'A')
+g <- g_hkd + g_obs + 
+  plot_annotation(tag_levels = 'A')
 
 ggsave(g,
        filename = here::here("figure/figure_obs.pdf"),
-       width = 10,
-       height = 9)
+       width = 13,
+       height = 6)

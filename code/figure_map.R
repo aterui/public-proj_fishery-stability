@@ -47,22 +47,25 @@ g_example <- ggplot() +
           fill = grey(0.97)) +
   geom_sf(data = albers_sf_channel_example,
           color = grey(0.4)) +
-  geom_sf(data = filter(albers_sf_point, river == "okushibetsu"),
-          size = 2) +
+  geom_sf(data = filter(albers_sf_point,
+                        river == "okushibetsu"),
+          size = 1) +
   annotation_scale() +
   theme_void() +
-  theme(plot.background = element_rect(fill = "white"))
+  theme(plot.background = element_rect(fill = grey(1, 0.5)))
 
 g_hkd <- ggplot() +
   geom_sf(data = albers_sf_hkd,
-          fill = grey(0.97)) +
+          color = NA,
+          fill = grey(0.75)) +
   geom_sf(data = albers_sf_point,
           size = 0.5) +
   theme_bw() +
   inset_element(g_example,
                 ignore_tag = TRUE,
-                0.7, 0.7, 0.98, 0.98)
+                0.6, 0.05, 0.99, 0.3)
 
 g_masu <- ggdraw() +
   draw_image("image/masu_salmon.jpg") +
   theme_void()
+
