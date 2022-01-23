@@ -12,6 +12,7 @@ filename <- list.files(path = here::here("result"),
                        full.names = T) %>% 
   as_tibble() %>% 
   filter(str_detect(string = .$value, pattern = "reg")) %>% 
+  filter(!str_detect(string = .$value, pattern = "reg_rich")) %>% 
   pull()
 
 name <- str_extract(filename, pattern = "all|masu|other")
@@ -50,7 +51,8 @@ df_est <- lapply(filename, function(x) {
                               parameter == "b[2]" ~ "Stock enhancement",
                               parameter == "b[3]" ~ "Ocean productivity"),
            Response = ifelse(parameter == "b[1]", response, NA),
-           Response = case_when(Response == "cv" ~ "CV",
+           Response = case_when(Response == "richness" ~ "Species richness",
+                                Response == "cv" ~ "CV",
                                 Response == "mu" ~ "Mean $\\mu$",
                                 Response == "sigma" ~ "SD $\\sigma$")) %>% 
     relocate(Response,
