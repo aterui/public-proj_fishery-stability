@@ -67,8 +67,8 @@ df_beta <- lapply(file_name,
          pp = prob_positive,
          pn = 1 - prob_positive) %>%
   mutate(response = factor(response,
-                           levels = c("CV~sigma/mu",
-                                      "Species~richness",
+                           levels = c("Species~richness",
+                                      "CV~sigma/mu",
                                       "Mean~mu~(ind.~m^-2)",
                                       "SD~sigma~(ind.~m^-2)"))) %>% 
   filter(str_detect(parameter, "b_raw")) %>%
