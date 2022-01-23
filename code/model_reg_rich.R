@@ -26,14 +26,17 @@ model {
   ## site-level
   for(i in 1:Nsite) {
     
-    log_y[i] ~ dnorm(mu[i], tau)
+    Y[i] ~ dpois(lambda[i])
     
-    mu[i] <-
+    log(lambda[i]) <-
       a0[River[i]] + 
       a[1] * scl_wsd_area[i] +
       a[2] * scl_temp[i] +
       a[3] * scl_ppt[i] +
-      a[4] * scl_forest[i]
+      a[4] * scl_forest[i] +
+      eps[i]
+    
+    eps[i] ~ dnorm(0, tau)
     
   }
   
@@ -59,8 +62,6 @@ data {
   # standardization ---------------------------------------------------------
   
   for(i in 1:Nsite) {
-    log_y[i] <- log(Y[i])
-    
     scl_wsd_area[i] <- (Wsd_area[i] - mean(Wsd_area[])) / sd(Wsd_area[])
     scl_temp[i] <- (Temp[i] - mean(Temp[])) / sd(Temp[])
     scl_ppt[i] <- (Ppt[i] - mean(Ppt[])) / sd(Ppt[])

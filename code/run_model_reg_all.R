@@ -119,4 +119,7 @@ out <- relocate(out, c(response, parameter))
 
 # export ------------------------------------------------------------------
 
+out <- read_csv("result/reg_rich.csv") %>% 
+  bind_rows(out)
+
 write_csv(out, "result/reg_all.csv")
