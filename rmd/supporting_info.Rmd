@@ -18,7 +18,8 @@ header-includes:
 pacman::p_load(knitr)
 
 knitr::opts_chunk$set(echo = FALSE,
-                      message = FALSE)
+                      message = FALSE,
+                      warning = FALSE)
 options(knitr.kable.NA = '')
 
 ```
@@ -27,6 +28,7 @@ options(knitr.kable.NA = '')
 \newpage
 \pagenumbering{arabic}
 ```
+
 # Tables
 
 ## Table S1 Parameter values used in the main simulation
@@ -96,10 +98,9 @@ for(i in 1:length(table_stvy)) {
 
 ```{r table_reg}
 
-j <- 5
-
 ## load regression tables
 source(here::here("code/table_reg.R"))
+j <- 5
 
 ## conditional text
 c_text <- case_when(name == "all" ~ "whole community",
@@ -134,3 +135,38 @@ for(i in seq_len(length(df_est))) {
 
 # Figures
 
+```{r figure_main}
+
+## load figures
+source(here::here("code/figure_suppl.R"))
+
+j <- 0
+figure_sim_chunk <- knit_chunk <- NULL
+
+for(i in seq_len(nrow(df_param))) {
+  
+  knit_chunk <- paste0("## Figure S", i + j,
+                       " Theoretical prediction (",
+                       "$r_1$ = `r df_param$r1[",i,"]`, ",
+                       "$\\sigma_{env}$ = `r df_param$sd_env[",i,"]`, ",
+                       "$K$ = `r df_param$k[",i,"]`) \n",
+                       
+                       "\n```{r figure_s", i + j,", fig.width = 9.5, fig.height = 8}
+                       \n\n
+                       list_g[[",i,"]]
+                       \n\n
+                       ```\n",
+                       
+                       "Theoretical predictions for the stocking effect on community dynamics. Rows represent different response varaibles, and columns show distinct simulation scenarios with different strength of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters used in this analysis is the following: ",
+                       "intrinsic growth rate of enhanced species $r_1$ = `r df_param$r1[",i,"]`; ",
+                        "environmental variability $\\sigma_{env}$ = `r df_param$sd_env[",i,"]`; ",
+                        "carrying capacity $K$ = `r df_param$k[",i,"]`.",
+                        "\n\\pagebreak\n")
+
+  figure_sim_chunk <- c(figure_sim_chunk, knit_chunk)
+  
+}
+
+```
+
+`r paste(knit(text = figure_sim_chunk), collapse = '\n')`
