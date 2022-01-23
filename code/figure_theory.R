@@ -39,7 +39,6 @@ df0 <- sim_result %>%
                                            "SD~sigma~(ind.)")))
 
 
-
 # plot1 cv mean sd --------------------------------------------------------
 
 source("code/figure_set_theme.R")
@@ -72,3 +71,8 @@ g_theory <- df0 %>%
              labeller = label_parsed) +
   guides(color = guide_legend(override.aes = list(fill = NA)),
          fill = "none")
+
+ggsave(g_theory,
+       filename = here::here("figure/figure_theory.pdf"),
+       width = 7.5,
+       height = 6)
