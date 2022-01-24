@@ -11,7 +11,7 @@ pacman::p_load(tidyverse, foreach)
 ## species under these genera were recorded as either species-level or as spp.
 ## extra-care must be taken for species-level analysis for these species
 
-d0 <- read_csv("data_fmt/data_hkd_prtwsd_fmt.csv") %>% 
+d0 <- read_csv(here::here("data_fmt/data_hkd_prtwsd_fmt.csv")) %>% 
   mutate(taxon = case_when(genus == "Cottus" ~ "Cottus_spp",
                            genus == "Pungitius" ~ "Pungitius_spp",
                            genus == "Tribolodon" ~ "Tribolodon_spp",
