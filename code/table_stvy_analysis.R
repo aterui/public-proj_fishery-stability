@@ -22,7 +22,7 @@ for(i in seq_len(length(text_match))) {
                                                     "Carrying capacity $K$",
                                                     "Intrinsic growth rate $r_1$",
                                                     "Maximum intrinsic growth rate $r_{max}$",
-                                                    "Environmental variability $\\sigma_{env}$",
+                                                    "Environmental variability $\\sigma_{\\epsilon}$",
                                                     "Relative fitness $f_R$",
                                                     "Competition coefficient $\\bar{\\alpha}$",
                                                     "Intercept"),

@@ -19,9 +19,9 @@ df_param <- sim_result %>%
                 alpha) %>% 
   pivot_longer(cols = everything(),
                names_to = "Parameter",
-               values_to = "Value") %>% 
+               values_to = "Main") %>% 
   group_by(Parameter) %>% 
-  summarize(Value = list(unique(Value))) %>% 
+  summarize(Main = list(unique(Main))) %>% 
   ungroup() %>% 
   mutate(
     id = case_when(Parameter == "n_species" ~ "a",
@@ -38,26 +38,21 @@ df_param <- sim_result %>%
                                Parameter == "sd_env" ~ "Environmental variability",
                                Parameter == "phi" ~ "Relative fitness of captive-bred individuals",
                                Parameter == "alpha" ~ "Average strength of interspecific competition"),
+    Sensitivity = case_when(Parameter == "n_species" ~ "Unif(5, 20)",
+                            Parameter == "k" ~ "Unif(100, 1000)",
+                            Parameter == "r1" ~ "Unif(0.5, 2.5)",
+                            Parameter == "r_max" ~ "Unif(0.5, 2.5)",
+                            Parameter == "sd_env" ~ "Unif(0.05, 0.5)",
+                            Parameter == "phi" ~ "Unif(0.5, 1)",
+                            Parameter == "alpha" ~ "Unif(0.05, 0.5)"),
     Parameter = case_when(Parameter == "n_species" ~ "$S$",
                           Parameter == "k" ~ "$K$",
                           Parameter == "r1" ~ "$r_1$",
                           Parameter == "r_max" ~ "$r_{max}$",
-                          Parameter == "sd_env" ~ "$\\sigma_{env}$",
+                          Parameter == "sd_env" ~ "$\\sigma_{\\epsilon}$",
                           Parameter == "phi" ~ "$f_R$",
                           Parameter == "alpha" ~ "$\\bar{\\alpha}$")
   ) %>% 
   arrange(id) %>% 
   dplyr::select(-id) %>% 
   relocate(Parameter, Interpretation)
-
-
-# table for sensitivity analysis ------------------------------------------
-            
-df_param_stvy <- df_param %>% 
-  mutate(Value = case_when(Parameter == "$S$" ~ "Unif(5, 20)",
-                           Parameter == "$K$" ~ "Unif(100, 1000)",
-                           Parameter == "$r_1$" ~ "Unif(0.5, 2.5)",
-                           Parameter == "$r_{max}$" ~ "Unif(0.5, 2.5)",
-                           Parameter == "$\\sigma_{env}$" ~ "Unif(0.05, 0.5)",
-                           Parameter == "$f_R$" ~ "Unif(0.5, 1)",
-                           Parameter == "$\\bar{\\alpha}$" ~ "Unif(0.05, 0.5)"))
