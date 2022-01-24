@@ -33,18 +33,17 @@ df0 <- sim_result %>%
                               status == "enhanced" ~ "b",
                               status == "unenhanced" ~ "c")) %>% 
   mutate(response_name = factor(response_name,
-                                levels = c("CV~sigma/mu",
-                                           "Number~of~species~persist",
+                                levels = c("Number~of~species~persist",
+                                           "CV~sigma/mu",
                                            "Mean~mu~(ind.)",
                                            "SD~sigma~(ind.)")))
 
 
-# plot1 cv mean sd --------------------------------------------------------
+# plot --------------------------------------------------------------------
 
 source("code/figure_set_theme.R")
 theme_set(plt_theme)
 
-# cv plot ####
 g_theory <- df0 %>% 
   ggplot(aes(y = value,
              x = stock,
@@ -66,13 +65,9 @@ g_theory <- df0 %>%
        y = "Value",
        color = "Species group") +
   facet_wrap(facets = ~ response_name,
-             nrow = 2,
+             nrow = 4,
              scales = "free_y",
              labeller = label_parsed) +
-  guides(color = guide_legend(override.aes = list(fill = NA)),
-         fill = "none")
-
-ggsave(g_theory,
-       filename = here::here("figure/figure_theory.pdf"),
-       width = 7.5,
-       height = 6)
+  guides(color = "none",#guide_legend(override.aes = list(fill = NA)),
+         fill = "none") +
+  theme(axis.title.y = element_blank())

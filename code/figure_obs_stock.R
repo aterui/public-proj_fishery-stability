@@ -38,8 +38,8 @@ df_m <- do.call(bind_rows, list_df) %>%
                               group == "masu" ~ "b",
                               group == "other" ~ "c")) %>% 
   mutate(response = factor(response,
-                           levels = c("CV~sigma/mu",
-                                      "Species~richness",
+                           levels = c("Species~richness",
+                                      "CV~sigma/mu",
                                       "Mean~mu~(ind.~m^-2)",
                                       "SD~sigma~(ind.~m^-2)")))
 
@@ -111,7 +111,7 @@ g_obs <- df_plot %>%
   ggplot(aes(x = mean_stock,
              y = value)) +
   facet_wrap(facets = ~ response,
-             nrow = 3,
+             nrow = 4,
              scales = "free_y",
              labeller = label_parsed) + 
   geom_point(data = filter(df_plot, group == "masu"),
@@ -132,16 +132,3 @@ g_obs <- df_plot %>%
   scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
   guides(linetype = "none") +
   theme(axis.title.y = element_blank())
-
-
-# export ------------------------------------------------------------------
-
-source("code/figure_map.R")
-
-g <- g_hkd + g_obs + 
-  plot_annotation(tag_levels = 'A')
-
-ggsave(g,
-       filename = here::here("figure/figure_obs.pdf"),
-       width = 13,
-       height = 6)

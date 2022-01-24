@@ -51,8 +51,8 @@ g_example <- ggplot() +
                         river == "okushibetsu"),
           size = 1) +
   annotation_scale() +
-  theme_void() +
-  theme(plot.background = element_rect(fill = grey(1, 0.5)))
+  theme_void()# +
+  #theme(plot.background = element_rect(fill = grey(1, 0.5)))
 
 g_hkd <- ggplot() +
   geom_sf(data = albers_sf_hkd,
@@ -60,10 +60,10 @@ g_hkd <- ggplot() +
           fill = grey(0.75)) +
   geom_sf(data = albers_sf_point,
           size = 0.5) +
-  theme_bw() +
-  inset_element(g_example,
-                ignore_tag = TRUE,
-                0.6, 0.05, 0.99, 0.3)
+  theme_bw()# +
+  #inset_element(g_example,
+  #              ignore_tag = TRUE,
+  #              0.6, 0.05, 0.99, 0.3)
 
 g_masu <- ggdraw() +
   draw_image("image/masu_salmon.jpg") +
