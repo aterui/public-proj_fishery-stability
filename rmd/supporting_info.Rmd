@@ -29,13 +29,48 @@ options(knitr.kable.NA = '')
 \pagenumbering{arabic}
 ```
 
+# Supplementary text
+
+## Sensitivity analysis
+
+We performed a sensitivity analysis of the community simulation to identify key simulation parameters that strongly affect the relationships between community dynamics (temporal mean and SD of density) and stock enhancement. We generated 500 sets of parameter combinations by randomly drawing values of 7 simulation parameters from uniform distributions (**Table S1**). For each parameter combination, we simulated dynamics of 100 independent communities with varying numbers of stock enhancement $R$ (drawn randomly from $Unif(0, 500)$). This yields a total of 50000 simulation replicates. In each simulation replicate, we ran 1600 time steps of community dynamics and obtained temporal means and SDs of whole community ($\sum_i^SN_i$), enhanced species ($N_1$), and unenhanced species ($\sum_{i, i\ne1}^SN_i$) using the last 1000 time steps. The first 600 time steps were discarded as initialization and burn-in periods.
+
+For each parameter combination, we regressed mean densities and SDs of whole community, enhanced species, and unenhanced species $y_j$ on the number of release $R$ as:
+
+```{=tex}
+\begin{equation}
+\begin{aligned}
+  y_j &\sim Normal(\mu_j, \sigma^2)\\
+  \mu_j &= \psi_0 + \psi_1~R_j
+\end{aligned}
+\end{equation}
+```
+
+where $\psi_k$ ($k = 0-1$) are the intercept ($\psi_0$) and regression coefficient ($\psi_1$). We extracted 500 estimates of $\psi_1$, each of which represents the effect of stock enhancement $R$ on community dynamics under a given parameter combination. To examine influences of simulation parameters (**Table S1**) on $\psi_1$, we developed the following regression model taking $\psi_1$ as a response variable (parameter combination $n$):
+
+```{=tex}
+\begin{equation}
+\begin{aligned}
+  \psi_{n} &\sim Normal(\mu_n, \sigma^2)\\
+  \mu_n &= \zeta_0 + \zeta_1 S_n + \zeta_2 K_n + \zeta_3 r_{1,n} + \zeta_4 r_{max,n} + \zeta_5 \sigma_{\epsilon,n} + \zeta_6 f_{R, n} + \zeta_7 \bar{\alpha}_n
+\end{aligned}
+\end{equation}
+```
+
+where $\zeta_k$ ($k = 0-7$) are the intercept ($\zeta_0$) and regression coefficients ($\zeta_{1-7}$). Both response and explanatory variables were standardized to a mean of zero and a standard deviation of one, so that regression coefficients are comparable.
+
+We found that regression coefficients of the following parameters ($\zeta$) never exceeded a value of 0.30 and were less influential: the number of species $S$, the maximum intrinsic growth rate of unenhanced species $r_{max}$, and relative fitness $f_R$. Therefore, in the main simulation, we fixed values of $S$ and $r_{max}$ (**Table S1**). In the meantime, we varied values of $K$, $r_1$, $\sigma_{\epsilon}$, $f_R$, and $\bar{\alpha}$ as they are potentially influential (**Table S1**). Although $f_R$ had little influence on stocking effects (**Table S1**), we varied this parameter given the significant interest in relative fitness of captive-bred individuals in the wild.
+
+\newpage
+
 # Tables
 
-## Table S1 Parameter values used in the main simulation
-See Methods for model description.
+## Table S1 Simulation parameter
+Parameter values used in the main and sensitivity analysis. In the sensitivity analysis, 500 parameter values were drawn randomly from uniform distributions. See Methods for model description.
 
-```{r table_param_main_sim}
+```{r table_s1}
 
+# Table S1
 source(here::here("code/table_param_set.R"))
 kable(df_param, format = "markdown")
 
@@ -43,20 +78,9 @@ kable(df_param, format = "markdown")
 
 \newpage
 
-## Table S2 Parameter values used in the sensitivity analysis
-In the sensitivity analysis, parameter values were randomly drawn from uniform distributions. Discrete parameters (number of species, carrying capacity) were rounded to the nearest integer prior to the analysis.
-
-```{r table_param_stvy}
-
-source(here::here("code/table_param_set.R"))
-kable(df_param_stvy, format = "markdown")
-
-```
-
-\newpage
-
 ```{r data_stvy, include=FALSE}
 
+# Table S2-4
 ## load table for sensitivity analysis
 source(here::here("code/table_stvy_analysis.R"))
 
@@ -64,7 +88,8 @@ source(here::here("code/table_stvy_analysis.R"))
 
 ```{r table_sensitivity, results="asis"}
 
-j <- 2
+# Table S2-4
+j <- 1
 
 ## conditional text
 c_text <- c("whole community",
@@ -94,10 +119,23 @@ for(i in 1:length(table_stvy)) {
 
 `r paste(knit(text = table_stvy_chunk), collapse = '\n')`
 
+## Table S5 Observed species
+Fish species found in the study watersheds.
 
+```{r table_s5}
+
+# Table S5
+source(here::here("code/table_species_list.R"))
+
+kable(df_sp_list, format = "markdown")
+
+```
+
+\newpage
 
 ```{r table_reg}
 
+# Table S6-8
 ## load regression tables
 source(here::here("code/table_reg.R"))
 j <- 5
@@ -135,10 +173,11 @@ for(i in seq_len(length(df_est))) {
 
 # Figures
 
-```{r figure_main}
+```{r figure_sim}
 
+# Figure S1-12
 ## load figures
-source(here::here("code/figure_suppl.R"))
+source(here::here("code/figure_si_theory.R"))
 
 j <- 0
 figure_sim_chunk <- knit_chunk <- NULL
@@ -148,18 +187,18 @@ for(i in seq_len(nrow(df_param))) {
   knit_chunk <- paste0("## Figure S", i + j,
                        " Theoretical prediction (",
                        "$r_1$ = `r df_param$r1[",i,"]`, ",
-                       "$\\sigma_{env}$ = `r df_param$sd_env[",i,"]`, ",
+                       "$\\sigma_{\\epsilon}$ = `r df_param$sd_env[",i,"]`, ",
                        "$K$ = `r df_param$k[",i,"]`) \n",
                        
                        "\n```{r figure_s", i + j,", fig.width = 9.5, fig.height = 8}
                        \n\n
-                       list_g[[",i,"]]
+                       list_g_theory[[",i,"]]
                        \n\n
                        ```\n",
                        
-                       "Theoretical predictions for the stocking effect on community dynamics. Rows represent different response varaibles, and columns show distinct simulation scenarios with different strength of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters used in this analysis is the following: ",
+                       "Theoretical predictions for the stocking effect on community dynamics. Rows represent different response varaibles, and columns show distinct simulation scenarios with different strength of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters are: ",
                        "intrinsic growth rate of enhanced species $r_1$ = `r df_param$r1[",i,"]`; ",
-                        "environmental variability $\\sigma_{env}$ = `r df_param$sd_env[",i,"]`; ",
+                        "environmental variability $\\sigma_{\\epsilon}$ = `r df_param$sd_env[",i,"]`; ",
                         "carrying capacity $K$ = `r df_param$k[",i,"]`.",
                         "\n\\pagebreak\n")
 
@@ -170,3 +209,38 @@ for(i in seq_len(nrow(df_param))) {
 ```
 
 `r paste(knit(text = figure_sim_chunk), collapse = '\n')`
+
+
+```{r figure_dyns}
+
+# Figure S13-15
+## load figures
+source(here::here("code/figure_si_obs_dyns.R"))
+j <- 12
+
+c_text <- c("whole community",
+            "masu salmon",
+            "unenhanced species")
+
+figure_dyns_chunk <- knit_chunk <- NULL
+
+for(i in seq_len(length(list_g_dyns))) {
+  
+  knit_chunk <- paste0("## Figure S", i + j,
+                       " Temporal dynamics of stream fish communities (`r c_text[",i,"]`) \n",
+                       
+                       "\n```{r figure_s", i + j,", fig.width = 11, fig.height = 8}
+                       \n\n
+                       list_g_dyns[[",i,"]]
+                       \n\n
+                       ```\n",
+                       "Temporal dynamics of stream fish communities (`r c_text[",i,"]`) in Hokkaido, Japan. Dots represent observed density, and solid lines are predicted values of the Bayesian state-space model. Panels correspond to individual watersheds, and colors distinguish samplig sites within a watershed.",
+                        "\n\\pagebreak\n")
+
+  figure_dyns_chunk <- c(figure_dyns_chunk, knit_chunk)
+  
+}
+
+```
+
+`r paste(knit(text = figure_dyns_chunk), collapse = '\n')`
