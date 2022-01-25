@@ -91,7 +91,7 @@ while(max(mcmc_summary$Rhat) > 1.09) {
 }
 
 mcmc_sample <- post$mcmc
-save(mcmc_sample, file = "result/mcmc_rich.RData")
+save(mcmc_sample, file = "result/mcmc_all_richness.RData")
 
 ## output ####
 n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
