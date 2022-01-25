@@ -48,14 +48,14 @@ site_selected <- d0 %>%
          n_obs_masu > n_obs_masu_threshold) %>% 
   pull(site_id)
 
-d0 <- d0 %>% 
+df_selected <- d0 %>% 
   filter(site_id %in% site_selected)
 
 
 # summarize data to community level ---------------------------------------
 
 ## summarize data by group - stocked or unstocked
-df_group <- d0 %>% 
+df_group <- df_selected %>% 
   mutate(group = case_when(taxon == "Oncorhynchus_masou_masou" ~ "masu_salmon",
                            taxon != "Oncorhynchus_masou_masou" ~ "other")) %>% 
   group_by(year,
@@ -71,7 +71,7 @@ df_group <- d0 %>%
        
 ## summarize data as community
 ## combine with group data
-df_fish <- d0 %>% 
+df_fish <- df_selected %>% 
   group_by(year,
            river,
            site,
@@ -85,7 +85,7 @@ df_fish <- d0 %>%
   bind_rows(df_group)
 
 ## year information for state-space model
-df_year <- d0 %>% 
+df_year <- df_selected %>% 
   group_by(site_id) %>% 
   summarize(St_year = min(year) - min(.$year) + 1,
             End_year = max(year) - min(.$year) + 1) %>% 
