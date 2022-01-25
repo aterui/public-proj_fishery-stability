@@ -33,8 +33,8 @@ df0 <- sim_result %>%
                               status == "enhanced" ~ "b",
                               status == "unenhanced" ~ "c")) %>% 
   mutate(response_name = factor(response_name,
-                                levels = c("Number~of~species~persist",
-                                           "CV~sigma/mu",
+                                levels = c("CV~sigma/mu",
+                                           "Number~of~species~persist",
                                            "Mean~mu~(ind.)",
                                            "SD~sigma~(ind.)")))
 
