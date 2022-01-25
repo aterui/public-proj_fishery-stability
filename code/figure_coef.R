@@ -9,21 +9,22 @@ pacman::p_load(foreach,
 
 # data --------------------------------------------------------------------
 
-variable <- c("cv", "mu", "sigma")
+variable <- c("richness", "cv", "mu", "sigma")
 group <- c("all", "masu", "other")
 
 ## loop for response variables
 df_mcmc <- foreach(i = seq_len(length(variable)),
                      .combine = bind_rows) %do% {
   
-  file_name <- list.files(path = "result") %>%
+  file_name <- list.files(path = here::here("result")) %>%
     as_tibble() %>%
+    filter(str_detect(value, "mcmc")) %>%
     filter(str_detect(value, variable[i])) %>%
     pull() %>%
     paste0("result/", .)
   
   ## loop for fish group
-  df_mcmc_beta <- foreach(j = seq_len(length(group)),
+  df_mcmc_beta <- foreach(j = seq_len(length(file_name)),
           .combine = bind_rows) %do% {
     
     load(file = file_name[j])
@@ -40,28 +41,41 @@ df_mcmc <- foreach(i = seq_len(length(variable)),
 
 df_mcmc <- df_mcmc %>%
   filter(!(group != "all" & response == "cv")) %>%
-  mutate(group = case_when(group == "all" ~ "All",
+  mutate(group = case_when(group == "all" ~ "Whole",
                            group == "masu" ~ "Enhanced",
                            group == "other" ~ "Unenhanced"),
-         response = case_when(response == "cv" ~ "CV",
+         response = case_when(response == "richness" ~ "Species richness",
+                              response == "cv" ~ "CV",
                               response == "mu" ~ "Mean",
                               response == "sigma" ~ "SD")) %>%
-  mutate(group = factor(group, levels = c("All", "Enhanced", "Unenhanced")))
+  mutate(group = factor(group,
+                        levels = c("Whole",
+                                   "Enhanced",
+                                   "Unenhanced")),
+         response = factor(response,
+                           levels = c("SD",
+                                      "Mean",
+                                      "Species richness",
+                                      "CV")))
 
 # plot --------------------------------------------------------------------
 
 g_coef <- df_mcmc %>% 
-  ggplot(aes(x = response,
-             y = b2,
+  ggplot(aes(x = b2,
+             y = response,
+             color = group,
              fill = group)) +
-  geom_violin(alpha = 0.5,
-              draw_quantiles = 0.5) +
-  labs(x = "Response",
-       y = "Effect of enhancement",
+  geom_vline(xintercept = 0,
+             color = grey(0.5),
+             linetype = "dashed") +
+  geom_density_ridges(alpha = 0.5) +
+  labs(y = "Response",
+       x = "Stocking effect",
        fill = "Species group") +
+  guides(color = "none") +
   theme_ridges()
 
 ggsave(g_coef,
        filename = here::here("figure/figure_coef.pdf"),
-       width = 6,
-       height = 3)
+       width = 8,
+       height = 6)
