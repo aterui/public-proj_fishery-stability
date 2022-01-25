@@ -1,5 +1,5 @@
 ---
-title: "Selective stock enhancement undermines community stability"
+title: "Stock enhancement undermines community stability"
 output:
   word_document:
     reference_docx: word_format.docx
@@ -11,10 +11,13 @@ bibliography: reference.bib
 ---
 
 ```{r setup, include=FALSE}
+
+# setup
 knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load(tidyverse)
+op <- function(x, d = 2) sprintf(paste0("%1.", d, "f"), x) 
 
-# theory infomation
+# theory
 load(here::here("result/result_ricker.RData"))
 
 n_sim <- sim_result %>% 
@@ -23,8 +26,6 @@ n_sim <- sim_result %>%
   unique()
 
 param_set <- sim_result %>% 
-  filter(r_max == 2,
-         alpha != 0.3) %>% 
   distinct(n_species,
            k,
            r_type,
@@ -37,6 +38,22 @@ param_set <- sim_result %>%
            alpha,
            model,
            seed)
+
+# empirical data
+
+source(here::here("code/data_fmt_fishdata.R"))
+
+filename <- list.files(path = here::here("result"), full.names = T) %>% 
+  as_tibble() %>% 
+  filter(str_detect(string = .$value, pattern = "reg")) %>% 
+  filter(!str_detect(string = .$value, pattern = "reg_rich")) %>% 
+  pull()
+
+df_beta <- lapply(filename, function(x) {
+  read_csv(here::here(x)) %>% 
+    filter(parameter == "b[2]")
+})
+names(df_beta) <- str_extract(filename, "all|masu|other")  
 
 ```
 
@@ -75,29 +92,29 @@ $$
 
 $f_R~(\ge 0)$ is the density-independent survival of captive-bred individuals relative to wild individuals. Therefore, the model accounts for fitness difference of captive-bred individuals due to genetic effects and/or plasticity [@weberInteractionsHatcheryWild2003; @snyderLimitationsCaptiveBreeding1996; @arakiHatcheryStockingHelp2010] when considering the reproductive contribution of released individuals to the next generation of the enhanced species. Without loss of generality, we assumed constant $K_i$ ($K_i = K$) and $R_t$ ($R_t = R$) across species and time, respectively.
 
-In our simulation, we used `r nrow(param_set)` simulation scenarios with varied values of the following ecological parameters: intrinsic growth of the enhanced species $r_1$, mean strength of interspecific competition $\bar{\alpha}$, carrying capacity $K$, relative fitness of captive-bred individuals $f_R$, and degree of environmental stochasticity $\sigma_{\epsilon}$. Under each scenario with a unique parameter combination, we ran `r n_sim` time steps of `r max(sim_result$n_rep)` independent communities (i.e., simulation replicates) with varying numbers of released individuals $R$ ($0-500$). The last `r unique(sim_result$n_timestep)` time steps were used to obtain the number of species persist (defined as $N_i > 0.01$ at $t=1000$), the coefficient of variation (CV), the temporal mean, and the temporal SD of total community density ($\sum_i^SN_i$). In addition, temporal means and SDs were calculated separately for the enhanced species $N_1$ and unenhanced species $\sum_{i,i \ne 1}^S N_i$ to infer mechanisms that underlie the community-level response.
+In our simulation, we considered `r nrow(param_set)` simulation scenarios with different values of the following ecological parameters: intrinsic growth of the enhanced species $r_1$ (`r unique(sim_result$r1)`), mean strength of interspecific competition $\bar{\alpha}$ (`r unique(sim_result$alpha)`), carrying capacity $K$ (`r unique(sim_result$k)`), relative fitness of captive-bred individuals $f_R$ (`r unique(sim_result$phi)`), and degree of environmental stochasticity $\sigma_{\epsilon}$ (`r unique(sim_result$sd_env)`). We chose these parameters because our sensitivity analysis revealed that these parameters have the potential to alter the relationship between community dynamics and stock enhancement (**Supporting Information**). Under each scenario with a unique parameter combination, we ran `r n_sim` time steps of `r max(sim_result$n_rep)` independent communities (i.e., simulation replicates) with varying numbers of released individuals $R$ ($0-500$). The last `r unique(sim_result$n_timestep)` time steps were used to obtain the following summary statistics of total community density $\sum_i^SN_i$: the number of species persist (defined as $N_i > 0.01$ at $t=1000$), the coefficient of variation (CV), the temporal mean, and the temporal SD. In addition, temporal means and SDs were calculated separately for the enhanced species $N_1$ and unenhanced species $\sum_{i,i \ne 1}^S N_i$ to infer mechanisms that underlie the community-level response.
 
-In general, our model predicted a destabilizing effect of selective stock enhancement on ecological communities as illustrated by increased CV with increasing numbers of released individuals $R$ (**Figure 1A**). This pattern stemmed mainly from the reduced mean of total community density, and both enhanced and unenhanced species groups were responsible for this result (**Figure 1A**). For enhanced species, released individuals induced overcompensation, in which the negative effect of reduced per-capita reproduction due to competition exceeds the numerical benefit of released individuals. Therefore, the enhanced species reached the lower long-term average of population density with higher numbers of released individuals, confirming previous theoretical predictions [@satakeStockingCaptivebredFish2012]. Meanwhile, interspecific competition caused the reduced mean density of unenhanced species and led to decreased numbers of persisting species at high levels of stock enhancement (**Figure 1A**). Combined, the long-term average of the total community density decreased more sharply than individual species groups with stock enhancement (**Figure 1A**). The SDs showed a similar trend, but the relationship was flatter at the community level (**Figure 1A**). Since a CV is a ratio of an SD to a mean, the steeper relationship of the mean community density resulted in the increased CV. These patterns were qualitatively similar across most ecological scenarios, even when interspecific competition is very weak (**Figure S1-6**).
+When carrying capacity is small ($K=100$), our model predicted a destabilizing effect of selective stock enhancement on ecological communities as illustrated by increased CV with increasing numbers of released individuals $R$ (**Figure 1A**). This pattern stemmed mainly from the reduced mean of total community density, and both enhanced and unenhanced species groups were responsible (**Figure 1A**). For enhanced species, released individuals induced overcompensation, in which the negative effect of reduced per-capita reproduction due to competition exceeds the numerical benefit of released individuals. Therefore, the enhanced species reached the lower long-term average of population density with higher numbers of released individuals, confirming previous theoretical predictions [@satakeStockingCaptivebredFish2012]. Meanwhile, interspecific competition caused the reduced mean density of unenhanced species and led to decreased numbers of persisting species at high levels of stock enhancement (**Figure 1A**). Combined, the long-term average of the total community density decreased more sharply than individual species groups with stock enhancement (**Figure 1A**). The SDs showed a similar trend, but the relationship was flatter at the community level (**Figure 1A**). Since a CV is a ratio of an SD to a mean, the steeper relationship of the mean community density resulted in the increased CV. These patterns were qualitatively similar across most ecological scenarios even when interspecific competition is very weak (**Figure S1-6**).
 
 The destabilizing effect emerges because stock enhancement undermines the balance of species interactions that underpins community stability. Ecological theory suggests that stable coexistence of competing species requires a niche difference that is large enough to overcome the relative difference in intrinsic competitive ability [@carrollNicheFitnessDifferences2011a]. Under this condition, competing species can grow from small populations because numerically dominant species undergoes stronger intraspecific competition [@carrollNicheFitnessDifferences2011a]. Such stable coexistence increases the likelihood of stabilizing temporal dynamics of species rich communities [@tilmanEcologicalConsequencesChanges1999a] because it gives rise to "overyielding" [@loreauDoesFunctionalRedundancy2004; @carrollNicheFitnessDifferences2011a], that is, total community density of a multi-species community exceeds what would be expected in a single species community ($\sum_i^S N_i > K$). However, stock enhancement is externally controlled and the number of release is not subject to density-dependent regulation. Therefore, excessive individuals supplemented through stock enhancement impose additional intra- and interspecific competition that interferes with the ecological process producing overyielding.
 
-The only scenario where stock enhancement had a little influence on community dynamics was when carrying capacity was sufficiently large ($K=500$; **Figures S7-S12**). In particular, stock enhancement increased, albeit slightly, the average density of the enhanced species with low population growth rate ($r_1=0.5$; **Figures S7 and S8**). This result may explain why some of the best evidence for successful stock enhancement comes from endangered species [@johnsonGeneticRestorationFlorida2010; @oppelPopulationReinforcementDemographic2021], which typically suffer from increased mortality. At the same time, our theoretical analysis illuminates limitation of stock enhancement as a primary tool of ecosystem management. One of the primary motivations for stock enhancement is to mitigate or reverse declining trends of biodiversity due to human impacts, such as habitat loss and fragmentation [@chaseEcosystemDecayExacerbates2020]. However, our results suggest that stock enhancement will not bring desired ecological outcomes unless we restore high levels of environmental capacity to support biodiversity.
+The only scenario where stock enhancement had little influence on community dynamics was when carrying capacity was sufficiently large ($K=500$; **Figures S7-S12**). In particular, stock enhancement increased the average density of the enhanced species with low population growth rate ($r_1=0.5$; **Figures S7 and S8**). This result may explain why some of the best evidence for successful stock enhancement comes from endangered species that typically suffer from increased mortality [@johnsonGeneticRestorationFlorida2010; @oppelPopulationReinforcementDemographic2021]. More importantly, the contrasting community response at different levels of carrying capacity provides deeper insights into ecosystem management. One of the core motivations for stock enhancement is to mitigate or reverse declining trends of biodiversity due to human impacts, such as habitat loss and fragmentation [@chaseEcosystemDecayExacerbates2020]. However, our results suggest that stock enhancement will not bring desired ecological outcomes in degraded habitats with compromised environmental capacity.
 
 ## Empirical evidence
 
-To demonstrate the relevance of our general theory to natural systems, we assessed the potential impacts of selective stock enhancement of masu salmon on the long-term stability of stream fish communities. Masu salmon is one of the most valuable freshwater resources in Hokkaido Island, Japan, and XX leads extensive hatchery programs across the island. In protected watersheds where any form of exploitation is prohibited (including recreational angling), long-term monitoring has been conducted with consistent sampling methods over the past two decades along with official records of stock enhancement [@teruiMetapopulationStabilityBranching2018]. Therefore, the study system sets the stage for a "natural experiment" to test our theoretical predictions. In this study, we used time-series data of stream fish communities at XX sites within XX protected watersheds (see Methods for selection criterion). Using hierarchical Bayesian models, we quantified the relationship between community dynamics and the number of fish released while accounting for potential confounding effects of climates and local abiotic factors.
+To demonstrate the relevance of our general theory to natural systems, we assessed the potential impacts of selective stock enhancement of masu salmon *Oncorhynchus masou masou* (**Figure 1E**) on the long-term stability of stream fish communities. Masu salmon is one of the most valuable freshwater resources in Hokkaido Island, Japan, and extensive hatchery programs have been implemented. In protected watersheds where any form of exploitation is prohibited (including recreational angling) (**Figure 1C and 1D**), long-term monitoring has been conducted over the past two decades along with official records of stock enhancement [@teruiMetapopulationStabilityBranching2018]. Therefore, the study system sets the stage for a "natural experiment" to test our theoretical predictions. In this study, we used the long-term data of stream fish communities (1999-2019) at `r n_distinct(df_fish$site_id)` sites within `r n_distinct(df_fish$river)` protected watersheds (see Methods for selection criterion). Using hierarchical Bayesian models, we quantified the effect of stock enhancement on community dynamics while accounting for potential confounding effects of climates and local abiotic factors.
 
-As our theory predicts, stream fish communities showed greater temporal fluctuations (higher CV) in watersheds with greater numbers of fish released. The positive relationship between the CV and the number of fish released was strongly supported by a hierarchical linear model, in which the probability of the regression coefficient being positive was XXX. This pattern was associated with the reduced long-term averages of population densities of enhanced (masu salmon) and unenhanced fish groups, although statistical support for this relationship was weak to moderate (STATS). In the meantime, the SDs of population densities had vague relationships with the number of fish released, and neither positive or negative relationship was supported by statistical analysis. These results are in good agreement with previous studies. Negative or vague population response to stock enhancement has been widely observed in other fish and invertebrate species, implying limited effectiveness of this method as a management tool. Our analysis of long-term community data further illuminated the potential negative impact of stock enhancement on unenhanced species and expanded our understanding to community-level response to stock enhancement.
+As our theory predicts, stream fish communities showed greater temporal fluctuations (higher CV) in watersheds with greater numbers of fish released (**Figure 1B**). The positive relationship between the CV and the number of fish released was strongly supported by the statistical model (**Figure 2**), in which the probability of the regression coefficient being positive was `r op(df_beta$all$prob_positive[df_beta$all$response == "cv"])`. This pattern was associated with the reduced long-term average of total community density, and both enhanced (masu salmon) and unenhanced fish groups contributed to this trend (**Figure 1B and 2**). In the meantime, the SDs had vague relationships with stock enhancement, and neither positive or negative relationship was supported by statistical analysis (**Figure 1B and 2**). At the population level, similar responses to stock enhancement have been reported in other fish and aquatic invertebrates [@arakiHatcheryStockingHelp2010]. However, our analysis expands our understanding by illustrating the community-level response to stock enhancement in natural systems.
 
-In our theory, the observed pattern emerges when negative density dependence operates in the recipient community, and this assumption is well supported by previous observations. Masu salmon typically spend one year in freshwater before migrating to the ocean, and a wealth of evidence suggests that released masu salmon compete with wild individuals of masu salmon [@sahashiEvaluationContributionHatchery2015a] and other stream fishes [@hasegawaEffectsHatcheryChum2014; @hasegawaWildMasuSalmon2018]. Hatchery-reared salmons are larger and more aggressive than wild individuals, further increasing the likelihood of intense intra- and interspecific competition in the wild [@hasegawaWildMasuSalmon2018; @weberInteractionsHatcheryWild2003]. Importantly, the number of fish released is likely controlled by socioeconomic factors (e.g., budget allocation) because there was no apparent congruence between the number of fish released and the population density of masu salmon (XX). As such, released fish are "excessive" given the density-dependent regulation of recipient communities and may impose resource competition that would otherwise not exist.
+In our theory, the observed pattern emerges when negative density dependence operates in the recipient community, and previous observations confirm this assumption. Masu salmon typically spend one year in freshwater before migrating to the ocean, and a wealth of evidence suggests that released masu salmon compete with wild masu salmon [@sahashiEvaluationContributionHatchery2015a] and other stream fishes [@hasegawaEffectsHatcheryChum2014; @hasegawaWildMasuSalmon2018]. Hatchery-reared salmons are larger and more aggressive than wild individuals, further increasing the likelihood of intense intra- and interspecific competition in the wild [@hasegawaWildMasuSalmon2018; @weberInteractionsHatcheryWild2003]. Importantly, the number of fish released is controlled by socioeconomic factors (e.g., budget allocation). As such, released fish are "excessive" given the density-dependent regulation of recipient communities and may impose resource competition that would otherwise not exist.
 
-Reduced fitness of captive-bred individuals may also play a role in producing the observed community response. As with other salmonid species, ocean-migrating adults of captive-bred masu salmon show lower return rates to the spawning river and therefore less contribute to the next generation (miyakoshi?). It has also been shown that hatchery-reared salmons are more susceptible to predation than wild salmons [@weberInteractionsHatcheryWild2003]. The fitness disadvantage of captive-bred fish may interact with negative density dependence to reduce the long-term average of community density, undermining community stability in the long term.
+Reduced fitness of captive-bred individuals may also play a role in producing the observed community response. As with other salmonid species, ocean-migrating adults of captive-bred masu salmon show lower return rates to the spawning river. It has also been shown that hatchery-reared salmons are more susceptible to predation than wild salmons [@weberInteractionsHatcheryWild2003]. The fitness disadvantage of captive-bred fish may add to negative density dependence to reduce the long-term average of community density, undermining community stability in the long term.
 
 Like any non-experimental studies, we cannot exclude the possibility that our results were driven by spurious correlations. However, in the protected watersheds, any exploitation of aquatic species and alteration of in-stream habitats (e.g., construction of river-crossing structure) are strictly regulated; therefore, it is difficult to envision that unmeasured human influences played a major role in the observed relationships. Further, we have statistically controlled natural variation in environmental factors, including climatic and land use variables. Hence, we are confident in our statistical inference, and this unique study setup may have helped produce the close agreement between theory and empirical patterns.
 
 ## Implications
 
-The past few decades have witnessed substantial efforts to unveil ecological consequences of captive breeding, and there is a general agreement that the distinctive features of captive-bred individuals bring fitness disadvantages in the wild [@arakiHatcheryStockingHelp2010; @snyderLimitationsCaptiveBreeding1996]. As such, numerous studies suggested that stock enhancement with captive breeding must be carefully employed given the potential negative impacts on wild populations of enhanced species [@christieGeneticAdaptationCaptivity2012; @arakiGeneticEffectsCaptive2007a]. Despite the significant attention to the fate of captive-bred individuals, it is rare to consider the self-regulation process of biodiversity. The results of this study suggest that the ignorance of this critical process may erode the long-term persistence of the recipient community. While our empirical example is limited to stream fish communities, the consistent emergence of destabilizing effect across simulated ecological scenarios implies that this ecological phenomenon is pervasive across terrestrial and aquatic taxa.
+The past few decades have witnessed substantial efforts to unveil ecological consequences of captive breeding, and there is a general agreement that the distinctive features of captive-bred individuals bring fitness disadvantages in the wild [@arakiHatcheryStockingHelp2010; @snyderLimitationsCaptiveBreeding1996]. As such, numerous studies suggested that stock enhancement with captive breeding must be carefully employed given the potential negative impacts on wild populations of enhanced species [@christieGeneticAdaptationCaptivity2012; @arakiGeneticEffectsCaptive2007a]. Despite the significant attention to the fate of captive-bred individuals, current schemes rarely consider the self-regulation process of biodiversity. The results of this study suggest that the ignorance of this critical process may erode the long-term persistence of the recipient community. While our empirical example is limited to stream fish communities, the consistent emergence of destabilizing effect across simulated ecological scenarios implies that this ecological phenomenon is pervasive across terrestrial and aquatic taxa.
 
 We should prioritize the preservation and restoration efforts of natural habitats with a broader scope of biodiversity conservation. In particular, such efforts are crucial given that the undesired influence of stock enhancement is predicted to be exacerbated in degraded habitats due to the compromised capacity to support biodiversity (XX). It has been shown that protected areas and environmental restoration are promising tools to conserve biodiversity, and the effective spatial design is a key to achieve successful conservation [@koningNetworkGrassrootsReserves2020; @akasakaSmartProtectedArea2017]. For example, coordinated placement of conservation sites considering spatial biodiversity patterns is of critical importance in improving the ecological outcomes [@akasakaSmartProtectedArea2017; @teruiEmergentDualScaling2021; @koningNetworkGrassrootsReserves2020; @stollSmallImpoverishedRegional2013]. Socioeconomic factors such as governance may also play a central role in enforcing environmental legislation, potentially determining the effectiveness of conservation investment [@amanoSuccessfulConservationGlobal2018]. These considerable potentials indicate that we have viable management options for the sustainable future of biodiversity and natural resources before blindly accepting stock enhancement programs. Without a comprehensive framework that appreciates the ecological integrity of natural communities, stock enhancement will never be effective but impairs biodiversity.
 
@@ -105,24 +122,42 @@ We should prioritize the preservation and restoration efforts of natural habitat
 
 ## Theory
 
-We developed a multispecies Ricker model to simulate community dynamics with selective stock enhancement of a constituent species (species 1). Population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
+In this study, we modified a multispecies Ricker model to include selective stock enhancement of a constituent species (species 1). In the basic model formula without stock enhancement, population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
 
 $$
-N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp[r_i(1-\frac{N_{i,t}+\alpha_{i1} R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K})]exp(\epsilon_{i,t})
+\begin{aligned}N_{i,t+1} = N_{i,t}~exp[r_i(1-\frac{N_{i,t} + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i})]exp(\epsilon_{i,t}) &\text{(1)}
+\end{aligned}
 $$
 
-where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient between species $i$ and $j$, $K$ the community-level carrying capacity in the absence of niche difference, $R_t$ the number of released individuals for the stock enhancement of species 1 (set constant as $R_t = R$), and $\epsilon_{i,t}$ the species responses to stochastic environmental fluctuations that obey an normal distribution with a mean of zero and a standard deviation of $\sigma_{\epsilon}$. The parameter $\phi_i$ controls the relative fitness of captive-bred individuals as follows:
+where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient between species $i$ and $j$, $K_i$ the carrying capacity, and $\epsilon_{i,t}$ the species responses to stochastic environmental fluctuations that obey an normal distribution $\epsilon_{i,t} \sim Normal(0, \sigma_{\epsilon}^2)$. We modified this model formula to consider the effects of stock enhancement on reproduction and competition as follows:
 
 $$
+\begin{aligned}
+N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp[r_i \{1-\frac{N_{i,t}+\alpha_{i1} (N_1 + R_t) + \sum_{j=2}^S \alpha_{ij}N_{j,t}}{K_i}\}]exp(\epsilon_{i,t}) &\text{(2)}
+\end{aligned}
+$$
+
+$R_t$ is the number of released individuals, and the parameter $\phi_i$ controls the relative fitness of captive-bred individuals as follows:
+
+$$
+\begin{aligned}
 \phi_i = \left\{
 \begin{array}{}
 f_R & (i = 1)\\
 0 & (i \ne 1)
 \end{array}
 \right.
+&\text{(3)}
+\end{aligned}
 $$
 
-$f_R~(\ge 0)$ is the density-independent survival of captive-bred individuals relative to wild individuals.
+$f_R~(\ge 0)$ is the density-independent survival of captive-bred individuals relative to wild individuals. The equation (2) can be reorganized to:
+
+$$
+\begin{aligned}
+N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp[r_i(1-\frac{N_{i,t}+\alpha_{i1}R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i})]exp(\epsilon_{i,t}) &\text{(4)}
+\end{aligned}
+$$
 
 We varied values of the following ecological parameters: mean strength of interspecific competition ($\bar{\alpha}=$ `r unique(param_set$alpha)`), intrinsic growth of the enhanced species ($r_1 =$ `r unique(param_set$r1)`), relative fitness of captive-bred individuals ($f_R=$ `r unique(param_set$phi)`), and degree of environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(param_set$sd_env)`). Other parameters were set constant or drawn randomly from a probability distribution: $S=$ `r unique(param_set$n_species)` , $K=$ `r unique(param_set$k)` , $r_i =$ $Unif$(`r unique(param_set$r_min)` , `r unique(param_set$r_max)`) ($i \ne 1$), $\alpha_{ii} = 1$, $\alpha_{ij,i \ne j} \sim Exp(\bar{\alpha})$. This simulation setup resulted in `r nrow(param_set)` sets of parameter combinations that cover a range of ecological scenarios.
 
@@ -132,57 +167,77 @@ Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_resu
 
 ### Data
 
-**Time-series data.** We assembled time-series data of fish abundance across XX sites within XX protected watersheds of Hokkaido Island, Japan. In these watersheds, aquatic species are protected and no harvest is allowed. At these sites, the long-term monitoring program began in 1971 but effective sampling methods (a combination of electrofishing and cast net sampling) were implemented in 1999. Data were collected in summer to fall with irregular sampling intervals (0 to 3 year intervals for most cases). After careful data selection (Supporting Information), we used time-series data of fish abundance at XX sites during a period of 1999-2019.
+**Time-series data.** We assembled time-series data of fish abundance across `r n_distinct(d0$site_id)` sites within `r n_distinct(d0$river)` protected watersheds of Hokkaido Island, Japan. At these sites, the long-term monitoring program began in 1971 but effective sampling methods (a combination of electrofishing and cast net sampling) were implemented in 1999. Most data were collected in summer to fall with irregular sampling intervals (0 to 3 year intervals for most cases). We confined our analysis to the sites that meets the following selection criteria: (1) the observation span (from the first to the last year of observation) exceeds 10 years, (2) the number of observation years exceeds five years, and (3) masu salmon are observed at least twice during the observation period. As a result, we used time-series data of fish abundance at `r n_distinct(df_fish$site_id)` sites within `r n_distinct(df_fish$river)` during a period of 1999-2019.
 
-**Fish stocking.** At the protected watersheds, masu salmon were stocked to enhance the wild populations since XXX. A mixture of captive-bred and wild-born individuals were released in spring (fry [age 0+] and smolt [age 1+] stages) and fall (juvenile stage [age 0+]). We examined historical records of fish stocking and obtained annual stocking data (the number of individuals released) for a period of 1999-2019 at each watershed. Although fish were released at multiple locations within a watershed, we were unable to extract stocking data at the site level.
+**Fish stocking.** At the protected watersheds, stocking of masu salmon began in 1950s. A mixture of captive-bred and wild-born individuals were released in spring (fry [age 0+] and smolt [age 1+] stages) and fall (juvenile stage [age 0+]). For each watershed, we examined historical records and assembled annual data of stock enhancement (the number of individuals released) for a period of 1999-2019. Although fish were released at multiple locations within a watershed, we were unable to extract stocking data at the site level.
 
-**Environmental data.** At each sampling site, we collected the following data as potential covariates: upstream watershed area (km^2^; a proxy for stream size), proportional land use in the upstream watershed (forest, agriculture, urban), local climates (annual mean air temperature [unit] and cumulative precipitation [mm]), and ocean productivity (Chlorophyll a [unit]). Annual data of ocean productivity (2003-2019) were extracted from OceanColor (<https://oceancolor.gsfc.nasa.gov/>) and the averaged value within the 30-km radius of each river mouth was calculated.
+**Environmental data.** At each sampling site, we collected the following data as potential covariates: upstream watershed area (km^2^; a proxy for stream size), proportional land use in the upstream watershed (forest), local climates (annual mean air temperature [unit] and cumulative precipitation [mm]), and ocean productivity (Chlorophyll a [unit]). Annual data of ocean productivity (2003-2019) were extracted from OceanColor (<https://oceancolor.gsfc.nasa.gov/>) and the averaged value within the 30-km radius of each river mouth was calculated.
 
 ### Statistical analysis
 
-Our goal is to compare temporal dynamics of fish communities across sites. However, the data are not directly comparable because of observation errors (e.g., different observers) and missing observations. To confront this challenge, we developed Bayesian state space models for three species groups separately: (1) whole community, summed abundance of all species, (2) enhanced species, abundance of masu salmon, (3) unenhanced species, summed abundance of all species except masu salmon. Bayesian state space models is best suited for our analysis because it can account for observation errors while imputing missing values given the long-term trend at each site. The model is composed of observation and state models as described below.
+Our goal is to compare temporal community dynamics across sites. However, the data are not directly comparable because of observation errors (e.g., different observers) and missing observations. To confront this challenge, we developed a Bayesian state space model for three species groups separately: (1) whole community, summed abundance of all species, (2) enhanced species, abundance of masu salmon, (3) unenhanced species, summed abundance of all species except masu salmon. A Bayesian state space model is best suited for our analysis because it can account for observation errors while imputing missing values given the long-term trend at each site. The model is composed of observation and state models as described below.
 
-In the observation model, we model observation processes. Summed fish abundance of either whole community, enhanced species (masu salmon only), and unenhanced species at site $s$ in year $t$, $N_{s,t}$, was assumed to follow a Poisson distribution:
+In the observation model, we model observation processes. Summed fish abundance of either whole community, enhanced species (masu salmon only), or unenhanced species at site $s$ in year $t$, $N_{s,t}$, was assumed to follow a Poisson distribution:
 
 $$
-N_{s,t} \sim Poisson(\lambda_{s,t} A_{s,t})
+\begin{aligned}
+N_{s,t} \sim Poisson(\lambda_{s,t} A_{s,t}) &\text{(6)}
+\end{aligned}
 $$
 
 where $\lambda_{s,t}$ is the expected fish density (individual m^-2^) and $A_{s,t}$ the sampling area (m^2^). Since fish sampling was conducted after the spring stocking of masu salmon, captured fish may include individuals released in the observation year. To avoid biases in estimating temporal community trends, we explicitly modeled this observation process:
 
 $$
-\lambda_{s,t} = n_{s,t}e^{\epsilon_{s,t}^{obs}} + \psi \beta_s~Fry_{w(s),t}
+\begin{aligned}
+\lambda_{s,t} = n_{s,t}exp(\epsilon_{s,t}^{obs}) + \psi \beta_s~Fry_{w(s),t} &\text{(7)}
+\end{aligned}
 $$
 
-$n_{s,t}$ is the "true" fish density excluding fish released in the spring, $Fry_{w(s),t}$ the number of salmon fry released in spring in watershed $w$ within which site $s$ is located, and $\beta_s$ the site-specific effect of released salmon fry on the observed fish density. The parameter $e^{\epsilon_{s,t}^{obs}}$ is a random error variable drawn from a log-normal distribution as $\epsilon_{s,t}^{obs} \sim Normal(0, \sigma_{obs,s}^2)$. The inclusion of this random variable allows us to account for site-specific and year-specific observation errors. The parameter $\psi$ equals zero when we model the unenhanced species group (otherwise $\psi = 1$). We included $\psi$ to exclude the term $\beta_s~Fry_{w(j),t}$ because the unenhanced species group does not include masu salmon.
+$n_{s,t}$ is the "true" fish density excluding fish released in the spring, $Fry_{w(s),t}$ the number of salmon fry released in spring in watershed $w$ within which site $s$ is located, and $\beta_s$ the site-specific effect of released salmon fry on the observed fish density. The error term $\epsilon_{s,t}^{obs}$ is drawn from a normal distribution as $\epsilon_{s,t}^{obs} \sim Normal(0, \sigma_{obs,s}^2)$ to account for site- and year-specific observation errors. The parameter $\psi$ equals zero when we model the unenhanced species group (otherwise $\psi = 1$) so we exclude the term $\beta_s~Fry_{w(j),t}$.
 
 In the state model, we model temporal dynamics of fish density $n_{s,t}$ as follows:
 
 $$
-ln~n_{s,t+1} = ln~r_{s} + ln~n_{s,t} + \epsilon_{s,t}^{state}
-$$where $ln~r_{s}$ is the site-specific rate of change at site $s$ and $\epsilon_{s,t}^{state}$ is the process error that is assumed to follow a normal distribution as $\epsilon_{s,t}^{state} \sim Normal(0, \sigma_{state,s}^2)$. The site-specific rate of change is random draws from a normal distribution as $ln~r_s \sim Normal(\mu_r, \sigma_r^2)$, assuming that community dynamics across Hokkaido have a shared temporal trend to some degree (the degree of shared trend is controlled by the standard deviation $\sigma_r$). This hierarchical structure allows for improved estimates of $ln~r_s$ by sharing information across sites. We used median estimates of fish density $n_{s,t}$ to calculate temporal CV, mean ($\mu$), and SD ($\sigma$).
+\begin{aligned}
+ln~n_{s,t+1} = ln~r_{s} + ln~n_{s,t} + \epsilon_{s,t}^{state} &\text{(8)}
+\end{aligned}
+$$ where $ln~r_{s}$ is the site-specific rate of change at site $s$ and $\epsilon_{s,t}^{state}$ is the process error that is assumed to follow a normal distribution as $\epsilon_{s,t}^{state} \sim Normal(0, \sigma_{state,s}^2)$. The site-specific rate of change is random draws from a normal distribution $ln~r_s \sim Normal(\mu_r, \sigma_r^2)$, assuming that community dynamics across Hokkaido have a shared temporal trend to some degree (the degree of shared trend is controlled by the standard deviation $\sigma_r$). This hierarchical structure allows for improved estimates of $ln~r_s$ by sharing information across sites. We used median estimates of fish density $n_{s,t}$ to calculate temporal CVs, means ($\mu$), and SDs ($\sigma$).
 
-We developed the following linear regression models taking either log-transformed CV, mean, or SD as a response variable $ln~y_s$ with a normal error distribution.
+We developed the following linear regression models taking either CV, species richness, mean, or SD as a response variable $y_s$ with a normal or Poisson distribution.
 
 $$
 \begin{aligned}
-ln~y_s &\sim Normal(\mu_{y,s},\sigma_y^2)\\
-\mu_{y,s} &= \beta_{0,w(s)} + \sum_k \beta_kx_{k,s}
+\left\{
+\begin{array}{}
+ln~y_s &\sim Normal(\mu_y, \sigma_y^2)~&~\text{for CV, mean, and SD}\\
+y_s &\sim Poisson(\mu_{y,s}exp(\epsilon_{y,s}))~&\text{for species richness}
+\end{array}
+\right.
+&\text{(9)}
 \end{aligned}
 $$
 
-where $\beta_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$ nested within watershed $w$) and $\beta_k (k > 0)$ is the regression coefficient of site-level predictor $x_k$. The site-level predictors include upstream watershed area, air temperature, precipitation, forest land use, and local species richness (we excluded local species richness from the masu salmon model). The watershed-specific intercept was related to watershed-level predictors as:
+where $\sigma_y$ is the SD of residual errors and $\epsilon_{y,s}$ is the normally-distributed error term that accounts for overdispersion ($\epsilon_{y,s} \sim Normal(0, \sigma_y^2)$). The expected mean $\mu_y$ was related to linear predictors as follows:
 
 $$
 \begin{aligned}
-\beta_{0,w} &\sim Normal(\mu_{\beta,w},\sigma_{\beta}^2)\\
-\mu_{\beta,w} &=\gamma_0+\sum_k\gamma_k z_{k,w}
+\mu_{y,s} &= \gamma_{0,w(s)} + \sum_k \gamma_kx_{k,s} &\text{(10)}
 \end{aligned}
 $$
 
-The watershed-level predictors include the number of released masu salmon and ocean productivity (sea surface chlorophyll a).
+$\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$ nested within watershed $w$) and $\gamma_k (k > 0)$ are the regression coefficients of site-level predictor $x_k$. The site-level predictors include upstream watershed area, air temperature, precipitation, and forest land use (fraction). The watershed-specific intercept was related to watershed-level predictors as:
 
-We fitted the models to the data using JAGS version 4.1.0 through *runjags* package in R. Priors were summarized in XXX. Data manipulation and analysis were performed in R version 4.1.0.
+$$
+\begin{aligned}
+\gamma_{0,w} &\sim Normal(\mu_{\gamma,w},\sigma_{\gamma}^2)\\
+\mu_{\gamma,w} &=\delta_0+\sum_k\delta_k z_{k,w}
+&&\text{(11)}
+\end{aligned}
+$$
+
+$\delta_{0}$ is the watershed-specific intercept and $\delta_k (k > 0)$ are the regression coefficients. The watershed-level predictors $z_{k,w}$ include the number of released masu salmon and ocean productivity (sea surface chlorophyll a). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that cannot be captured by the watershed-level predictors.
+
+We fitted the models to the data using JAGS version 4.1.0 through *runjags* package in R. We assigned weakly informative priors for parameters, which were summarized in XXX. Data manipulation and analysis were performed in R version 4.1.0.
 
 # Data availability
 
