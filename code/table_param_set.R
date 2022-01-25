@@ -5,7 +5,7 @@ rm(list = ls())
 pacman::p_load(tidyverse)
 
 
-# table for main simulation -----------------------------------------------
+# table for simulation parameters -----------------------------------------
 
 load(file = here::here("result/result_ricker.RData"))
 
