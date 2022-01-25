@@ -41,17 +41,17 @@ For each parameter combination, we regressed mean densities and SDs of whole com
 \begin{equation}
 \begin{aligned}
   y_j &\sim Normal(\mu_j, \sigma^2)\\
-  \mu_j &= \psi_0 + \psi_1~R_j
+  \mu_j &= \xi_0 + \xi_1~R_j
 \end{aligned}
 \end{equation}
 ```
 
-where $\psi_k$ ($k = 0-1$) are the intercept ($\psi_0$) and regression coefficient ($\psi_1$). We extracted 500 estimates of $\psi_1$, each of which represents the effect of stock enhancement $R$ on community dynamics under a given parameter combination. To examine influences of simulation parameters (**Table S1**) on $\psi_1$, we developed the following regression model taking $\psi_1$ as a response variable (parameter combination $n$):
+where $\xi_k$ ($k = 0-1$) are the intercept ($\xi_0$) and regression coefficient ($\xi_1$). We extracted 500 estimates of $\xi_1$, each of which represents the effect of stock enhancement $R$ on community dynamics under a given parameter combination. To examine influences of simulation parameters (**Table S1**) on $\xi_1$, we developed the following regression model taking $\xi_1$ as a response variable (parameter combination $n$):
 
 ```{=tex}
 \begin{equation}
 \begin{aligned}
-  \psi_{n} &\sim Normal(\mu_n, \sigma^2)\\
+  \xi_{1,n} &\sim Normal(\mu_n, \sigma^2)\\
   \mu_n &= \zeta_0 + \zeta_1 S_n + \zeta_2 K_n + \zeta_3 r_{1,n} + \zeta_4 r_{max,n} + \zeta_5 \sigma_{\epsilon,n} + \zeta_6 f_{R, n} + \zeta_7 \bar{\alpha}_n
 \end{aligned}
 \end{equation}
@@ -133,12 +133,26 @@ kable(df_sp_list, format = "markdown")
 
 \newpage
 
+## Table S6 Priors
+Prior distributions used in the Bayesian models.
+
+```{r table_s6}
+
+# Table S6
+source(here::here("code/table_prior.R"))
+
+kable(df_prior, format = "markdown")
+
+```
+
+\newpage
+
 ```{r table_reg}
 
-# Table S6-8
+# Table S7-9
 ## load regression tables
 source(here::here("code/table_reg.R"))
-j <- 5
+j <- 6
 
 ## conditional text
 c_text <- case_when(name == "all" ~ "whole community",
