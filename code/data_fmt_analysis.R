@@ -6,7 +6,7 @@ pacman::p_load(tidyverse)
 
 # data --------------------------------------------------------------------
 
-source("code/data_fmt_fishdata.R")
+source(here::here("code/data_fmt_fishdata.R"))
 
 river_id <- pull(distinct(df_fish, river))
 
@@ -21,7 +21,7 @@ df_sp <- d0 %>%
          scl_n_species_unstock = c(scale(n_species_unstock)))
 
 ## df for environmental covariates
-df_env <- read_csv("data_fmt/data_env_fmt.csv") %>% 
+df_env <- read_csv(here::here("data_fmt/data_env_fmt.csv")) %>% 
   rename(wsd_area = area) %>% 
   filter(river %in% river_id) %>% 
   mutate(scl_wsd_area = c(scale(wsd_area)),
@@ -30,24 +30,23 @@ df_env <- read_csv("data_fmt/data_env_fmt.csv") %>%
          scl_forest = c(scale(frac_forest)))
 
 ## df for ocean environments
-df_ocean <- read_csv("data_fmt/data_ocean_fmt.csv") %>% 
+df_ocean <- read_csv(here::here("data_fmt/data_ocean_fmt.csv")) %>% 
   filter(river %in% river_id) %>% 
   mutate(scl_chr_a = c(scale(chr_a)),
          scl_sst = c(scale(sst)))
 
 ## df for stock data
-source("code/data_fmt_stock.R")
+source(here::here("code/data_fmt_stock.R"))
 
 ## group name
 group <- c("all", "masu", "other")
 
 # ssm data ----------------------------------------------------------------
 
-file_name <- list.files("data_fmt") %>% 
+file_name <- list.files(path = here::here("data_fmt"), full.names = T) %>% 
   as_tibble() %>% 
   filter(str_detect(value, "data_ssm")) %>% 
-  pull() %>% 
-  paste0("data_fmt/", .)
+  pull()
 
 list_ssm <- foreach(i = seq_len(length(file_name))) %do% {
   

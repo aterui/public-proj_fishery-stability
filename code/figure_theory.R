@@ -9,7 +9,7 @@ pacman::p_load(tidyverse,
 # data --------------------------------------------------------------------
 
 ## call `sim_result`
-load(file = "result/result_ricker.RData")
+load(file = here::here("result/result_ricker.RData"))
 
 df0 <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 
@@ -41,7 +41,7 @@ df0 <- sim_result %>%
 
 # plot --------------------------------------------------------------------
 
-source("code/figure_set_theme.R")
+source(here::here("code/figure_set_theme.R"))
 theme_set(plt_theme)
 
 g_theory <- df0 %>% 
@@ -68,6 +68,6 @@ g_theory <- df0 %>%
              nrow = 4,
              scales = "free_y",
              labeller = label_parsed) +
-  guides(color = "none",#guide_legend(override.aes = list(fill = NA)),
+  guides(color = "none",
          fill = "none") +
   theme(axis.title.y = element_blank())

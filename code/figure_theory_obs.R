@@ -7,9 +7,9 @@ pacman::p_load(tidyverse,
 
 # data --------------------------------------------------------------------
 
-source("code/figure_theory.R")
-source("code/figure_obs_stock.R")
-source("code/figure_map.R")
+source(here::here("code/figure_theory.R"))
+source(here::here("code/figure_obs_stock.R"))
+source(here::here("code/figure_map.R"))
 
 layout <- "
 ABC

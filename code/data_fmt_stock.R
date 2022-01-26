@@ -12,7 +12,7 @@ pacman::p_load(tidyverse)
 ## df_year_river - 31 rivers x 21 years = 651 combo
 ## df_stock - raw stock data
 
-source("code/data_fmt_fishdata.R")
+source(here::here("code/data_fmt_fishdata.R"))
 river_id <- pull(distinct(df_fish, river))
 
 df_site_id <- df_fish %>% 
@@ -28,7 +28,7 @@ df_year_river <- tibble(year_release = rep(1999:2019,
                         river = rep(river_id,
                                     each = length(1999:2019)))
 
-df_stock <- read_csv("data_fmt/data_hkd_prtwsd_stock_fmt.csv") %>% 
+df_stock <- read_csv(here::here("data_fmt/data_hkd_prtwsd_stock_fmt.csv")) %>% 
   filter(between(year_release, 1999, 2019),
          river %in% river_id)
   

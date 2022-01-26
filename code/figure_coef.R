@@ -16,12 +16,11 @@ group <- c("all", "masu", "other")
 df_mcmc <- foreach(i = seq_len(length(variable)),
                      .combine = bind_rows) %do% {
   
-  file_name <- list.files(path = here::here("result")) %>%
+  file_name <- list.files(path = here::here("result"), full.names = TRUE) %>%
     as_tibble() %>%
     filter(str_detect(value, "mcmc")) %>%
     filter(str_detect(value, variable[i])) %>%
-    pull() %>%
-    paste0("result/", .)
+    pull()
   
   ## loop for fish group
   df_mcmc_beta <- foreach(j = seq_len(length(file_name)),

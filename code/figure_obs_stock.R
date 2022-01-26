@@ -9,7 +9,7 @@ pacman::p_load(tidyverse,
 # data --------------------------------------------------------------------
 
 ## raw data for cv, mean, sd
-source("code/data_fmt_analysis.R")
+source(here::here("code/data_fmt_analysis.R"))
 
 list_df <- lapply(list_ssm, function(x) {
   x %>% 
@@ -38,13 +38,13 @@ df_m <- do.call(bind_rows, list_df) %>%
                               group == "masu" ~ "b",
                               group == "other" ~ "c")) %>% 
   mutate(response = factor(response,
-                           levels = c("Species~richness",
-                                      "CV~sigma/mu",
+                           levels = c("CV~sigma/mu",
+                                      "Species~richness",
                                       "Mean~mu~(ind.~m^-2)",
                                       "SD~sigma~(ind.~m^-2)")))
 
 ## parameter estimates
-file_name <- list.files(path = "result", full.names = TRUE) %>%
+file_name <- list.files(path = here::here("result"), full.names = TRUE) %>%
   as_tibble() %>%
   filter(str_detect(value, ".csv")) %>%
   filter(!str_detect(value, "reg_rich")) %>% 
@@ -85,7 +85,7 @@ df_beta <- lapply(file_name,
 
 # plot --------------------------------------------------------------------
 
-source("code/figure_set_theme.R")
+source(here::here("code/figure_set_theme.R"))
 theme_set(plt_theme)
 
 ## predicted values
@@ -125,10 +125,11 @@ g_obs <- df_plot %>%
                 color = group_id,
                 linetype = lty),
             data = df_y) +
-  scale_linetype_manual(values = c("solid", "dashed", "dotted")) +
+  scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted"),
+                        labels = c("> 0.95", "0.90-0.95", "< 0.90")) +
   labs(x = expression("Number of release (thousand fish year"^-1*")"),
        y = "Value",
-       color = "Species group") +
-  scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
-  guides(linetype = "none") +
+       color = "Species group",
+       linetype = "Posterior prob.") +
   theme(axis.title.y = element_blank())
