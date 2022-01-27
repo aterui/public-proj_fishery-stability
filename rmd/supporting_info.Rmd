@@ -147,12 +147,26 @@ kable(df_prior, format = "markdown")
 
 \newpage
 
+## Table S7 Parameter estimates of the Bayesian state space model
+Median estimates of the Bayesian state space model. Site specific parameters were excluded due to the large number of parameters. Numbers in parenthesis indicate 95% credible intervals.
+
+```{r table_s7}
+
+# Table S7
+source(here::here("code/table_ssm.R"))
+
+kable(df_ssm, format = "markdown")
+
+```
+
+\newpage
+
 ```{r table_reg}
 
-# Table S7-9
+# Table S8-10
 ## load regression tables
 source(here::here("code/table_reg.R"))
-j <- 6
+j <- 7
 
 ## conditional text
 c_text <- case_when(name == "all" ~ "whole community",
