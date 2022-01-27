@@ -57,12 +57,12 @@ fit_sense <- df_m %>%
   group_by(response) %>% 
   do(fit = lm(scale(slope) ~ 
                 n_species +
-                k +
                 r1 +
                 r_max +
+                alpha +
+                k +
                 sd_env +
-                phi +
-                alpha,
+                phi,
               data = .))
 
 save(fit_sense, file = "result/result_stvy_analysis.RData")
