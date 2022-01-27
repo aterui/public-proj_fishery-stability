@@ -25,12 +25,12 @@ df_param <- sim_result %>%
   ungroup() %>% 
   mutate(
     id = case_when(Parameter == "n_species" ~ "a",
-                   Parameter == "k" ~ "b",
-                   Parameter == "r1" ~ "c",
-                   Parameter == "r_max" ~ "d",
-                   Parameter == "sd_env" ~ "e",
-                   Parameter == "phi" ~ "f",
-                   Parameter == "alpha" ~ "g"),
+                   Parameter == "r1" ~ "b",
+                   Parameter == "r_max" ~ "c",
+                   Parameter == "alpha" ~ "d",
+                   Parameter == "k" ~ "e",
+                   Parameter == "sd_env" ~ "f",
+                   Parameter == "phi" ~ "g"),
     Interpretation = case_when(Parameter == "n_species" ~ "Number of species",
                                Parameter == "k" ~ "Carrying capacity",
                                Parameter == "r1" ~ "Intrinsic growth rate of an enhanced species",
