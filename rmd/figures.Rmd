@@ -1,0 +1,40 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+knit: (function(inputFile, encoding) {
+        rmarkdown::render(inputFile, encoding = encoding, output_dir = "document_output")
+      })
+header-includes:
+  \pagenumbering{gobble}
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+
+```
+
+```{r figure_1, fig.width=9, fig.height=11}
+
+source(here::here("code/figure_theory_obs.R"))
+
+print(g)
+
+```
+
+**Figure 1** Theory and empirical observations agree that stock enhancement destabilizes community dynamics. Panels and colors distinguish response variables and species groups, respectively. (A) Theoretical predictions. Dots represent individual simulation replicates, and lines and shades are loess curves fitted to simulated data and their 95% confidence intervals. Parameters used in this simulation are: intrinsic growth rate of the enhanced species $r_1=$ `r unique(df0$r1)`, average interspecific competition $\bar{\alpha}=$ `r unique(df0$alpha)`, carrying capacity $K=$ `r unique(df0$k)`, relative fitness of captive-bred individuals $f_R=$ `r unique(df0$phi)`. (B) Empirical evidence. Dots represent observed values in 31 watersheds. We averaged site-level values (geometric mean) in each watershed. Lines are predicted values of regression models, and line types corresponds to posterior probabilities of regression coefficients. See Tables S8-10 for full statistics. (C) Map of sampling sites (black dots) in Hokkaido, Japan. (D) Example of an protected watershed (Okushibetsu). (E) Masu salmon *Oncorhynchus masou masou*. Photo credit: Akira Terui.
+
+\newpage
+
+```{r figure2, fig.width=8, fig.height=6}
+
+source(here::here("code/figure_coef.R"))
+
+print(g_coef)
+
+```
+
+**Figure 2** Posterior distributions for the standardized regression coefficients of stock enhancement. Y-axis represents different response variables grouped by colors distinguishing species groups (whole community, enhanced species [masu salmon], and unenhanced species).
