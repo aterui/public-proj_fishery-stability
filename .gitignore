@@ -13,5 +13,5 @@ data_gis/CHELSA_bio10_01.tif
 data_gis/CHELSA_bio10_01.tif.aux.xml
 data_gis/CHELSA_bio10_12.tif
 data_gis/epsg4326_lu_hkd.tif.aux.xml
-rmd/document_output/manuscript.docx
+rmd/document_output
 rmd/supporting_info.log
