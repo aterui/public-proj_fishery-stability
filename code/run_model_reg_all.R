@@ -110,7 +110,11 @@ out <- foreach(i = seq_len(length(variable)),
     mutate(parameter = rownames(mcmc_summary),
            prob_positive = unlist(MCMCvis::MCMCpstr(post$mcmc,
                                                     func = function(x) mean(x > 0))),
-           response = variable[i])
+           response = variable[i],
+           n_total_mcmc = n_total_mcmc,
+           n_sample = n_sample,
+           n_thin = n_thin,
+           n_burn = n_burn)
   
   return(re)
 }
@@ -120,6 +124,9 @@ out <- relocate(out, c(response, parameter))
 # export ------------------------------------------------------------------
 
 out <- read_csv("result/reg_rich.csv") %>% 
-  bind_rows(out)
+  bind_rows(out) %>% 
+  mutate(response = factor(response,
+                           levels = c("cv", "richness", "mu", "sigma"))) %>% 
+  arrange(response)
 
 write_csv(out, "result/reg_all.csv")

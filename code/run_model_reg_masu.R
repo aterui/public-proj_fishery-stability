@@ -111,7 +111,11 @@ out <- foreach(i = seq_len(length(variable)),
     mutate(parameter = rownames(mcmc_summary),
            prob_positive = unlist(MCMCvis::MCMCpstr(post$mcmc,
                                                     func = function(x) mean(x > 0))),
-           response = variable[i])
+           response = variable[i],
+           n_total_mcmc = n_total_mcmc,
+           n_sample = n_sample,
+           n_thin = n_thin,
+           n_burn = n_burn)
   
   return(re)
 }
