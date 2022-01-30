@@ -5,29 +5,218 @@ output:
     toc: true
     includes:
         before_body: title.tex
-bibliography: reference.bib
 knit: (function(inputFile, encoding) {
         rmarkdown::render(inputFile, encoding = encoding, output_dir = "document_output")
       })
 header-includes:
   \pagenumbering{gobble}
+  \usepackage{amsmath}
+bibliography: reference.bib
+csl: science.csl
 ---
 
 ```{r setup, include=FALSE}
 
-pacman::p_load(knitr)
+# setup
+pacman::p_load(knitr,
+               tidyverse)
 
 knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE,
                       warning = FALSE)
+
 options(knitr.kable.NA = '')
 
+op <- function(x, d = 2) sprintf(paste0("%1.", d, "f"), x) 
+
+# theory
+load(here::here("result/result_ricker.RData"))
+
+n_sim <- sim_result %>% 
+  mutate(n_sim = n_warmup + n_burnin + n_timestep) %>% 
+  pull(n_sim) %>% 
+  unique()
+
+param_set <- sim_result %>% 
+  distinct(n_species,
+           k,
+           r_type,
+           r1,
+           r_min,
+           r_max,
+           sd_env,
+           phi,
+           int_type,
+           alpha,
+           model,
+           seed)
+
+# empirical data
+
+## raw data
+source(here::here("code/data_fmt_fishdata.R"))
+
+filename <- list.files(path = here::here("result"), full.names = T) %>% 
+  as_tibble() %>% 
+  filter(str_detect(string = .$value, pattern = "reg")) %>% 
+  filter(!str_detect(string = .$value, pattern = "reg_rich")) %>% 
+  pull()
+
+df_beta <- lapply(filename, function(x) {
+  read_csv(here::here(x)) %>% 
+    filter(parameter == "b[2]")
+})
+names(df_beta) <- str_extract(filename, "all|masu|other")  
+
+## ssm estimate
+df_bp <- list.files(path = here::here("data_fmt"), full.names = T) %>% 
+  as_tibble() %>% 
+  filter(str_detect(string = .$value, pattern = "ssm")) %>% 
+  pull() %>% 
+  lapply(function(x) {
+    read_csv(x) %>% 
+      filter(param == "bp_value") %>% 
+      select(mean) %>% 
+      mutate(group = str_extract(x, "all|masu|other"))
+  }) %>% 
+  bind_rows()
 ```
 
 ```{=tex}
 \newpage
 \pagenumbering{arabic}
 ```
+
+# Materials and Methods
+
+## Theory
+
+We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012]. In the basic formula without stock enhancement, population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
+
+```{=tex}
+\begin{align}
+N_{i,t+1} = N_{i,t}~exp\left[r_i \left(1-\frac{N_{i,t} + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
+\end{align}
+```
+
+ere $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient between species $i$ and $j$, $K_i$ the carrying capacity, and $\epsilon_{i,t}$ the species response to stochastic environmental fluctuations that obey an normal distribution $Normal(0, \sigma_{\epsilon}^2)$. We modified this formula to include the effects of stock enhancement on reproduction and competition as follows:
+
+```{=tex}
+\begin{align}
+N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp \left[r_i \left\{1-\frac{N_{i,t}+\alpha_{i1} (N_1 + R_t) + \sum_{j=2}^S \alpha_{ij}N_{j,t}}{K_i} \right\} \right]exp(\epsilon_{i,t})
+\end{align}
+```
+
+$R_t$ is the number of released individuals, and the parameter $\phi_i$ controls the relative fitness of captive-bred individuals:
+
+```{=tex}
+\begin{align}
+\phi_i = 
+\left\{
+\begin{array}{cc}
+f_R & (i = 1)\\
+0 & (i \ne 1)
+\end{array}
+\right.
+\end{align}
+```
+
+$f_R~(\ge 0)$ is the density-independent survival of captive-bred individuals relative to wild individuals. The equation (2) can be reorganized to:
+
+```{=tex}
+\begin{align}
+N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp \left[r_i \left(1-\frac{N_{i,t}+\alpha_{i1}R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
+\end{align}
+```
+
+In this model, intrinsic growth rates of unenhanced species $r_{i,i \ne 1}$ and interspecific competition $\alpha_{ij}$ are random draws from a uniform ($r_{i,i \ne 1} \sim Unif(0,r_{max})$) and an exponential distribution ($\alpha_{ij} \sim Exp(1/\bar{\alpha})$), respectively. We assumed constant values of intraspecific competition ($\alpha_{ii}=1$), carrying capacity $(K_i = K)$ and the number of release $(R_t=R)$.
+
+Prior to the main simulation analysis, we performed an extensive sensitivity analysis to identify parameters that strongly influence the relationship between community dynamics and stock enhancement (see **Supplementary text**). We identified five influential parameters (**Table S2-4**), different values of which were considered in the main simulation as follows: intrinsic growth of enhanced species ($r_1 =$ `r unique(param_set$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(param_set$alpha)`), carrying capacity ($K=$ `r unique(param_set$k)`), degree of environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(param_set$sd_env)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(param_set$phi)`). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(param_set$n_species)`) and the maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(param_set$r_max)`). This simulation setup resulted in `r nrow(param_set)` sets of parameter combinations that cover a range of ecological scenarios.
+
+Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_result$n_rep)` independent communities (i.e., simulation replicates). The number of released individuals $R$ was drawn randomly from a uniform distribution for each simulation replicate as $R \sim Unif(0,500)$. We initialized the community with populations of each species drawn from a poisson distribution with a mean of five. We repeated the seeding procedure every 10 time steps over the first `r unique(sim_result$n_warmup)` time steps to allow species to establish populations and reach an equilibrium without stock enhancement (initialization period). After the initialization period, we released $R$ individuals of the enhanced species every time step over the next `r unique(sim_result$n_burnin)` time steps to reach a new equilibrium with selective stock enhancement (burn-in period). We continued the simulation run with stock enhancement and saved the last `r unique(sim_result$n_timestep)` time steps. We obtained the following summary statistics of the whole community $\sum_i^SN_j$: the coefficient of variation (CV), the number of species persist (defied as $N_i > 0.01$ at $t=1600$), the temporal mean ($\mu$), and the SD ($\sigma$). The temporal mean and SD were also calculated for the enhanced species ($N_1$) and unenhanced species ($\sum_{i,i \ne 1}^S N_i$) separately. We summarized values of simulation parameters in **Table S1**.
+
+## Empirical analysis
+
+### Data
+
+**Time-series data.** We assembled time-series data of fish abundance across `r n_distinct(d0$site_id)` sites within `r n_distinct(d0$river)` protected watersheds of Hokkaido Island, Japan. At these sites, the long-term monitoring program began in 1971 but effective sampling methods (a combination of electrofishing and cast net sampling) were implemented since 1999. Most data were collected in summer with irregular interannual intervals (1 to 3 year intervals for most cases). We confined our analysis to the sites that meets the following selection criteria: (i) the observation span (from the first to the last year of observation) exceeds 10 years, (ii) the number of observation years exceeds five years, and (iii) masu salmon are observed at least twice during the observation period. As a result, we used time-series data of fish abundance at `r n_distinct(df_fish$site_id)` sites within `r n_distinct(df_fish$river)` watersheds during a period of 1999-2019. **Table S5** summarizes observed species in these watersheds.
+
+**Fish stocking.** At the protected watersheds, stocking of masu salmon began in 1950s. Hatchery fish were released in spring (fry [age 0+] and smolt [age 1+] stages) and fall (juvenile stage [age 0+]). For each watershed, we examined historical records and assembled annual data of stock enhancement (the number of fish released) for a period of 1999-2019. Although fish were released at multiple locations within a watershed, we were unable to extract stocking data at the site level.
+
+**Environmental data.** At each sampling site, we measured the following environmental variables as potential covariates: upstream watershed area (km^2^; a proxy for stream size), proportional land use in the upstream watershed (forest), local climates (annual mean air temperature [degree Celsius] and cumulative precipitation [mm]), and ocean productivity (Chlorophyll a [unit]). We used MERIT Hydro [@yamazakiMERITHydroHighresolution2019] to delineate upstream watershed polygons for each sampling site. The proportion of forest land use in each watershed polygon was estimated based on land-use data in 2015 from Copernicus Global Land Service (100-m resolution) [@marcelbuchhornCopernicusGlobalLand2020]. Climate data at each sampling site were extracted from CHELSA version 1.2 [@kargerClimatologiesHighResolution2017; @kargerDataClimatologiesHigh2018]. Annual data of ocean productivity (2003-2019) were extracted from OceanColor ([\<https://oceancolor.gsfc.nasa.gov/\>](https://oceancolor.gsfc.nasa.gov/){.uri}) and the averaged value within the 30-km radius of each river mouth was calculated. We used the following R packages to perform geospatial analysis: *sf* [@pebesmaSimpleFeaturesStandardized2018]*, raster* [@hijmansRasterGeographicData2020]*, exactextractr* [@bastonExactextractrFastExtraction2020]*, stars* [@pebesmaStarsSpatiotemporalArrays2020]*, whitebox* [@lindsayWhiteboxGATCase2016]*.*
+
+### Statistical analysis
+
+Our goal is to compare temporal community dynamics across sites. However, the data are not directly comparable because of observation errors (e.g., different observers) and missing observations. To confront this challenge, we developed a Bayesian state space model for three species groups separately: (i) whole community, summed abundance of all species, (ii) enhanced species, abundance of masu salmon, (iii) unenhanced species, summed abundance of all species except masu salmon. A Bayesian state space model is best suited for our analysis because it can account for observation errors while imputing missing values given the long-term trend at each site [@clarkPopulationTimeSeries2004; @keryBayesianPopulationAnalysis2012]. The model is composed of observation and state models as described below.
+
+In the observation model, we model observation processes. Summed fish abundance of either whole community, enhanced species (masu salmon only), or unenhanced species at site $s$ in year $t$, $N_{s,t}$, was assumed to follow a Poisson distribution:
+
+```{=tex}
+\begin{align}
+N_{s,t} \sim Poisson(\lambda_{s,t} A_{s,t})
+\end{align}
+```
+
+where $\lambda_{s,t}$ is the expected fish density (individual m^-2^) and $A_{s,t}$ the sampling area (m^2^). Since fish sampling was conducted after the spring stocking of masu salmon, captured fish may include individuals released in the observation year. To avoid biases in estimating temporal community trends, we explicitly modeled this observation process:
+
+```{=tex}
+\begin{align}
+\lambda_{s,t} = n_{s,t}exp(\epsilon_{s,t}^{obs}) + \psi \beta_s~Fry_{w(s),t}
+\end{align}
+```
+
+$n_{s,t}$ is the "true" fish density excluding fish released in the spring, $Fry_{w(s),t}$ the number of salmon fry released in spring in watershed $w$ within which site $s$ is located, and $\beta_s$ the site-specific effect of released salmon fry on the observed fish density. The parameter $\beta_s$ was drawn from a normal distribution with the hyper-mean $\mu_{\beta}$ and hyper-variance $\sigma_{\beta}^2$. The error term $\epsilon_{s,t}^{obs}$ is drawn from a normal distribution as $\epsilon_{s,t}^{obs} \sim Normal(0, \sigma_{obs,s}^2)$ to account for site- and year-specific observation errors. When modeling the unenhanced species group, $\psi$ equals zero (otherwise $\psi = 1$) so the model excludes the term $\beta_s~Fry_{w(s),t}$.
+
+In the state model, we model temporal dynamics of fish density $n_{s,t}$ as follows:
+
+```{=tex}
+\begin{align}
+ln~n_{s,t+1} = ln~r_{s} + ln~n_{s,t} + \epsilon_{s,t}^{state}
+\end{align}
+```
+
+where $ln~r_{s}$ is the site-specific rate of change at site $s$ and $\epsilon_{s,t}^{state}$ is the process error that is assumed to follow a normal distribution as $\epsilon_{s,t}^{state} \sim Normal(0, \sigma_{state,s}^2)$. The site-specific rate of change is random draws from a normal distribution $ln~r_s \sim Normal(\mu_r, \sigma_r^2)$, assuming that community dynamics across Hokkaido have a shared temporal trend to some degree (the degree of shared trend is controlled by the standard deviation $\sigma_r$). This hierarchical structure allows for improved estimates of $ln~r_s$ by sharing information across sites. We used median estimates of fish density $n_{s,t}$ to calculate temporal CVs, means ($\mu$), and SDs ($\sigma$). Bayesian p-values [@keryIntroductionWinBUGSEcologists2010] for the state-space models ranged from `r op(min(df_bp$mean))` to `r op(max(df_bp$mean))`, indicating that our model specification is appropriate. Estimated parameters and community dynamics are summarized in Supporting Information (**Table S7** and **Figures S13-S15**).
+
+We developed the following linear regression model taking either CV, species richness (the number of species present during the observation period), mean, or SD as a response variable $y_s$ with a normal or Poisson distribution.
+
+```{=tex}
+\begin{align}
+\left\{
+\begin{aligned}
+ln~y_s &\sim Normal(\mu_y, \sigma_y^2) &&\text{for CV, mean, and SD}\\
+y_s &\sim Poisson(\mu_{y,s}exp(\epsilon_{y,s})) &&\text{for species richness}
+\end{aligned}
+\right.
+\end{align}
+```
+
+where $\sigma_y$ is the SD of residual errors and $\epsilon_{y,s}$ is the normally-distributed error term that accounts for overdispersion ($\epsilon_{y,s} \sim Normal(0, \sigma_y^2)$). The expected mean $\mu_y$ was related to linear predictors as follows:
+
+```{=tex}
+\begin{align}
+\left\{
+\begin{aligned}
+\mu_{y,s} &= \gamma_{0,w(s)} + \sum_k \gamma_kx_{k,s} &&\text{for CV, mean, and SD}\\
+ln~\mu_{y,s} &= \gamma_{0,w(s)} + \sum_k \gamma_kx_{k,s} &&\text{for species richness}
+\end{aligned}
+\right.
+\end{align}
+```
+
+$\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$ nested within watershed $w$) and $\gamma_k (k > 0)$ are the regression coefficients of site-level predictor $x_k$. The site-level predictors include upstream watershed area, air temperature, precipitation, and forest land use (fraction). The watershed-specific intercept was related to watershed-level predictors as:
+
+```{=tex}
+\begin{align}
+\gamma_{0,w} &\sim Normal(\mu_{\gamma,w},\sigma_{\gamma}^2)\\
+\mu_{\gamma,w} &=\delta_0+\sum_k\delta_k z_{k,w}
+\end{align}
+```
+
+$\delta_{0}$ is the watershed-specific intercept and $\delta_k (k > 0)$ are the regression coefficients. The watershed-level predictors $z_{k,w}$ include the number of masu salmon released (average of 1999-2019) and ocean productivity (Chlorophyll a). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that cannot be captured by the watershed-level predictors.
+
+We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned weakly informative priors for parameters, which were summarized in **Table S6**. Data manipulation and analysis were performed in R version 4.1.0 [@rcoreteamLanguageEnvironmentStatistical2021].
+
+\newpage
 
 # Supplementary text
 
@@ -37,25 +226,21 @@ We performed a sensitivity analysis of the community simulation to identify key 
 
 For each parameter combination, we regressed mean densities and SDs of whole community, enhanced species, and unenhanced species $y_j$ on the number of release $R$ as:
 
-```{=tex}
-\begin{equation}
+$$
 \begin{aligned}
   y_j &\sim Normal(\mu_j, \sigma^2)\\
   \mu_j &= \xi_0 + \xi_1~R_j
 \end{aligned}
-\end{equation}
-```
+$$
 
 where $\xi_k$ ($k = 0-1$) are the intercept ($\xi_0$) and regression coefficient ($\xi_1$). We extracted 500 estimates of $\xi_1$, each of which represents the effect of stock enhancement $R$ on community dynamics under a given parameter combination. To examine influences of simulation parameters (**Table S1**) on $\xi_1$, we developed the following regression model taking $\xi_1$ as a response variable (parameter combination $n$):
 
-```{=tex}
-\begin{equation}
+$$
 \begin{aligned}
   \xi_{1,n} &\sim Normal(\mu_n, \sigma^2)\\
-  \mu_n &= \zeta_0 + \zeta_1 S_n + \zeta_2 K_n + \zeta_3 r_{1,n} + \zeta_4 r_{max,n} + \zeta_5 \sigma_{\epsilon,n} + \zeta_6 f_{R, n} + \zeta_7 \bar{\alpha}_n
+  \mu_n &= \zeta_0 + \zeta_1 S_n + \zeta_2 r_{1,n} + \zeta_3 r_{max,n} + \zeta_4  \bar{\alpha}_n + \zeta_5 K_n + \zeta_6 \sigma_{\epsilon,n} + \zeta_7 f_{R, n}
 \end{aligned}
-\end{equation}
-```
+$$
 
 where $\zeta_k$ ($k = 0-7$) are the intercept ($\zeta_0$) and regression coefficients ($\zeta_{1-7}$). Both response and explanatory variables were standardized to a mean of zero and a standard deviation of one, so that regression coefficients are comparable.
 
@@ -66,6 +251,7 @@ We found that regression coefficients of the following parameters ($\zeta$) neve
 # Tables
 
 ## Table S1 Simulation parameter
+
 Parameter values used in the main and sensitivity analysis. In the sensitivity analysis, 500 parameter values were drawn randomly from uniform distributions. See Methods for model description.
 
 ```{r table_s1}
@@ -120,6 +306,7 @@ for(i in 1:length(table_stvy)) {
 `r paste(knit(text = table_stvy_chunk), collapse = '\n')`
 
 ## Table S5 Observed species
+
 Fish species found in the study watersheds.
 
 ```{r table_s5}
@@ -134,6 +321,7 @@ kable(df_sp_list, format = "markdown")
 \newpage
 
 ## Table S6 Priors
+
 Prior distributions used in the Bayesian models.
 
 ```{r table_s6}
@@ -148,6 +336,7 @@ kable(df_prior, format = "markdown")
 \newpage
 
 ## Table S7 Parameter estimates of the Bayesian state space model
+
 Median estimates of the Bayesian state space model. Site specific parameters were excluded due to the large number of parameters. Numbers in parenthesis indicate 95% credible intervals.
 
 ```{r table_s7}
@@ -198,7 +387,6 @@ for(i in seq_len(length(df_est))) {
 
 `r paste(knit(text = table_reg_chunk), collapse = '\n')`
 
-
 # Figures
 
 ```{r figure_sim}
@@ -238,7 +426,6 @@ for(i in seq_len(nrow(df_param))) {
 
 `r paste(knit(text = figure_sim_chunk), collapse = '\n')`
 
-
 ```{r figure_dyns}
 
 # Figure S13-15
@@ -272,3 +459,5 @@ for(i in seq_len(length(list_g_dyns))) {
 ```
 
 `r paste(knit(text = figure_dyns_chunk), collapse = '\n')`
+
+# References
