@@ -56,6 +56,10 @@ param_set <- sim_result %>%
 ## raw data
 source(here::here("code/data_fmt_fishdata.R"))
 
+df_area <- d0 %>% 
+  group_by(site_id, year) %>% 
+  summarize(area = unique(area))
+
 filename <- list.files(path = here::here("result"), full.names = T) %>% 
   as_tibble() %>% 
   filter(str_detect(string = .$value, pattern = "reg")) %>% 
@@ -80,6 +84,38 @@ df_bp <- list.files(path = here::here("data_fmt"), full.names = T) %>%
       mutate(group = str_extract(x, "all|masu|other"))
   }) %>% 
   bind_rows()
+
+## mcmc sample size
+df_mcmc_ssm <- list.files(path = here::here("data_fmt"), full.names = T) %>% 
+  as_tibble() %>% 
+  filter(str_detect(string = .$value, pattern = "ssm")) %>% 
+  pull() %>% 
+  lapply(function(x) {
+    read_csv(x) %>% 
+      select(n_total_mcmc,
+             n_sample,
+             n_thin,
+             n_burn) %>% 
+      distinct()
+  }) %>% 
+  bind_rows()
+
+df_mcmc_reg <- list.files(path = here::here("result"), full.names = T) %>% 
+  as_tibble() %>% 
+  filter(str_detect(string = .$value, pattern = "reg_")) %>% 
+  filter(!str_detect(string = .$value, pattern = "rich")) %>% 
+  pull() %>% 
+  lapply(function(x) {
+    read_csv(x) %>% 
+      select(n_total_mcmc,
+             n_sample,
+             n_thin,
+             n_burn) %>% 
+      distinct()
+  }) %>% 
+  bind_rows()
+
+
 ```
 
 ```{=tex}
@@ -101,7 +137,7 @@ where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coeffici
 
 ```{=tex}
 \begin{align}
-N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp \left[r_i \left\{1-\frac{N_{i,t}+\alpha_{i1} (N_1 + R_t) + \sum_{j=2}^S \alpha_{ij}N_{j,t}}{K_i} \right\} \right]exp(\epsilon_{i,t})
+N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp \left[r_i \left\{1-\frac{N_{i,t}+\alpha_{i1} (N_{1,t} + R_t) + \sum_{j=2}^S \alpha_{ij}N_{j,t}}{K_i} \right\} \right]exp(\epsilon_{i,t})
 \end{align}
 ```
 $R_t$ is the number of released individuals, and the parameter $\phi_i$ controls the relative fitness of captive-bred individuals:
@@ -134,7 +170,7 @@ Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_resu
 
 ### Data
 
-**Time-series data.** We assembled time-series fish data across `r n_distinct(d0$site_id)` sites within `r n_distinct(d0$river)` protected watersheds of Hokkaido Island, Japan. A long-term monitoring program began at these sites in 1971, but effective sampling methods (a combination of electrofishing and cast net sampling) were implemented in 1999. Most data were collected in summer with irregular interannual intervals (1- to 3-year intervals for most cases). We confined our analysis to the sites that meet the following criteria: (i) the observation span (from the first to the last year of observation) exceeds 10 years, (ii) the number of observation years exceeds five years, and (iii) masu salmon is observed at least twice during the observation period. As a result, we used time-series data at `r n_distinct(df_fish$site_id)` sites within `r n_distinct(df_fish$river)` watersheds from 1999 to 2019. **Table S5** summarizes observed species in these watersheds.
+**Time-series data.** We assembled time-series fish data across `r n_distinct(d0$site_id)` sites within `r n_distinct(d0$river)` protected watersheds of Hokkaido Island, Japan. A long-term monitoring program began at these watersheds in 1971, but an effective sampling method (two-pass sampling with a combination of electrofishing and cast net) was implemented in 1999. Most data were collected in summer with irregular interannual intervals (1- to 3-year intervals for most cases), and sampling efforts were quantified by sampling area (average: `r op(mean(df_area$area))` $\pm$ `r op(sd(df_area$area))` m^2^). We confined our analysis to the sites that meet the following criteria: (i) the observation span (from the first to the last year of observation) exceeds 10 years, (ii) the number of observation years exceeds five years, and (iii) masu salmon is observed at least twice during the observation period. As a result, we used time-series data at `r n_distinct(df_fish$site_id)` sites within `r n_distinct(df_fish$river)` watersheds from 1999 to 2019. Summed abundance of first and second passes was used in the following analysis. **Table S5** summarizes observed species in these watersheds.
 
 **Fish stocking.** At the protected watersheds, the stocking of masu salmon began in the 1950s. Hatchery fish were released in spring (fry [age 0+] and smolt [age 1+] stages) and fall (juvenile stage [age 0+]). For each watershed, we examined historical records and assembled annual data of stock enhancement (the number of fish released) from 1999 to 2019. Although fish were released at multiple locations within a watershed, we could not extract stocking data at the site level.
 
@@ -142,16 +178,16 @@ Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_resu
 
 ### Statistical analysis
 
-Our goal is to compare temporal community dynamics across sites. However, the data are not comparable because of observation errors (e.g., different observers) and missing observations. To confront this challenge, we developed a Bayesian state-space model for three species groups separately: (i) whole community, summed abundance of all species, (ii) enhanced species, the abundance of masu salmon, (iii) unenhanced species, summed abundance of all species except masu salmon. A Bayesian state-space model is best suited for our analysis because it can account for observation errors while imputing missing values given the long-term trend at each site [@clarkPopulationTimeSeries2004; @keryBayesianPopulationAnalysis2012]. The model is composed of observation and state models, as described below.
+Our goal is to compare temporal community dynamics across sites. However, the data are not comparable because of observation errors (e.g., different observers) and missing observations. To confront this challenge, we developed a Bayesian state-space model for three species groups separately: (i) whole community, the summed abundance of all species, (ii) enhanced species, the abundance of masu salmon, (iii) unenhanced species, the summed abundance of all species except masu salmon. A Bayesian state-space model is best suited for our analysis because it can account for observation errors while imputing missing values given the long-term trend at each site [@clarkPopulationTimeSeries2004; @keryBayesianPopulationAnalysis2012]. The model is composed of observation and state models, as described below.
 
-In the observation model, we model observation processes. Summed fish abundance of either whole community, enhanced species (masu salmon), or unenhanced species at site $s$ in year $t$, $N_{s,t}$, was assumed to follow a Poisson distribution:
+In the observation model, we model observation processes. Fish abundance of either whole community, enhanced species (masu salmon), or unenhanced species at site $s$ in year $t$, $N_{s,t}$, was assumed to follow a Poisson distribution:
 
 ```{=tex}
 \begin{align}
 N_{s,t} \sim Poisson(\lambda_{s,t} A_{s,t})
 \end{align}
 ```
-where $\lambda_{s,t}$ is the expected fish density (individual m^-2^) and $A_{s,t}$ the sampling area (m^2^). Since fish sampling was conducted after the spring stocking of masu salmon, captured fish may include individuals released in the observation year. To avoid biases in estimating temporal community trends, we explicitly modeled this observation process:
+where $\lambda_{s,t}$ is the expected fish density (individual m^-2^) and $A_{s,t}$ the sampling area (m^2^). Since fish sampling was conducted after the spring stocking of masu salmon, captured fish may include individuals released in the observation year. We explicitly modeled this observation process to avoid biases in estimating temporal community trends:
 
 ```{=tex}
 \begin{align}
@@ -205,7 +241,7 @@ $\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$
 ```
 $\delta_{0}$ is the watershed-specific intercept and $\delta_k (k > 0)$ are the regression coefficients. The watershed-level predictors $z_{k,w}$ include the number of masu salmon released (average of 1999-2019) and ocean productivity (Chlorophyll a). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture. All predictors were standardized (mean = 0, SD = 1) before the analysis.
 
-We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned weakly informative priors to parameters (**Table S6**). Data manipulation and analysis were performed in R version 4.1.0 [@rcoreteamLanguageEnvironmentStatistical2021].
+We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned weakly informative priors to parameters (**Table S6**). Three Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. Total MCMC interations ranged from `r min(df_mcmc_ssm$n_total_mcmc)` to `r max(df_mcmc_ssm$n_total_mcmc)` for the state-space models and was `r unique(df_mcmc_reg$n_total_mcmc)` for the regression models. The first `r unique(c(df_mcmc_ssm$n_burn, df_mcmc_reg$n_burn))` iterations were discarded as burn-in, and MCMC samples were saved every `r unique(df_mcmc_ssm$n_thin)` (state-space) and `r unique(df_mcmc_reg$n_thin)` iterations (regression) to reduce autocorrelation. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached \< 1.1 [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.1.0 [@rcoreteamLanguageEnvironmentStatistical2021].
 
 \newpage
 
