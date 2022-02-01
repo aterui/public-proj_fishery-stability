@@ -94,7 +94,9 @@ df_lu <- exact_extract(albers_rs_fua,
 
 albers_sf_wsd <- albers_sf_wsd %>% 
   left_join(df_lu, by = c("river", "site")) %>% 
-  left_join(df_clim, by = c("river", "site"))
+  left_join(df_clim, by = c("river", "site")) %>% 
+  mutate(area = st_area(.),
+         area = units::set_units(area, km^2))
 
 st_write(albers_sf_wsd,
          dsn = "data_gis/albers_upstr_watershed_env.gpkg",
