@@ -10,6 +10,7 @@ pacman::p_load(tidyverse, foreach)
 ## six genera were aggregated as spp.
 ## species under these genera were recorded as either species-level or as spp.
 ## extra-care must be taken for species-level analysis for these species
+## remove sites with no coordinates - "usubetsu4", "atsuta6", "kokamotsu4"
 
 d0 <- read_csv(here::here("data_fmt/data_hkd_prtwsd_fmt.csv")) %>% 
   mutate(taxon = case_when(genus == "Cottus" ~ "Cottus_spp",
@@ -25,7 +26,8 @@ d0 <- read_csv(here::here("data_fmt/data_hkd_prtwsd_fmt.csv")) %>%
             area = unique(area),
             genus = unique(genus),
             taxon = unique(taxon)) %>% 
-  ungroup()
+  ungroup() %>% 
+  filter(!(site_id %in% c("usubetsu4", "atsuta6", "kokamotsu4")))
 
 # select by number of observations ----------------------------------------
 
