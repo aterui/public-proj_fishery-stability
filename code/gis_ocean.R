@@ -52,7 +52,7 @@ albers_stack_sst <- projectRaster(from = wgs84_stack_sst,
                                   res = 4000,
                                   method = "bilinear")
 
-names(albers_sst) <- paste0("sst_", 2002:2019)
+names(albers_stack_sst) <- paste0("sst_", 2002:2019)
 
 # extraction --------------------------------------------------------------
 
@@ -68,11 +68,32 @@ albers_sf_outlet_bf30 <- list.files(path = here::here("data_gis"),
   dplyr::select(river) %>% 
   st_buffer(dist = 30000)
 
-## extractr
+## extractr - spatial and temporal average
 df_chr_a <- exact_extract(albers_stack_chr_a,
                           albers_sf_outlet_bf30,
                           fun = "mean",
                           append_cols = TRUE) %>% 
-  as_tibble()
+  as_tibble() %>% 
+  pivot_longer(cols = mean.chr_a_2002:mean.chr_a_2019,
+               values_to = "value",
+               names_to = "group") %>% 
+  group_by(river) %>% 
+  summarize(chr_a = mean(value))
 
+df_sst <- exact_extract(albers_stack_sst,
+                        albers_sf_outlet_bf30,
+                        fun = "mean",
+                        append_cols = TRUE) %>% 
+  as_tibble() %>% 
+  pivot_longer(cols = mean.sst_2002:mean.sst_2019,
+               values_to = "value",
+               names_to = "group") %>% 
+  group_by(river) %>% 
+  summarize(sst = mean(value))
+
+# export ------------------------------------------------------------------
+
+df_chr_a %>% 
+  left_join(df_sst, by = "river") %>% 
+  write_csv("data_fmt/data_ocean_fmt.csv")
 
