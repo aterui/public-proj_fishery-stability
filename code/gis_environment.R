@@ -17,15 +17,19 @@ source("code/gis_crs_fmt.R")
 
 ## watershed polygons
 albers_sf_wsd <- st_read(dsn = "data_gis/epsg4326_upstr_watershed.gpkg") %>%
-  dplyr::select(-epsg4326_watershed) %>% 
-  st_transform(wkt_jgd_albers) %>% 
-  mutate(id = seq_len(nrow(.)),
-         area = st_area(.)) %>% 
-  mutate(area = units::set_units(area, km^2))
+  dplyr::select(river,
+                site) %>% 
+  st_transform(wkt_jgd_albers)
 
 ## sampling sites
-wgs84_sf_site <- st_read(dsn = "data_gis/epsg4326_point_snap_prtwsd_edit.gpkg")
+wgs84_sf_site <- st_read(dsn = "data_gis/epsg4326_point_snap_prtwsd_edit.gpkg") %>% 
+  dplyr::select(-ID,
+                -source)
 
+## 1km buffer around sampling sites
+albers_sf_site_bf1 <- wgs84_sf_site %>% 
+  st_transform(crs = wkt_jgd_albers) %>% 
+  st_buffer(dist = 1000)
 
 # climate -----------------------------------------------------------------
 
@@ -41,32 +45,22 @@ wgs84_rs_ppt <- raster("data_gis/CHELSA_bio10_12.tif") %>%
   crop(extent(wgs84_sf_mask)) %>% 
   mask(mask = wgs84_sf_mask)
 
-wgs84_rs_clim <- raster::stack(wgs84_rs_temp,
-                               wgs84_rs_ppt)
-names(wgs84_rs_clim) <- c("temp", "ppt")
+wgs84_stack_clim <- stack(wgs84_rs_temp,
+                          wgs84_rs_ppt)
 
-# for point estimate
-df_clim <- raster::extract(wgs84_rs_clim, wgs84_sf_site) %>% 
-  as_tibble() %>% 
-  mutate(id = seq_len(nrow(.)),
-         temp = temp * 0.1) %>% 
-  relocate(id)
+albers_stack_clim <- projectRaster(from = wgs84_stack_clim,
+                                   crs = wkt_jgd_albers,
+                                   res = 1000,
+                                   method = "bilinear")
 
-## for polygon average
-#albers_clim <- projectRaster(from = wgs84_rs_clim,
-#                             crs = st_crs(albers_sf_wsd)$wkt,
-#                             method = 'bilinear',
-#                             res = 1000)
+names(albers_stack_clim) <- c("temp", "ppt")
 
-#df_clim <- exact_extract(albers_clim,
-#                         albers_sf_wsd) %>% 
-#  bind_rows(.id = "id") %>% 
-#  drop_na(ppt) %>% 
-#  mutate(id = as.numeric(id)) %>% 
-#  dplyr::group_by(id) %>% 
-#  dplyr::summarise(temp = sum(temp * 0.1 * coverage_fraction) / sum(coverage_fraction),
-#                   ppt = sum(ppt * coverage_fraction) / sum(coverage_fraction))
-
+# buffer average
+df_clim <- exact_extract(albers_stack_clim,
+                         albers_sf_site_bf1,
+                         fun = "mean",
+                         append_cols = TRUE)
+  
 
 # land use ----------------------------------------------------------------
 
@@ -89,19 +83,18 @@ names(albers_rs_fua) <- c("forest", "urban", "agri")
 
 df_lu <- exact_extract(albers_rs_fua,
                        albers_sf_wsd,
-                       "mean") %>% 
+                       "mean",
+                       append_cols = TRUE) %>% 
   rename(frac_forest = mean.forest,
          frac_urban = mean.urban,
-         frac_agri = mean.agri) %>% 
-  mutate(id = seq_len(nrow(.)))
+         frac_agri = mean.agri)
 
 
 # merge data --------------------------------------------------------------
 
 albers_sf_wsd <- albers_sf_wsd %>% 
-  left_join(df_lu, by = "id") %>% 
-  left_join(df_clim, by = "id") %>% 
-  relocate(id)
+  left_join(df_lu, by = c("river", "site")) %>% 
+  left_join(df_clim, by = c("river", "site"))
 
 st_write(albers_sf_wsd,
          dsn = "data_gis/albers_upstr_watershed_env.gpkg",
