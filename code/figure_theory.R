@@ -61,7 +61,7 @@ g_theory <- df0 %>%
   geom_smooth(size= 0.1,
               method = "loess") +
   scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
-  labs(x = "Number of release (individuals)",
+  labs(x = "Number of releases (individuals)",
        y = "Value",
        color = "Species group") +
   facet_wrap(facets = ~ response_name,
