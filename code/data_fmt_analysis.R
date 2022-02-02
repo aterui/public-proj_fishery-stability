@@ -25,8 +25,8 @@ df_env <- read_csv(here::here("data_fmt/data_env_fmt.csv")) %>%
   rename(wsd_area = area) %>% 
   filter(river %in% river_id) %>% 
   mutate(scl_wsd_area = c(scale(wsd_area)),
-         scl_ppt = c(scale(ppt)),
-         scl_temp = c(scale(temp)),
+         scl_ppt = c(scale(mean.ppt)),
+         scl_temp = c(scale(mean.temp)),
          scl_forest = c(scale(frac_forest)))
 
 ## df for ocean environments
