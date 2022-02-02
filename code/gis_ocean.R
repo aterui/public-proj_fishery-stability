@@ -33,7 +33,7 @@ wgs84_stack_chr_a <- list.files(path = here::here("data_gis/ocean_data"),
 
 albers_stack_chr_a <- projectRaster(from = wgs84_stack_chr_a,
                                     crs = wkt_jgd_albers,
-                                    res = 4000,
+                                    res = 4600,
                                     method = "bilinear")
 
 names(albers_stack_chr_a) <- paste0("chr_a_", 2002:2019)
@@ -49,7 +49,7 @@ wgs84_stack_sst <- list.files(path = here::here("data_gis/ocean_data"),
 
 albers_stack_sst <- projectRaster(from = wgs84_stack_sst,
                                   crs = wkt_jgd_albers,
-                                  res = 4000,
+                                  res = 4600,
                                   method = "bilinear")
 
 names(albers_stack_sst) <- paste0("sst_", 2002:2019)
