@@ -16,13 +16,13 @@ source("code/gis_crs_fmt.R")
 # read polygons and points ------------------------------------------------
 
 ## watershed polygons
-albers_sf_wsd <- st_read(dsn = "data_gis/epsg4326_upstr_watershed.gpkg") %>%
+albers_sf_wsd <- st_read(dsn = "data_raw/gis/epsg4326_upstr_watershed.gpkg") %>%
   dplyr::select(river,
                 site) %>% 
   st_transform(wkt_jgd_albers)
 
 ## sampling sites
-wgs84_sf_site <- st_read(dsn = "data_gis/epsg4326_point_snap_prtwsd_edit.gpkg") %>% 
+wgs84_sf_site <- st_read(dsn = "data_raw/gis/epsg4326_point_snap_prtwsd_edit.gpkg") %>% 
   dplyr::select(-ID,
                 -source)
 
@@ -33,15 +33,15 @@ albers_sf_site_bf50 <- wgs84_sf_site %>%
 
 # climate -----------------------------------------------------------------
 
-wgs84_sf_mask <- st_read("data_gis/albers_hkd_shape.gpkg") %>% 
+wgs84_sf_mask <- st_read("data_raw/gis/albers_hkd_shape.gpkg") %>% 
   st_set_crs(st_crs(albers_sf_wsd)) %>% 
   st_transform(4326)
 
-wgs84_rs_temp <- raster("data_gis/CHELSA_bio10_01.tif") %>% 
+wgs84_rs_temp <- raster("data_raw/gis/CHELSA_bio10_01.tif") %>% 
   crop(extent(wgs84_sf_mask)) %>% 
   mask(mask = wgs84_sf_mask)
 
-wgs84_rs_ppt <- raster("data_gis/CHELSA_bio10_12.tif") %>% 
+wgs84_rs_ppt <- raster("data_raw/gis/CHELSA_bio10_12.tif") %>% 
   crop(extent(wgs84_sf_mask)) %>% 
   mask(mask = wgs84_sf_mask)
 
@@ -65,7 +65,7 @@ df_clim <- exact_extract(albers_stack_clim,
 
 # land use ----------------------------------------------------------------
 
-wgs84_rs_lu <- raster("data_gis/epsg4326_lu_hkd.tif")
+wgs84_rs_lu <- raster("data_raw/gis/epsg4326_lu_hkd.tif")
 albers_rs_lu <- projectRaster(from = wgs84_rs_lu,
                               crs = st_crs(albers_sf_wsd)$wkt,
                               method = 'ngb',
@@ -100,7 +100,7 @@ albers_sf_wsd <- albers_sf_wsd %>%
          area = units::set_units(area, km^2))
 
 st_write(albers_sf_wsd,
-         dsn = "data_gis/albers_upstr_watershed_env.gpkg",
+         dsn = "data_raw/gis/albers_upstr_watershed_env.gpkg",
          append = FALSE)
 
 df_albers_sf_wsd <- albers_sf_wsd %>% 

@@ -40,10 +40,10 @@ st_snap_points = function(x, y, max_dist = 1000) {
 
 # snap to the nearest streamline -------------------------------------------
 
-#albers_sf_channel <- st_read(dsn = "data_gis/epsg4326_channel_1sqkm.gpkg") %>% 
+#albers_sf_channel <- st_read(dsn = "data_raw/gis/epsg4326_channel_1sqkm.gpkg") %>% 
 #  st_transform(crs = wkt_jgd_albers)
 #
-#albers_sf_site <- read_csv("data_gis/site-coordinate_hogosuimen_terui-org-2019.csv") %>% 
+#albers_sf_site <- read_csv("data_raw/gis/site-coordinate_hogosuimen_terui-org-2019.csv") %>% 
 #  drop_na(longitude) %>% 
 #  st_as_sf(coords = c("longitude", "latitude")) %>% 
 #  st_set_crs(4326) %>% 
@@ -61,7 +61,7 @@ st_snap_points = function(x, y, max_dist = 1000) {
 #  st_transform(crs = 4326)
 #
 #st_write(wgs84_sf_site_snap_coord,
-#         dsn = "data_gis/epsg4326_point_snap_prtwsd.gpkg",
+#         dsn = "data_raw/gis/epsg4326_point_snap_prtwsd.gpkg",
 #         append = FALSE)
 
 
@@ -73,7 +73,7 @@ st_snap_points = function(x, y, max_dist = 1000) {
 # source file "epsg4326_point_snap_prtwsd.gpkg"
 
 ## flow direction
-wgs84_dir_arc <- raster::raster("data_gis/epsg4326_dir.tif")
+wgs84_dir_arc <- raster::raster("data_raw/gis/epsg4326_dir.tif")
 wgs84_dir_d8 <- arc2d8(wgs84_dir_arc)
 
 temp_d8 <- paste(tempdir(), "epsg4326_dir_d8.tif", sep = "\\")
@@ -83,7 +83,7 @@ raster::writeRaster(wgs84_dir_d8,
                     overwrite = TRUE)
 
 ## pour point
-wgs84_outlet <- sf::st_read("data_gis/epsg4326_point_snap_prtwsd_edit.gpkg")
+wgs84_outlet <- sf::st_read("data_raw/gis/epsg4326_point_snap_prtwsd_edit.gpkg")
 
 ## parallel setup
 cl <- makeCluster(detectCores())
@@ -145,5 +145,5 @@ wgs84_watershed <- wgs84_watershed %>%
          site = wgs84_outlet$site)
 
 st_write(wgs84_watershed,
-         dsn = "data_gis/epsg4326_upstr_watershed.gpkg",
+         dsn = "data_raw/gis/epsg4326_upstr_watershed.gpkg",
          append = FALSE)

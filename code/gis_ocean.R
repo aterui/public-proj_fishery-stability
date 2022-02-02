@@ -13,7 +13,7 @@ source(here::here("code/gis_crs_fmt.R"))
 # data --------------------------------------------------------------------
 
 ## for crop extent
-wgs84_sf_hkd_bf50 <- list.files(path = here::here("data_gis"),
+wgs84_sf_hkd_bf50 <- list.files(path = here::here("data_raw/gis"),
                                 full.names = T) %>% 
   as_tibble() %>% 
   filter(str_detect(value, "albers_hkd_shape")) %>% 
@@ -23,7 +23,7 @@ wgs84_sf_hkd_bf50 <- list.files(path = here::here("data_gis"),
   st_transform(crs = 4326)
 
 ## MODIS chr a data - 2002 to 2019
-wgs84_stack_chr_a <- list.files(path = here::here("data_gis/ocean_data"),
+wgs84_stack_chr_a <- list.files(path = here::here("data_raw/ocean"),
                                 full.names = T) %>% 
   as_tibble() %>% 
   filter(str_detect(value, "chlor_a")) %>% 
@@ -39,7 +39,7 @@ albers_stack_chr_a <- projectRaster(from = wgs84_stack_chr_a,
 names(albers_stack_chr_a) <- paste0("chr_a_", 2002:2019)
 
 ## MODIS sst data - 2002 to 2019
-wgs84_stack_sst <- list.files(path = here::here("data_gis/ocean_data"),
+wgs84_stack_sst <- list.files(path = here::here("data_raw/ocean"),
                               full.names = T) %>% 
   as_tibble() %>% 
   filter(str_detect(value, "sst")) %>% 
@@ -57,7 +57,7 @@ names(albers_stack_sst) <- paste0("sst_", 2002:2019)
 # extraction --------------------------------------------------------------
 
 ## mask layer: river outlet
-albers_sf_outlet_bf30 <- list.files(path = here::here("data_gis"),
+albers_sf_outlet_bf30 <- list.files(path = here::here("data_raw/gis"),
                                     full.names = T) %>% 
   as_tibble() %>% 
   filter(str_detect(value, "outlet")) %>% 
