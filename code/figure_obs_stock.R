@@ -128,7 +128,7 @@ g_obs <- df_plot %>%
   scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
   scale_linetype_manual(values = c("solid", "dashed", "dotted"),
                         labels = c("> 0.95", "0.90-0.95", "< 0.90")) +
-  labs(x = expression("Number of releases (thousand fish year"^-1*")"),
+  labs(x = expression("Number of releases (million fish year"^-1*")"),
        y = "Value",
        color = "Species group",
        linetype = "Posterior prob.") +
