@@ -33,7 +33,7 @@ inits <- replicate(3,
                         .RNG.seed = NA),
                    simplify = FALSE)
 
-for (j in 1:3) inits[[j]]$.RNG.seed <- j
+for (j in 1:3) inits[[j]]$.RNG.seed <- (j - 1) * 100 + 1
 
 
 # jags --------------------------------------------------------------------
