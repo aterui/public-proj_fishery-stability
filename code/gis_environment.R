@@ -26,10 +26,10 @@ wgs84_sf_site <- st_read(dsn = "data_gis/epsg4326_point_snap_prtwsd_edit.gpkg") 
   dplyr::select(-ID,
                 -source)
 
-## 1km buffer around sampling sites
-albers_sf_site_bf1 <- wgs84_sf_site %>% 
+## 50m buffer around sampling sites
+albers_sf_site_bf50 <- wgs84_sf_site %>% 
   st_transform(crs = wkt_jgd_albers) %>% 
-  st_buffer(dist = 1000)
+  st_buffer(dist = 50)
 
 # climate -----------------------------------------------------------------
 
@@ -45,19 +45,17 @@ wgs84_rs_ppt <- raster("data_gis/CHELSA_bio10_12.tif") %>%
   crop(extent(wgs84_sf_mask)) %>% 
   mask(mask = wgs84_sf_mask)
 
-wgs84_stack_clim <- stack(wgs84_rs_temp,
-                          wgs84_rs_ppt)
-
-albers_stack_clim <- projectRaster(from = wgs84_stack_clim,
-                                   crs = wkt_jgd_albers,
-                                   res = 1000,
-                                   method = "bilinear")
+albers_stack_clim <- stack(wgs84_rs_temp,
+                           wgs84_rs_ppt) %>% 
+  projectRaster(crs = wkt_jgd_albers,
+                res = 1000,
+                method = "bilinear")
 
 names(albers_stack_clim) <- c("temp", "ppt")
 
 # buffer average
 df_clim <- exact_extract(albers_stack_clim,
-                         albers_sf_site_bf1,
+                         albers_sf_site_bf50,
                          fun = "mean",
                          append_cols = TRUE) %>% 
   rename(ppt = mean.ppt,
