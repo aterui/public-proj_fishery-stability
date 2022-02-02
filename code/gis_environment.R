@@ -59,7 +59,10 @@ names(albers_stack_clim) <- c("temp", "ppt")
 df_clim <- exact_extract(albers_stack_clim,
                          albers_sf_site_bf1,
                          fun = "mean",
-                         append_cols = TRUE)
+                         append_cols = TRUE) %>% 
+  rename(ppt = mean.ppt,
+         temp = mean.temp) %>% 
+  mutate(temp = 0.1 * temp)
   
 
 # land use ----------------------------------------------------------------
