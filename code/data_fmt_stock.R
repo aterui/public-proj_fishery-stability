@@ -61,6 +61,8 @@ df_stock_mu <- df_stock %>%
   group_by(river) %>% 
   summarize(mean_stock = mean(abundance)) %>% 
   ungroup() %>% 
-  mutate(scl_mean_stock = c(scale(mean_stock)))
+  mutate(mean_stock = mean_stock * 0.001, # unit conversion to million
+         scl_mean_stock = c(scale(mean_stock)),
+         stock_unit = "million_fish")
 
 #skimr::skim_without_charts(df_stock_mu)
