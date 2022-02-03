@@ -40,9 +40,9 @@ list_g_dyns <- foreach(i = seq_len(length(file_name))) %do% {
                    color = factor(site)),
                alpha = 0.5) +
     facet_wrap(facets = ~ river,
-               ncol = 6,
+               ncol = 5,
                scales = "free_y") +
-    ylab("Density (ind/sq-m)") +
+    ylab(expression("Density (ind."~m^-2*")")) +
     xlab("Year") +
     labs(color = "Site")
   
