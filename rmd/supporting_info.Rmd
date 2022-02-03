@@ -162,7 +162,7 @@ N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp \left[r_i \left(1-\frac{N_{i,t}+\alpha_{i1}R
 ```
 In this model, intrinsic growth rates of unenhanced species $r_{i,i \ne 1}$ and interspecific competition $\alpha_{ij}$ are random draws from a uniform ($r_{i,i \ne 1} \sim Unif(0,r_{max})$) and an exponential distribution ($\alpha_{ij} \sim Exp(1/\bar{\alpha})$), respectively. We assumed constant values of intraspecific competition ($\alpha_{ii}=1$), carrying capacity $(K_i = K)$ and the number of releases $(R_t=R)$.
 
-Prior to the main simulation, we performed an extensive sensitivity analysis to identify parameters that strongly influence the relationship between community dynamics and stock enhancement (see **Supplementary text**). We identified five influential parameters (**Table S2-4**), different values of which were considered in the main simulation as follows: intrinsic growth of enhanced species ($r_1 =$ `r unique(param_set$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(param_set$alpha)`), carrying capacity ($K=$ `r unique(param_set$k)`), degree of environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(param_set$sd_env)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(param_set$phi)`). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(param_set$n_species)`) and the maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(param_set$r_max)`). This simulation setup resulted in `r nrow(param_set)` sets of parameter combinations that cover a range of ecological scenarios.
+Prior to the main simulation, we performed an extensive sensitivity analysis to identify parameters that strongly influence the relationship between community dynamics and stock enhancement (see **Supplementary text**). We identified five influential parameters (**Table S2-S4**), different values of which were considered in the main simulation as follows: intrinsic growth of enhanced species ($r_1 =$ `r unique(param_set$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(param_set$alpha)`), carrying capacity ($K=$ `r unique(param_set$k)`), degree of environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(param_set$sd_env)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(param_set$phi)`). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(param_set$n_species)`) and the maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(param_set$r_max)`). This simulation setup resulted in `r nrow(param_set)` sets of parameter combinations that cover a range of ecological scenarios.
 
 Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_result$n_rep)` independent communities (i.e., simulation replicates). The number of released individuals $R$ was drawn randomly from a uniform distribution for each simulation replicate as $R \sim Unif(0,500)$. We initialized the community with populations of each species drawn from a Poisson distribution with a mean of five. We repeated the seeding procedure every 10 time steps over the first `r unique(sim_result$n_warmup)` time steps to allow species to establish populations and reach equilibrium without stock enhancement (initialization period). After the initialization period, we released $R$ individuals of the enhanced species every time step over the next `r unique(sim_result$n_burnin)` time steps to reach new equilibrium with selective stock enhancement (burn-in period). We continued the simulation run with stock enhancement and saved the last `r unique(sim_result$n_timestep)` time steps. We obtained the following summary statistics of the whole community $\sum_i^SN_j$: the coefficient of variation (CV), the number of species persist (defied as $N_i > 0.01$ at $t=1600$), the temporal mean ($\mu$), and the SD ($\sigma$). The temporal mean and SD were also calculated for the enhanced species ($N_1$) and unenhanced species ($\sum_{i,i \ne 1}^S N_i$) separately. We summarized values of simulation parameters in **Table S1**.
 
@@ -205,7 +205,7 @@ ln~n_{s,t+1} = ln~r_{s} + ln~n_{s,t} + \epsilon_{s,t}^{state}
 ```
 where $ln~r_{s}$ is the site-specific rate of change at site $s$, and $\epsilon_{s,t}^{state}$ is the process error that follows a normal distribution as $\epsilon_{s,t}^{state} \sim Normal(0, \sigma_{state,s}^2)$. The site-specific rate of change is random draws from a normal distribution $ln~r_s \sim Normal(\mu_r, \sigma_r^2)$, assuming that community dynamics across Hokkaido have a shared temporal trend to some degree (the degree of shared trend is controlled by the SD $\sigma_r$). This hierarchical structure allows for improved parameter estimates by partially sharing information across sites [@gelmanDataAnalysisUsing2007]. We used median estimates of fish density $n_{s,t}$ to calculate temporal CVs, means ($\mu$), and SDs ($\sigma$).
 
-We assessed the predictive performance of our model using the Bayesian p-value [@keryIntroductionWinBUGSEcologists2010], a value of which takes a range of 0-1 and indicates over- (\~0.0), under- (\~1.0), or suitable-fitting (\~0.5) to the data. Bayesian p-values for our state-space models ranged from `r op(min(df_bp$mean))` to `r op(max(df_bp$mean))`, indicating that our model specification is appropriate. We summarized the estimated parameters and reconstructed community dynamics in **Table S7** and **Figures S13-S15** .
+We assessed the predictive performance of our model using the Bayesian p-value [@keryIntroductionWinBUGSEcologists2010], a value of which takes a range of 0-1 and indicates over- (\~0.0), under- (\~1.0), or suitable-fitting (\~0.5) to the data. Bayesian p-values for our state-space models ranged from `r op(min(df_bp$mean))` to `r op(max(df_bp$mean))`, indicating that our model specification is appropriate. We summarized the reconstructed community dynamics in **Figures S7-S9**.
 
 We used linear regression to quantify the impact of stock enhancement on community dynamics. Although our focus is stock enhancement, each model included climatic and local abiotic variables to account for important environmental differences among sites. Specifically, we developed the following linear regression model taking either CV, species richness (the number of species present during the observation period), mean, or SD as a response variable $y_s$ with a normal or a Poisson distribution.
 
@@ -231,7 +231,7 @@ ln~\mu_{y,s} &= \gamma_{0,w(s)} + \sum_k \gamma_kx_{k,s} &&\text{for species ric
 \right.
 \end{align}
 ```
-$\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$ nested within watershed $w$) and $\gamma_k (k > 0)$ are the regression coefficients of site-level predictors $x_k$. The site-level predictors include upstream watershed area, air temperature, precipitation, and proportion of forest land use. The watershed-specific intercept was related to watershed-level predictors as:
+$\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$ nested within watershed $w$) and $\gamma_k (k > 0)$ are the regression coefficients of site-level predictors $x_k$. The site-level predictors include upstream watershed area, air temperature, precipitation, and forest land use. Urban and agricultural land use were omitted because of either a limited value range (**Figure S10**) or a strong correlation with forest land use (**Figure S11**). The watershed-specific intercept was related to watershed-level predictors as:
 
 ```{=tex}
 \begin{align}
@@ -241,7 +241,7 @@ $\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$
 ```
 $\delta_{0}$ is the watershed-specific intercept and $\delta_k (k > 0)$ are the regression coefficients. The watershed-level predictors $z_{k,w}$ include the yearly stocking of masu salmon (fry + juvenile + smolt; averaged for1999-2019) and ocean productivity (chlorophyll a concentration; averaged for 2002-2019). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture. All predictors were standardized (mean = 0, SD = 1) before the analysis.
 
-We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned weakly informative priors to parameters (**Table S6**). Three Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. Total MCMC interations ranged from `r min(df_mcmc_ssm$n_total_mcmc)` to `r max(df_mcmc_ssm$n_total_mcmc)` for the state-space models and was `r unique(df_mcmc_reg$n_total_mcmc)` for the regression models. The first `r unique(c(df_mcmc_ssm$n_burn, df_mcmc_reg$n_burn))` iterations were discarded as burn-in, and MCMC samples were saved every `r unique(df_mcmc_ssm$n_thin)` (state-space) and `r unique(df_mcmc_reg$n_thin)` iterations (regression) to reduce autocorrelation. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached \< 1.1 [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.1.0 [@rcoreteamLanguageEnvironmentStatistical2021].
+We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned weakly informative priors to parameters (**Table S6**). Three Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. Total MCMC interations ranged from `r min(df_mcmc_ssm$n_total_mcmc)` to `r max(df_mcmc_ssm$n_total_mcmc)` for the state-space models and was `r unique(df_mcmc_reg$n_total_mcmc)` for the regression models. The first `r unique(c(df_mcmc_ssm$n_burn, df_mcmc_reg$n_burn))` iterations were discarded as burn-in, and MCMC samples were saved every `r unique(df_mcmc_ssm$n_thin)` (state-space) and `r unique(df_mcmc_reg$n_thin)` iterations (regression) to reduce autocorrelation. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached \< 1.1 [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.1.0 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Table S7-S10**.
 
 \newpage
 
@@ -251,27 +251,18 @@ We fitted the models to the data using JAGS version 4.1.0 through *runjags* pack
 
 We performed a sensitivity analysis of the community simulation to identify key simulation parameters that strongly affect the relationships between community dynamics (temporal mean and SD of density) and stock enhancement. We generated 500 sets of parameter combinations by randomly drawing values of seven simulation parameters from uniform distributions (**Table S1**). For each parameter combination, we simulated dynamics of 100 independent communities with varying numbers of stock enhancement $R$ (drawn randomly from $Unif(0, 500)$). This yields a total of $5 \times 10^4$ simulation replicates. In each simulation replicate, we ran 1600 time steps of community dynamics and obtained temporal means and SDs of the whole community ($\sum_i^SN_i$), enhanced species ($N_1$), and unenhanced species ($\sum_{i, i\ne1}^SN_i$) using the last 1000 time steps. The first 600 time steps were discarded as initialization and burn-in periods.
 
-For each parameter combination, we regressed the mean densities and SDs of the whole community, enhanced species, and unenhanced species $y_j$ on the number of releases $R$ as:
+For each parameter combination, we estimated Spearman's rank correlation $\xi$ between the number of releases $R$ and community statistics (the mean densities and SDs of the whole community, enhanced species, and unhenaced species). To examine influences of simulation parameters on $\xi$ (**Table S1**), we developed the following regression model taking $\xi$ as a response variable (parameter combination $n$):
 
 $$
 \begin{aligned}
-  y_j &\sim Normal(\mu_j, \sigma^2)\\
-  \mu_j &= \xi_0 + \xi_1~R_j
-\end{aligned}
-$$
-
-where $\xi_k$ ($k = 0-1$) are the intercept ($\xi_0$) and regression coefficient ($\xi_1$). We extracted 500 estimates of $\xi_1$, each of which represents the effect of stock enhancement $R$ on community dynamics under a given parameter combination. To examine influences of simulation parameters (**Table S1**) on $\xi_1$, we developed the following regression model taking $\xi_1$ as a response variable (parameter combination $n$):
-
-$$
-\begin{aligned}
-  \xi_{1,n} &\sim Normal(\mu_n, \sigma^2)\\
+  \xi_{n} &\sim Normal(\mu_n, \sigma^2)\\
   \mu_n &= \zeta_0 + \zeta_1 S_n + \zeta_2 r_{1,n} + \zeta_3 r_{max,n} + \zeta_4  \bar{\alpha}_n + \zeta_5 K_n + \zeta_6 \sigma_{\epsilon,n} + \zeta_7 f_{R, n}
 \end{aligned}
 $$
 
-where $\zeta_k$ ($k = 0-7$) are the intercept ($\zeta_0$) and regression coefficients ($\zeta_{1-7}$). Both response and explanatory variables were standardized (mean = 0, SD = 1) to compare regression coefficients.
+where $\zeta_k$ ($k = 0-7$) are the intercept ($\zeta_0$) and regression coefficients ($\zeta_{1-7}$). Explanatory variables were standardized (mean = 0, SD = 1) to compare regression coefficients.
 
-We found that regression coefficients of the following parameters ($\zeta$) never exceeded a value of 0.30 and were less influential: the number of species $S$, the maximum intrinsic growth rate of unenhanced species $r_{max}$, and relative fitness $f_R$. Therefore, in the main simulation, we fixed values of $S$ and $r_{max}$ (**Table S1**). In the meantime, we varied values of $K$, $r_1$, $\sigma_{\epsilon}$, $f_R$, and $\bar{\alpha}$ as they are potentially influential (**Table S1**). Although $f_R$ had little influence on stocking effects (**Table S1**), we varied this parameter given the significant interest in the relative fitness of captive-bred individuals in the wild.
+We found that regression coefficients of the following parameters ($\zeta$) never exceeded a value of 0.10: the number of species $S$, maximum intrinsic growth rate of unenhanced species $r_{max}$, environmental stochasticity $\sigma_{\epsilon}$, and relative fitness $f_R$. Therefore, these parameters have little influence on the qualitative relationship between the number of releases and community dynamics. In the main simulation, we fixed values of $S$, $r_{max}$, and $\sigma_{\epsilon}$ (**Table S1**). In the meantime, we varied values of $K$, $r_1$, $f_R$, and $\bar{\alpha}$ as they are potentially influential (**Table S1**). Although $f_R$ had little influence on stocking effects (**Table S1**), we varied this parameter given the significant interest in the relative fitness of captive-bred individuals in the wild.
 
 \newpage
 
@@ -424,7 +415,7 @@ for(i in seq_len(length(df_est))) {
 
 ```{r figure_sim}
 
-# Figure S1-12
+# Figure S1-6
 ## load figures
 source(here::here("code/figure_si_theory.R"))
 
@@ -436,7 +427,6 @@ for(i in seq_len(nrow(df_param))) {
   knit_chunk <- paste0("## Figure S", i + j,
                        " Theoretical prediction (",
                        "$r_1$ = `r df_param$r1[",i,"]`, ",
-                       "$\\sigma_{\\epsilon}$ = `r df_param$sd_env[",i,"]`, ",
                        "$K$ = `r df_param$k[",i,"]`) \n",
                        
                        "\n```{r figure_s", i + j,", fig.width = 9.5, fig.height = 8}
@@ -446,8 +436,10 @@ for(i in seq_len(nrow(df_param))) {
                        ```\n",
                        
                        "Theoretical predictions for the stocking effect on community dynamics. Rows represent different response variables, and columns show distinct simulation scenarios with different strength of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters are: ",
-                       "intrinsic growth rate of enhanced species $r_1$ = `r df_param$r1[",i,"]`; ",
-                        "environmental variability $\\sigma_{\\epsilon}$ = `r df_param$sd_env[",i,"]`; ",
+                       "number of species $S$ = `r df_param$n_species[",i,"]`; ",
+                       "intrinsic growth rate of an enhanced species $r_1$ = `r df_param$r1[",i,"]`; ",
+                       "maximum intrinsic growth rate of unenhanced species $r_{max}$ = `r df_param$r_max[",i,"]`; ",
+                        "environmental stochasticity $\\sigma_{\\epsilon}$ = `r df_param$sd_env[",i,"]`; ",
                         "carrying capacity $K$ = `r df_param$k[",i,"]`.",
                         "\n\\pagebreak\n")
 
@@ -461,10 +453,10 @@ for(i in seq_len(nrow(df_param))) {
 
 ```{r figure_dyns}
 
-# Figure S13-15
+# Figure S7-9
 ## load figures
 source(here::here("code/figure_si_obs_dyns.R"))
-j <- 12
+j <- 6
 
 c_text <- c("whole community",
             "masu salmon",
@@ -492,5 +484,31 @@ for(i in seq_len(length(list_g_dyns))) {
 ```
 
 `r paste(knit(text = figure_dyns_chunk), collapse = '\n')`
+
+\newpage
+
+## Figure S10 Environmental variables
+
+```{r figure_s10, fig.width=11, fig.height=8}
+
+source(here::here("code/figure_si_env.R"))
+
+print(g_env)
+```
+
+Distribution of environmental variables in the protected watershed. Note that the number of fish released and ocean productivity (chlorophyll a) are measured at the watershed level while others are measured at the site level.
+
+\newpage
+
+## Figure S11 Correlation plot
+
+```{r figure_s11, fig.width=11, fig.height=11}
+
+source(here::here("code/figure_si_cor.R"))
+```
+
+Correlation plot among environmental variables in the protected watersheds. Numbers indicate Spearman's rank correlations.
+
+\newpage
 
 # References
