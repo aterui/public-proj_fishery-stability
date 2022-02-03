@@ -126,14 +126,14 @@ df_mcmc_reg <- list.files(path = here::here("result"), full.names = T) %>%
 
 ## Theory
 
-We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012]. In the basic formula without stock enhancement, population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
+We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012]. In the basic formula without stock enhancement, the population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
 
 ```{=tex}
 \begin{align}
 N_{i,t+1} = N_{i,t}~exp\left[r_i \left(1-\frac{N_{i,t} + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
 \end{align}
 ```
-where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient between species $i$ and $j$, $K_i$ the carrying capacity, and $\epsilon_{i,t}$ the species response to stochastic environmental fluctuations that obeys an normal distribution $Normal(0, \sigma_{\epsilon}^2)$. We modified this formula to include the effects of stock enhancement on reproduction and competition as follows:
+where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on $i$, $K_i$ the carrying capacity, and $\epsilon_{i,t}$ the species response to stochastic environmental fluctuations that obeys an normal distribution $Normal(0, \sigma_{\epsilon}^2)$. We modified this formula to include the effects of stock enhancement on reproduction and competition as follows:
 
 ```{=tex}
 \begin{align}
@@ -174,7 +174,7 @@ Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_resu
 
 **Fish stocking.** The stocking of masu salmon began in the 1950s. Hatchery fish are released in spring (fry [age 0+] and smolt [age 1+] stages) and fall (juvenile stage [age 0+]). Although the fish release occurs at multiple locations within a watershed, the stocking information is available only at the watershed level. We assembled annual records of stock enhancement (the total number of fish released) from 1999 to 2019 for each release stage.
 
-**Environmental data.** At each sampling site, we measured the following environmental variables as potential covariates: upstream watershed area (km^2^; a proxy for stream size), proportional land use in the upstream watershed (forest, agriculture), local climates (annual mean air temperature [degree Celsius] and cumulative precipitation [mm]), and ocean productivity (chlorophyll a concentration [mg m^-3^]). We used MERIT Hydro [@yamazakiMERITHydroHighresolution2019] to delineate upstream watershed polygons for each sampling site. We estimated the proportion of forest and agricultural land use in each watershed polygon based on land-use data in 2015 from Copernicus Global Land Service (100-m resolution) [@marcelbuchhornCopernicusGlobalLand2020]. Climate data at each sampling site were extracted from CHELSA version 1.2 [@kargerClimatologiesHighResolution2017; @kargerDataClimatologiesHigh2018]. We extracted annual data of chlorophyll a concentration (2002-2019; resolution, 4.6 km^2^) from OceanColor [@seawifsmissionpageNasaOceanBiology2019] as a proxy for ocean productivity and calculated the average value within the 30-km radius of each river mouth. Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). We used the following R packages to perform geospatial analysis: *sf* [@pebesmaSimpleFeaturesStandardized2018]*, raster* [@hijmansRasterGeographicData2020]*, exactextractr* [@bastonExactextractrFastExtraction2020]*, stars* [@pebesmaStarsSpatiotemporalArrays2020]*, whitebox* [@lindsayWhiteboxGATCase2016]*.*
+**Environmental data.** At each sampling site, we measured the following environmental variables as potential covariates: upstream watershed area (km^2^; a proxy for stream size), proportional land use in the upstream watershed (forest, agriculture), local climates (annual mean air temperature [degree Celsius] and cumulative precipitation [mm]), and ocean productivity (chlorophyll a concentration [mg m^-3^]). We used MERIT Hydro [@yamazakiMERITHydroHighresolution2019] to delineate upstream watershed polygons for each sampling site. We estimated the proportion of forest and agricultural land use in each watershed polygon based on land use data in 2015 from Copernicus Global Land Service (100-m resolution) [@marcelbuchhornCopernicusGlobalLand2020]. Climate data at each sampling site were extracted from CHELSA version 1.2 [@kargerClimatologiesHighResolution2017; @kargerDataClimatologiesHigh2018]. We extracted annual data of chlorophyll a concentration (2002-2019; resolution, 4.6 km^2^) from OceanColor [@seawifsmissionpageNasaOceanBiology2019] as a proxy for ocean productivity and calculated the average value within the 30-km radius of each river mouth. Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). We used the following R packages to perform geospatial analysis: *sf* [@pebesmaSimpleFeaturesStandardized2018]*, raster* [@hijmansRasterGeographicData2020]*, exactextractr* [@bastonExactextractrFastExtraction2020]*, stars* [@pebesmaStarsSpatiotemporalArrays2020]*, whitebox* [@lindsayWhiteboxGATCase2016]*.*
 
 ### Statistical analysis
 
@@ -194,7 +194,7 @@ where $\lambda_{s,t}$ is the expected fish density (individual m^-2^) and $A_{s,
 \lambda_{s,t} = n_{s,t}exp(\epsilon_{s,t}^{obs}) + \psi \beta_s~Fry_{w(s),t}
 \end{align}
 ```
-$n_{s,t}$ is the "true" fish density excluding fish released in the spring, $Fry_{w(s),t}$ the number of salmon fry released (unit: million fish) in spring in watershed $w$ within which site $s$ is located, and $\beta_s$ the site-specific effect of released salmon fry on the observed fish density. The parameter $\beta_s$ was drawn from a normal distribution with the hyper-mean $\mu_{\beta}$ and hyper-variance $\sigma_{\beta}^2$. The parameter $exp(\epsilon_{s,t}^{obs})$ is the error term that follows a log-normal distribution ($\epsilon_{s,t}^{obs} \sim Normal(0, \sigma_{obs,s}^2)$). The inclusion of this term allows the model to account for site- and year-specific observation errors, which can be caused by ecological and/or artificial factors. When modeling the unenhanced species group, $\psi$ equals zero (otherwise $\psi = 1$) so the model excludes the term $\beta_s~Fry_{w(s),t}$.
+$n_{s,t}$ is the "true" fish density excluding fish released in the spring, $Fry_{w(s),t}$ the number of salmon fry released (unit: million fish) in spring in watershed $w$ within which site $s$ is located, and $\beta_s$ the site-specific effect of released salmon fry on the observed fish density. The parameter $\beta_s$ was drawn from a normal distribution with the hyper-mean $\mu_{\beta}$ and hyper-variance $\sigma_{\beta}^2$. The parameter $\epsilon_{s,t}^{obs}$ is the error term that follows a normal distribution $Normal(0, \sigma_{obs,s}^2)$. The inclusion of this term allows the model to account for site- and year-specific observation errors, which can be caused by ecological and/or artificial factors. When modeling the unenhanced species group, $\psi$ equals zero (otherwise $\psi = 1$) so the model excludes the term $\beta_s~Fry_{w(s),t}$.
 
 In the state model, we model temporal dynamics of fish density $n_{s,t}$ as follows:
 
@@ -203,7 +203,7 @@ In the state model, we model temporal dynamics of fish density $n_{s,t}$ as foll
 ln~n_{s,t+1} = ln~r_{s} + ln~n_{s,t} + \epsilon_{s,t}^{state}
 \end{align}
 ```
-where $ln~r_{s}$ is the site-specific rate of change at site $s$, and $\epsilon_{s,t}^{state}$ is the process error that follows a normal distribution as $\epsilon_{s,t}^{state} \sim Normal(0, \sigma_{state,s}^2)$. The site-specific rate of change is random draws from a normal distribution $ln~r_s \sim Normal(\mu_r, \sigma_r^2)$, assuming that community dynamics across Hokkaido have a shared temporal trend to some degree (the degree of shared trend is controlled by the SD $\sigma_r$). This hierarchical structure allows for improved estimates of $ln~r_s$ by partially sharing information across sites [@gelmanDataAnalysisUsing2007]. We used median estimates of fish density $n_{s,t}$ to calculate temporal CVs, means ($\mu$), and SDs ($\sigma$).
+where $ln~r_{s}$ is the site-specific rate of change at site $s$, and $\epsilon_{s,t}^{state}$ is the process error that follows a normal distribution as $\epsilon_{s,t}^{state} \sim Normal(0, \sigma_{state,s}^2)$. The site-specific rate of change is random draws from a normal distribution $ln~r_s \sim Normal(\mu_r, \sigma_r^2)$, assuming that community dynamics across Hokkaido have a shared temporal trend to some degree (the degree of shared trend is controlled by the SD $\sigma_r$). This hierarchical structure allows for improved parameter estimates by partially sharing information across sites [@gelmanDataAnalysisUsing2007]. We used median estimates of fish density $n_{s,t}$ to calculate temporal CVs, means ($\mu$), and SDs ($\sigma$).
 
 We assessed the predictive performance of our model using the Bayesian p-value [@keryIntroductionWinBUGSEcologists2010], a value of which takes a range of 0-1 and indicates over- (\~0.0), under- (\~1.0), or suitable-fitting (\~0.5) to the data. Bayesian p-values for our state-space models ranged from `r op(min(df_bp$mean))` to `r op(max(df_bp$mean))`, indicating that our model specification is appropriate. We summarized the estimated parameters and reconstructed community dynamics in **Table S7** and **Figures S13-S15** .
 
@@ -249,9 +249,9 @@ We fitted the models to the data using JAGS version 4.1.0 through *runjags* pack
 
 ## Sensitivity analysis
 
-We performed a sensitivity analysis of the community simulation to identify key simulation parameters that strongly affect the relationships between community dynamics (temporal mean and SD of density) and stock enhancement. We generated 500 sets of parameter combinations by randomly drawing values of 7 simulation parameters from uniform distributions (**Table S1**). For each parameter combination, we simulated dynamics of 100 independent communities with varying numbers of stock enhancement $R$ (drawn randomly from $Unif(0, 500)$). This yields a total of $5 \times 10^4$ simulation replicates. In each simulation replicate, we ran 1600 time steps of community dynamics and obtained temporal means and SDs of the whole community ($\sum_i^SN_i$), enhanced species ($N_1$), and unenhanced species ($\sum_{i, i\ne1}^SN_i$) using the last 1000 time steps. The first 600 time steps were discarded as initialization and burn-in periods.
+We performed a sensitivity analysis of the community simulation to identify key simulation parameters that strongly affect the relationships between community dynamics (temporal mean and SD of density) and stock enhancement. We generated 500 sets of parameter combinations by randomly drawing values of seven simulation parameters from uniform distributions (**Table S1**). For each parameter combination, we simulated dynamics of 100 independent communities with varying numbers of stock enhancement $R$ (drawn randomly from $Unif(0, 500)$). This yields a total of $5 \times 10^4$ simulation replicates. In each simulation replicate, we ran 1600 time steps of community dynamics and obtained temporal means and SDs of the whole community ($\sum_i^SN_i$), enhanced species ($N_1$), and unenhanced species ($\sum_{i, i\ne1}^SN_i$) using the last 1000 time steps. The first 600 time steps were discarded as initialization and burn-in periods.
 
-For each parameter combination, we regressed mean densities and SDs of the whole community, enhanced species, and unenhanced species $y_j$ on the number of releases $R$ as:
+For each parameter combination, we regressed the mean densities and SDs of the whole community, enhanced species, and unenhanced species $y_j$ on the number of releases $R$ as:
 
 $$
 \begin{aligned}
@@ -271,7 +271,7 @@ $$
 
 where $\zeta_k$ ($k = 0-7$) are the intercept ($\zeta_0$) and regression coefficients ($\zeta_{1-7}$). Both response and explanatory variables were standardized (mean = 0, SD = 1) to compare regression coefficients.
 
-We found that regression coefficients of the following parameters ($\zeta$) never exceeded a value of 0.30 and were less influential: the number of species $S$, the maximum intrinsic growth rate of unenhanced species $r_{max}$, and relative fitness $f_R$. Therefore, in the main simulation, we fixed values of $S$ and $r_{max}$ (**Table S1**). In the meantime, we varied values of $K$, $r_1$, $\sigma_{\epsilon}$, $f_R$, and $\bar{\alpha}$ as they are potentially influential (**Table S1**). Although $f_R$ had little influence on stocking effects (**Table S1**), we varied this parameter given the significant interest in relative fitness of captive-bred individuals in the wild.
+We found that regression coefficients of the following parameters ($\zeta$) never exceeded a value of 0.30 and were less influential: the number of species $S$, the maximum intrinsic growth rate of unenhanced species $r_{max}$, and relative fitness $f_R$. Therefore, in the main simulation, we fixed values of $S$ and $r_{max}$ (**Table S1**). In the meantime, we varied values of $K$, $r_1$, $\sigma_{\epsilon}$, $f_R$, and $\bar{\alpha}$ as they are potentially influential (**Table S1**). Although $f_R$ had little influence on stocking effects (**Table S1**), we varied this parameter given the significant interest in the relative fitness of captive-bred individuals in the wild.
 
 \newpage
 
@@ -313,7 +313,7 @@ table_stvy_chunk <- knit_chunk <- NULL
 
 for(i in 1:length(table_stvy)) {
   
-  table_legend <- paste0("Sensitivity analysis of the community simulation. Parameter estimates of linear regression models (standard errors in parenthesis) are shown. Response variables are the effects of stock enhancement on temporal mean density ($\\mu$) and SD ($\\sigma$) of ", c_text[i],". Both response and explanatory variables (i.e., simulation parameters) were standardized (mean = 0, SD = 1) before the analysis.")
+  table_legend <- paste0("Sensitivity analysis of the community simulation. Parameter estimates of linear regression models (standard errors in parenthesis) are shown. Response variables are the effects of stock enhancement on the temporal mean density ($\\mu$) and SD ($\\sigma$) of ", c_text[i],". Both response and explanatory variables (i.e., simulation parameters) were standardized (mean = 0, SD = 1) before the analysis.")
   
   knit_chunk <- paste0("## Table S", i + j, " Sensitivity analysis (", c_text[i],") \n",
                        table_legend,
@@ -341,7 +341,8 @@ Fish species found in the study watersheds.
 # Table S5
 source(here::here("code/table_species_list.R"))
 
-kable(df_sp_list, format = "markdown")
+kable(df_sp_list,
+      format = "markdown")
 
 ```
 
@@ -356,7 +357,8 @@ Prior distributions used in the Bayesian models.
 # Table S6
 source(here::here("code/table_prior.R"))
 
-kable(df_prior, format = "markdown")
+kable(df_prior,
+      format = "markdown")
 
 ```
 
@@ -371,7 +373,9 @@ Median estimates of the Bayesian state-space model. Numbers in parenthesis indic
 # Table S7
 source(here::here("code/table_ssm.R"))
 
-kable(df_ssm, format = "markdown")
+kable(df_ssm,
+      align = c(rep("l", 3), "c"),
+      format = "markdown")
 
 ```
 
@@ -390,17 +394,19 @@ c_text <- case_when(name == "all" ~ "whole community",
                     name == "other" ~ "unenhanced species")
 
 ## common text
-table_legend <- "Median estimates and standard errors (SEs) of regression coefficients are shown. Pr(> 0) and Pr(< 0) represent the proportion of positive and negative estimates (MCMC samples), respectively (i.e., posterior probability)."
+table_legend <- "Median estimates and standard errors (SEs) of regression coefficients are shown. Pr(> 0) and Pr(< 0) represent the proportion of positive and negative estimates in MCMC samples, respectively (i.e., posterior probability)."
 
 table_reg_chunk <- knit_chunk <- NULL
 
 for(i in seq_len(length(df_est))) {
   
-  knit_chunk <- paste0("## Table S", i + j, " Parameter estimates for the regression model of ", c_text[i], " \n",
+  knit_chunk <- paste0("## Table S", i + j, " Parameter estimates for the regression model (", c_text[i], ") \n",
                        table_legend,
                        "\n```{r table_s", i + j,"}
                        \n\n
-                       kable(df_est[[",i,"]], format = 'markdown')
+                       kable(df_est[[",i,"]],
+                             align = c(rep('l', 3), rep('c', 4)),
+                             format = 'markdown')
                        \n\n
                        ```\n",
                        "\n\\pagebreak\n")
