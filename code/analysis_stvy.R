@@ -25,12 +25,12 @@ df_psi <- sim_stvy_result %>%
               values_from = c(mean_density,
                               sd_density)) %>% 
   group_by(group_id) %>% 
-  do(slope_mean_enhanced = coef(lm(mean_density_enhanced ~ stock, data = .))[2],
-     slope_mean_unenhanced = coef(lm(mean_density_unenhanced ~ stock, data = .))[2],
-     slope_mean_all = coef(lm(mean_density_all ~ stock, data = .))[2],
-     slope_sd_enhanced = coef(lm(sd_density_enhanced ~ stock, data = .))[2],
-     slope_sd_unenhanced = coef(lm(sd_density_unenhanced ~ stock, data = .))[2],
-     slope_sd_all = coef(lm(sd_density_all ~ stock, data = .))[2]) %>% 
+  summarize(slope_mean_enhanced = cor(mean_density_enhanced, stock, method = "spearman"),
+            slope_mean_unenhanced = cor(mean_density_unenhanced, stock, method = "spearman"),
+            slope_mean_all = cor(mean_density_all, stock, method = "spearman"),
+            slope_sd_enhanced = cor(sd_density_enhanced, stock, method = "spearman"),
+            slope_sd_unenhanced = cor(sd_density_unenhanced, stock, method = "spearman"),
+            slope_sd_all = cor(sd_density_all, stock, method = "spearman")) %>% 
   mutate(across(.fns = as.numeric)) %>% 
   ungroup()
 
@@ -55,7 +55,7 @@ df_m <- df_psi %>%
 
 fit_sense <- df_m %>% 
   group_by(response) %>% 
-  do(fit = lm(scale(slope) ~ 
+  do(fit = lm(slope ~ 
                 n_species +
                 r1 +
                 r_max +
