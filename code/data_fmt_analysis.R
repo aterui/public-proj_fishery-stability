@@ -11,7 +11,7 @@ source(here::here("code/data_fmt_fishdata.R"))
 river_id <- pull(distinct(df_fish, river))
 
 ## df for species richness
-df_sp <- d0 %>% 
+df_sp <- df_selected %>% 
   filter(abundance > 0) %>% 
   group_by(river, site, site_id) %>% 
   summarize(n_species = n_distinct(taxon),
@@ -23,7 +23,8 @@ df_sp <- d0 %>%
 ## df for environmental covariates
 df_env <- read_csv(here::here("data_fmt/data_env_fmt.csv")) %>% 
   rename(wsd_area = area) %>% 
-  filter(river %in% river_id) %>% 
+  mutate(site_id = paste0(river, site)) %>% 
+  filter(site_id %in% site_selected) %>% 
   mutate(scl_wsd_area = c(scale(wsd_area)),
          scl_ppt = c(scale(ppt)),
          scl_temp = c(scale(temp)),
@@ -62,7 +63,7 @@ list_ssm <- foreach(i = seq_len(length(file_name))) %do% {
     ungroup()
   
   df_m <- df_ssm %>% 
-    left_join(df_env, by = c("river", "site")) %>% 
+    left_join(df_env, by = c("river", "site", "site_id")) %>% 
     left_join(df_sp, by = c("river", "site", "site_id")) %>% 
     left_join(df_stock_mu, by = "river") %>% 
     left_join(df_ocean, by = "river") %>% 
