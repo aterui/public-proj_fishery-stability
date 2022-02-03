@@ -30,7 +30,7 @@ model {
     
     log(lambda[i]) <-
       a0[River[i]] + 
-      a[1] * scl_wsd_area[i] +
+      a[1] * scl_log_wsd_area[i] +
       a[2] * scl_temp[i] +
       a[3] * scl_ppt[i] +
       a[4] * scl_forest[i] +
@@ -62,7 +62,9 @@ data {
   # standardization ---------------------------------------------------------
   
   for(i in 1:Nsite) {
-    scl_wsd_area[i] <- (Wsd_area[i] - mean(Wsd_area[])) / sd(Wsd_area[])
+    log_wsd_area[i] <- log(Wsd_area[i])
+    
+    scl_log_wsd_area[i] <- (log_wsd_area[i] - mean(log_wsd_area[])) / sd(log_wsd_area[])
     scl_temp[i] <- (Temp[i] - mean(Temp[])) / sd(Temp[])
     scl_ppt[i] <- (Ppt[i] - mean(Ppt[])) / sd(Ppt[])
     scl_forest[i] <- (Forest[i] - mean(Forest[])) / sd(Forest[])
