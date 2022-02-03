@@ -28,12 +28,12 @@ df_ssm <- list.files(path = here::here("data_fmt"), full.names = T) %>%
                                    param == "mu_b" ~ "$\\mu_{\\beta}$",
                                    param == "sd_r_space" ~ "$\\sigma_{r}$",
                                    param == "sd_b" ~ "$\\sigma_{\\beta}$"),
-             Interpretation = case_when(param == "log_global_r" ~ "Global rate of community change",
+             Interpretation = case_when(param == "log_global_r" ~ "Rate of community change",
                                         param == "mu_b" ~ "Effect of spring stoking",
-                                        param == "sd_r_space" ~ "Variation in the site-specific rate of community change",
-                                        param == "sd_b" ~ "Variation in the site-specific effect of spring stocking"),
+                                        param == "sd_r_space" ~ "SD of the rate of community change",
+                                        param == "sd_b" ~ "SD of the effect of spring stocking"),
              `Species group` = case_when(group == "all" & param == "log_global_r" ~ "Whole",
-                                         group == "masu" & param == "log_global_r" ~ "Enhanced (masu salmon)",
+                                         group == "masu" & param == "log_global_r" ~ "Enhanced",
                                          group == "other" & param == "log_global_r" ~ "Unenhanced")) %>% 
       arrange(param)
     
@@ -43,9 +43,12 @@ df_ssm <- list.files(path = here::here("data_fmt"), full.names = T) %>%
     }
     
     df0 <- df0 %>%
-      mutate(across(.cols = `50%`:`97.5%`,
+      mutate(across(.cols = where(is.numeric),
                     .fns = op)) %>% 
-      mutate(Estimate = paste0(`50%`, " (", `2.5%`, ", ", `97.5%`, ")")) %>% 
+      mutate(Estimate = paste0("$",
+                               `50%`,
+                               "~(", `2.5%`, ",~", `97.5%`, ")",
+                               "$")) %>% 
       select(`Species group`,
              Parameter,
              Interpretation,

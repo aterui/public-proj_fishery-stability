@@ -59,7 +59,8 @@ df_est <- lapply(filename, function(x) {
              Parameter,
              Effect) %>% 
     dplyr::select(-parameter, -response) %>% 
-    mutate(across(median:prob_negative, op)) %>% 
+    mutate(across(.cols = where(is.numeric),
+                  .fns = function(x) paste0("$", op(x), "$"))) %>% 
     rename(Estimate = median,
            SE = sd,
            "Pr(> 0)" = prob_positive,
@@ -69,4 +70,5 @@ df_est <- lapply(filename, function(x) {
 })
 
 names(df_est) <- name
+
 
