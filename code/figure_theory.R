@@ -20,7 +20,7 @@ df0 <- sim_result %>%
          r1 == 1,
          sd_env == 0.5,
          alpha == 0.5,
-         phi == 0.8,
+         phi == 0.5,
          k == 100,
          response %in% c("n_sp_persist", "cv", "mean_density", "sd_density")) %>% 
   filter(!(response == "cv" & status != "all")) %>%
