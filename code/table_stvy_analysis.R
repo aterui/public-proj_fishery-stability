@@ -30,8 +30,8 @@ for(i in seq_len(length(text_match))) {
                                digits = 3,
                                dep.var.caption  = "Response variable",
                                dep.var.labels.include = FALSE,
-                               column.labels = c("Stocking effect on $\\mu$",
-                                                 "Stocking effect on $\\sigma$"),
+                               column.labels = c("Correlation with $\\mu$",
+                                                 "Correlation with $\\sigma$"),
                                report = "vcs",
                                omit.table.layout = "ns",
                                model.numbers = FALSE)
