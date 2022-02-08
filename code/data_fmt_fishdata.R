@@ -19,6 +19,8 @@ d0 <- read_csv(here::here("data_fmt/data_hkd_prtwsd_fmt.csv")) %>%
                            genus == "Gymnogobius" ~ "Gymnogobius_spp",
                            genus == "Lethenteron" ~ "Lethenteron_spp",
                            genus == "Rhinogobius" ~ "Rhinogobius_spp",
+                           latin == "Gasterosteus_aculeatus" ~ "Gasterosteus_spp",
+                           latin == "Salvelinus_malma" ~ "Salvelinus_malma_krascheninnikovi",
                            TRUE ~ as.character(latin)),
          site_id = paste0(river, site)) %>% 
   group_by(year, river, site, site_id, taxon) %>% 
