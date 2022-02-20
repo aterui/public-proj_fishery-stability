@@ -17,3 +17,6 @@ data_raw/ocean
 rmd/document_output
 rmd/supporting_info.log
 rmd/rmd_test.Rmd
+rmd/cover_letter.Rmd
+rmd/logo/letter_head.png
+rmd/logo/signature_terui.png
