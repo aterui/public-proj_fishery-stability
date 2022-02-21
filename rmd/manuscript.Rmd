@@ -1,5 +1,5 @@
 ---
-title: "Stock enhancement undermines ecological community stability"
+title: "Stock enhancement undermines ecological stability"
 output:
   word_document:
     reference_docx: word_format.docx
