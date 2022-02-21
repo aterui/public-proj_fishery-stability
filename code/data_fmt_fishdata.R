@@ -13,16 +13,19 @@ pacman::p_load(tidyverse, foreach)
 ## remove sites with no coordinates - "usubetsu4", "atsuta6", "kokamotsu4"
 
 d0 <- read_csv(here::here("data_fmt/data_hkd_prtwsd_fmt.csv")) %>% 
-  mutate(taxon = case_when(genus == "Tribolodon" ~ "Pseudaspius_spp",
+  mutate(taxon = case_when(genus == "Cottus" ~ "Cottus_spp",
                            genus == "Gymnogobius" ~ "Gymnogobius_spp",
                            genus == "Lethenteron" ~ "Lethenteron_spp",
+                           genus == "Pungitius" ~ "Pungitius_spp",
                            genus == "Rhinogobius" ~ "Rhinogobius_spp",
+                           genus == "Tribolodon" ~ "Pseudaspius_spp",
                            # update latin name
                            latin == "Gasterosteus_aculeatus" ~ "Gasterosteus_spp",
                            latin == "Hucho_perryi" ~ "Parahucho_perryi",
                            latin == "Noemacheilus_barbatulus" ~ "Barbatula_oreas",
                            latin == "Phoxinus_lagowskii_steindachneri" ~ "Rhynchocypris_lagowskii_steindachneri",
                            latin == "Phoxinus_percnurus_sachalinensis" ~ "Rhynchocypris_percnura_sachalinensis",
+                           latin == "Salvelinus_malma" ~ "Salvelinus_malma_krascheninnikovi",
                            TRUE ~ as.character(latin)),
          site_id = paste0(river, site)) %>% 
   group_by(year, river, site, site_id, taxon) %>% 
