@@ -141,7 +141,7 @@ We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012]. In th
 N_{i,t+1} = N_{i,t}~exp\left[r_i \left(1-\frac{N_{i,t} + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
 \end{align}
 ```
-where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on $i$, $K_i$ the carrying capacity, and $\epsilon_{i,t}$ the species response to stochastic environmental fluctuations that obey an normal distribution $Normal(0, \sigma_{\epsilon}^2)$. We modified this formula to include the effects of stock enhancement on reproduction and competition as follows:
+where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on $i$, $K_i$ the carrying capacity, and $\epsilon_{i,t}$ the species response to stochastic environmental fluctuations that obey an normal distribution $Normal(0, \sigma_{\epsilon}^2)$. We modified this formula to include the effects of stock enhancement (species 1) on reproduction and competition as follows:
 
 ```{=tex}
 \begin{align}
@@ -168,7 +168,7 @@ $f_R~(\ge 0)$ is the density-independent survival of captive-bred individuals re
 N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp \left[r_i \left(1-\frac{N_{i,t}+\alpha_{i1}R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
 \end{align}
 ```
-In this model, intrinsic growth rates of unenhanced species $r_{i,i \ne 1}$ and interspecific competition $\alpha_{ij}$ are random draws from a uniform ($r_{i,i \ne 1} \sim Unif(0,r_{max})$) and an exponential distribution ($\alpha_{ij} \sim Exp(1/\bar{\alpha})$), respectively. We assumed constant values of intraspecific competition ($\alpha_{ii}=1$), carrying capacity $(K_i = K)$ and the number of releases $(R_t=R)$.
+In this model, intrinsic growth rates of unenhanced species $r_{i,i \ne 1}$ and interspecific competition $\alpha_{ij}$ are random draws from a uniform ($r_{i,i \ne 1} \sim Unif(0.5,r_{max})$) and an exponential distribution ($\alpha_{ij} \sim Exp(1/\bar{\alpha})$), respectively. We assumed constant values of intraspecific competition ($\alpha_{ii}=1$), carrying capacity $(K_i = K)$ and the number of releases $(R_t=R)$.
 
 Prior to the main simulation, we performed an extensive sensitivity analysis to identify parameters that strongly influence the relationship between community dynamics and stock enhancement (see **Supplementary text**). We identified five influential parameters (**Table S2-S4**), of which different values were considered in the main simulation as follows: intrinsic growth of enhanced species ($r_1 =$ `r unique(param_set$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(param_set$alpha)`), carrying capacity ($K=$ `r unique(param_set$k)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(param_set$phi)`). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(param_set$n_species)`), maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(param_set$r_max)`), and environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(param_set$sd_env)`). This simulation setup resulted in `r nrow(param_set)` sets of parameter combinations that cover a range of ecological scenarios.
 
@@ -222,19 +222,19 @@ We used linear regression to quantify the impact of stock enhancement on communi
 \left\{
 \begin{aligned}
 ln~y_s &\sim Normal(\mu_{y,s}, \sigma_y^2) &&\text{for CV, mean, and SD}\\
-y_s &\sim Poisson(\mu_{y,s}exp(\epsilon_{y,s})) &&\text{for species richness}
+y_s &\sim Poisson(\lambda_{y,s} exp(\epsilon_{\lambda,s})) &&\text{for species richness}
 \end{aligned}
 \right.
 \end{align}
 ```
-where $\sigma_y$ is the SD of residual errors and $exp(\epsilon_{y,s})$ is the error term that accounts for overdispersion ($\epsilon_{y,s} \sim Normal(0, \sigma_y^2)$). The expected mean $\mu_y$ was related to linear predictors as follows:
+where $\sigma_y$ is the SD of residual errors and $exp(\epsilon_{\lambda,s})$ is the error term that accounts for overdispersion ($\epsilon_{\lambda,s} \sim Normal(0, \sigma_{\lambda}^2)$). The expected means were related to linear predictors as follows:
 
 ```{=tex}
 \begin{align}
 \left\{
 \begin{aligned}
 \mu_{y,s} &= \gamma_{0,w(s)} + \sum_k \gamma_kx_{k,s} &&\text{for CV, mean, and SD}\\
-ln~\mu_{y,s} &= \gamma_{0,w(s)} + \sum_k \gamma_kx_{k,s} &&\text{for species richness}
+ln~\lambda_{y,s} &= \gamma_{0,w(s)} + \sum_k \gamma_kx_{k,s} &&\text{for species richness}
 \end{aligned}
 \right.
 \end{align}
