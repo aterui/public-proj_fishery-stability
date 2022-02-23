@@ -65,6 +65,8 @@ names(df_beta) <- str_extract(filename, "all|masu|other")
 
 ```
 
+**One Sentence Summary:** Stock enhancement undermines the long-term persistence of ecological communities by disrupting the stable coexistence of competing species.
+
 **Authors:** Akira Terui^1,\*^, Hirokazu Urabe^2^, Masayuki Senzaki^3^, Bungo Nishizawa^4^
 
 \*Corresponding author: hanabi0111\@gmail.com
