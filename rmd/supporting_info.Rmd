@@ -145,7 +145,7 @@ where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coeffici
 
 ```{=tex}
 \begin{align}
-N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp \left[r_i \left\{1-\frac{N_{i,t}+\alpha_{i1} (N_{1,t} + R_t) + \sum_{j=2}^S \alpha_{ij}N_{j,t}}{K_i} \right\} \right]exp(\epsilon_{i,t})
+N_{i,t+1} = (N_{i,t}+\phi_i R_t)exp \left[r_i \left\{1-\frac{N_{i,t}+\alpha_{i1} (N_{1,t} + R_t) + \sum_{j=2}^S \alpha_{ij}N_{j,t}}{K_i} \right\} \right]exp(\epsilon_{i,t})
 \end{align}
 ```
 $R_t$ is the number of released individuals, and the parameter $\phi_i$ controls the relative fitness of captive-bred individuals:
@@ -165,7 +165,7 @@ $f_R~(\ge 0)$ is the density-independent survival of captive-bred individuals re
 
 ```{=tex}
 \begin{align}
-N_{i,t+1} = [N_{i,t}+\phi_i R_t]exp \left[r_i \left(1-\frac{N_{i,t}+\alpha_{i1}R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
+N_{i,t+1} = (N_{i,t}+\phi_i R_t)exp \left[r_i \left(1-\frac{N_{i,t}+\alpha_{i1}R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
 \end{align}
 ```
 In this model, intrinsic growth rates of unenhanced species $r_{i,i \ne 1}$ and interspecific competition $\alpha_{ij}$ are random draws from a uniform ($r_{i,i \ne 1} \sim Unif(0.5,r_{max})$) and an exponential distribution ($\alpha_{ij} \sim Exp(1/\bar{\alpha})$), respectively. We assumed constant values of intraspecific competition ($\alpha_{ii}=1$), carrying capacity $(K_i = K)$ and the number of releases $(R_t=R)$.
