@@ -11,6 +11,9 @@ knit: (function(inputFile, encoding) {
       })
 bibliography: reference.bib
 fontsize: 11pt
+header-includes:
+  - \usepackage{lineno}
+  - \linenumbers
 ---
 
 ```{r setup, include=FALSE}
@@ -123,6 +126,6 @@ We should prioritize habitat conservation with a broader scope of ecosystem mana
 
 # Acknowledgments
 
-We are grateful to people involved in the long-term monitoring program at the protected watersheds in Hokkaido. We thank Masato Yamamichi for helpful discussion on this manuscript. Data and codes will be made available upon acceptance.
+We are grateful to people involved in the long-term monitoring program at the protected watersheds in Hokkaido. We thank Masato Yamamichi for helpful discussion on this manuscript. Data and codes are available at <https://github.com/aterui/public-proj_fishery-stability>.
 
 # References
