@@ -58,4 +58,6 @@ g_env <- df0 %>%
   geom_histogram() +
   facet_wrap(facets = ~var_label,
              scales = "free",
-             labeller = label_parsed)
+             labeller = label_parsed) +
+  labs(x= "Value",
+       y = "Count")
