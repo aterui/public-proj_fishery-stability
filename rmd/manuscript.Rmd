@@ -128,6 +128,6 @@ We should prioritize habitat conservation with a broader scope of ecosystem mana
 
 # Acknowledgments
 
-We are grateful to people involved in the long-term monitoring program at the protected watersheds in Hokkaido. We thank Masato Yamamichi for helpful discussion on this manuscript. Data and codes are available at <https://github.com/aterui/public-proj_fishery-stability>.
+We are grateful to people involved in the long-term monitoring program at the protected watersheds in Hokkaido. We thank Genki Sahashi and Masato Yamamichi for helpful discussion on this manuscript. Data and codes are available at <https://github.com/aterui/public-proj_fishery-stability>.
 
 # References
