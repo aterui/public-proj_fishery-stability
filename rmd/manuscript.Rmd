@@ -1,5 +1,5 @@
 ---
-title: "Stock enhancement undermines ecological stability"
+title: "Intentional stocking undermines ecological stability"
 output:
   pdf_document:
     latex_engine: xelatex
@@ -65,7 +65,7 @@ names(df_beta) <- str_extract(filename, "all|masu|other")
 
 ```
 
-**One Sentence Summary:** Stock enhancement undermines the long-term persistence of ecological communities by disrupting the stable coexistence of competing species.
+**One Sentence Summary:** Large-scale releases of captive-bred organisms undermine the long-term persistence of ecological communities by disrupting the stable coexistence of competing species.
 
 **Authors:** Akira Terui^1,\*^, Hirokazu Urabe^2^, Masayuki Senzaki^3^, Bungo Nishizawa^4^
 
@@ -75,11 +75,11 @@ names(df_beta) <- str_extract(filename, "all|masu|other")
 
 # Abstract
 
-The past decades have witnessed efforts to unveil ecological risks associated with massive releases of captive-bred individuals (stock enhancement). Still, we may underestimate the negative impact because current schemes rarely consider the consequences of stock enhancement for the whole ecological community. Here, we use theory and long-term data of Japanese stream fish communities to show that stock enhancement undermines community stability. Our theory predicted that stock enhancement destabilizes community dynamics by facilitating competitive exclusion. Consistent with this prediction, fish communities showed greater temporal fluctuations and fewer species richness in rivers with the intensive stocking of hatchery masu salmon - a major freshwater resource in the region. Our findings paint a bleak picture for stock enhancement, reinforcing the recurrent calls for alternative management strategies.
+The past decades have witnessed efforts to unveil ecological risks associated with massive releases of captive-bred individuals ("stock enhancement"). Still, we may underestimate the negative impact because current schemes rarely consider the consequences of stock enhancement for the whole ecological community. Here, we use theory and long-term data of Japanese stream fish communities to show that stock enhancement undermines community stability. Our theory predicted that stock enhancement destabilizes community dynamics by facilitating competitive exclusion. Consistent with this prediction, fish communities showed greater temporal fluctuations and fewer species richness in rivers with the intensive stocking of hatchery masu salmon - a major freshwater resource in the region. Our findings paint a bleak picture for stock enhancement, reinforcing the recurrent calls for alternative management strategies.
 
 # Maintext
 
-Human demands for natural resources are ever-increasing, such that active interventions are critical to the sustainable management of fisheries, forestry, and wildlife [@laikreCompromisingGeneticDiversity2010]. Captive breeding is a form of the efforts to enhance wild populations of diverse plant and animal taxa [@snyderLimitationsCaptiveBreeding1996; @laikreCompromisingGeneticDiversity2010]. Although releases of captive-bred organisms (stock enhancement) entail ecological risks such as the accumulation of deleterious alleles [@arakiGeneticEffectsCaptive2007; @krkosekDecliningWildSalmon2007], this method is still pervasive in conservation [@snyderLimitationsCaptiveBreeding1996] and natural resource management [@laikreCompromisingGeneticDiversity2010]. In fisheries, for example, billions of hatchery individuals are released annually across the globe [@kitadaEconomicEcologicalGenetic2018]. The widespread use of captive breeding is perhaps because of the "myth" that the demographic benefits of released individuals may exceed the associated risks.
+Human demands for natural resources are ever-increasing, such that active interventions are critical to the sustainable management of fisheries, forestry, and wildlife [@laikreCompromisingGeneticDiversity2010]. Captive breeding is a form of the efforts to enhance wild populations of diverse plant and animal taxa [@snyderLimitationsCaptiveBreeding1996; @laikreCompromisingGeneticDiversity2010]. Although releases of captive-bred organisms ("stock enhancement") entail ecological risks such as the accumulation of deleterious alleles [@arakiGeneticEffectsCaptive2007; @krkosekDecliningWildSalmon2007], this method is still pervasive in conservation [@snyderLimitationsCaptiveBreeding1996] and natural resource management [@laikreCompromisingGeneticDiversity2010]. In fisheries, for example, billions of hatchery individuals are released annually across the globe [@kitadaEconomicEcologicalGenetic2018]. The widespread use of captive breeding is perhaps because of the "myth" that the demographic benefits of released individuals may exceed the associated risks.
 
 Current debates, however, overlook the fact that we have rarely assessed the community-wide impact of stock enhancement. Species are all embedded in the complex web of interacting organisms, and the stable coexistence of competing species through density-dependent feedback underpins the emergent stability of ecological communities [@tilmanEcologicalConsequencesChanges1999; @carrollNicheFitnessDifferences2011a; @loreauDoesFunctionalRedundancy2004]. Stock enhancement may disrupt the sensitive balance of species interactions because it introduces unnaturally high numbers of individuals into the wild [@careyNativeInvadersChallenges2012]. Hence, this form of species management may intervene in the ecological process that allows competing species to coexist, ultimately degrading the long-term community stability. Evidence for this hypothesis is lacking, however.
 
