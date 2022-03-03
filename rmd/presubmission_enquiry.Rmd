@@ -1,0 +1,31 @@
+---
+date: "3/2/2022"
+output:
+  word_document:
+    reference_docx: word_format.docx
+knit: (function(inputFile, encoding) {
+        rmarkdown::render(inputFile, encoding = encoding, output_dir = "document_output")
+      })
+---
+
+Dear Editor
+
+We are interested in your opinion regarding the suitability of our manuscript entitled "*Intentional stocking undermines ecological stability*" for publication in *Nature* as *Article*. We can submit it formally in a week if we receive a positive feedback from you. Our manuscript content is summarized below.
+
+Every year, humans release billions of captive-bred organisms into the wild to restore depleting natural resources across the globe (hereafter, "stock enhancement"). Scientists have discovered significant risks associated with stock enhancement, such as the accumulation of deleterious genes in wild populations. Yet, this form of species management is prevalent in fisheries, forestry, and wildlife management because the demographic benefits seem to exceed the associated risks.
+
+**We argue that this "myth" is a misunderstanding with serious consequences for global biodiversity conservation - current assessments rarely consider the impact of stock enhancement on whole ecological communities.** Stock enhancement introduces unnaturally high numbers of individuals into the wild. Hence, it should disrupt the sensitive balance of species interactions that allows the stable coexistence of competing species, ultimately undermining the long-term persistence of ecological communities. We are unaware of any research addressing this critical hypothesis.
+
+In this study, we used theory and long-term data of stream fish communities to show that stock enhancement undermines the stability of ecological communities. Our theory and empirical results agreed that stock enhancement inhibits the stable coexistence of competing species, thereby increasing the risk of community collapse. Importantly, stock enhancement tended to have a negative - rather than positive - effect on the stocked species due to intensified within-species competition. While our empirical evidence comes from stream ecosystems, this pattern appeared in most simulated ecological scenarios, implying that this phenomenon is pervasive across aquatic and terrestrial ecosystems.
+
+Our study distinguishes itself from previous studies in three important ways:
+
+1.  This study is the first to show the community-level impact of stock enhancement ***in the long term***. Although numerous studies paid close attention to the fate of captive-bred organisms in the wild, none has assessed its demographic impact on the long-term persistence of whole ecological communities.
+
+2.  Our empirical analysis exploited \> 20 years of fish community data at 97 sites collected by consistent sampling methods. Furthermore, while these sites greatly varied in stocking intensity, they preserved intact landscapes with strict regulations of human activities. Hence, our study system set the stage for a "natural experiment" to test our hypothesis.
+
+3.  Our findings will trigger radical changes to the current management of natural resources. Despite the widespread recognition that stock enhancement entails ecological risks, trillions of dollars are invested into stock enhancement to manage natural resources globally. The results of this study alarm that the continued use of this method will accelerate biodiversity loss with no obvious benefit to the stocked species.
+
+In addition to the significance described above, the connection between natural resource management and ecology has a broad implication for a truly interdisciplinary audience, including policy-decision makers, stakeholders, conservation biologists, and basic ecologists. Therefore, we believe *Nature* is an ideal outlet for this manuscript.
+
+We are looking forward to hearing from you.
