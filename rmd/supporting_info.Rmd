@@ -29,34 +29,6 @@ options(knitr.kable.NA = '')
 
 op <- function(x, d = 2) sprintf(paste0("%1.", d, "f"), x) 
 
-# theory
-load(here::here("result/result_ricker.RData"))
-
-n_sim <- sim_result %>% 
-  mutate(n_sim = n_warmup + n_burnin + n_timestep) %>% 
-  pull(n_sim) %>% 
-  unique()
-
-param_set <- sim_result %>% 
-  distinct(n_species,
-           k,
-           r_type,
-           r1,
-           r_min,
-           r_max,
-           sd_env,
-           phi,
-           int_type,
-           alpha,
-           model,
-           seed)
-
-# empirical data
-
-## raw data
-source(here::here("code/data_fmt_fishdata.R"))
-
-
 ```
 
 ```{=tex}
