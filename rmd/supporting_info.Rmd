@@ -298,7 +298,3 @@ source(here::here("code/figure_si_cor.R"))
 ```
 
 Correlation plot among environmental variables in the protected watersheds. Numbers indicate Spearman's rank correlations.
-
-\newpage
-
-# References
