@@ -48,7 +48,7 @@ df_est <- lapply(filename, function(x) {
                               parameter == "a[4]" ~ "Forest fraction",
                               parameter == "a[5]" ~ "Forest fraction",
                               parameter == "b[1]" ~ "Intercept",
-                              parameter == "b[2]" ~ "Stock enhancement",
+                              parameter == "b[2]" ~ "Intentional release",
                               parameter == "b[3]" ~ "Ocean productivity"),
            Response = ifelse(parameter == "b[1]", response, NA),
            Response = case_when(Response == "richness" ~ "Species richness",

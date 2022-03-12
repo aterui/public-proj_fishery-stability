@@ -69,7 +69,7 @@ g_coef <- df_mcmc %>%
              linetype = "dashed") +
   geom_density_ridges(alpha = 0.5) +
   labs(y = "Response",
-       x = "Stocking effect",
+       x = "Release effect",
        fill = "Species group") +
   guides(color = "none") +
   theme_ridges()

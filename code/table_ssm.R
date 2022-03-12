@@ -29,9 +29,9 @@ df_ssm <- list.files(path = here::here("data_fmt"), full.names = T) %>%
                                    param == "sd_r_space" ~ "$\\sigma_{r}$",
                                    param == "sd_b" ~ "$\\sigma_{\\beta}$"),
              Interpretation = case_when(param == "log_global_r" ~ "Rate of community change",
-                                        param == "mu_b" ~ "Effect of spring stoking",
+                                        param == "mu_b" ~ "Effect of spring release",
                                         param == "sd_r_space" ~ "SD of the rate of community change",
-                                        param == "sd_b" ~ "SD of the effect of spring stocking"),
+                                        param == "sd_b" ~ "SD of the effect of spring release"),
              `Species group` = case_when(group == "all" & param == "log_global_r" ~ "Whole",
                                          group == "masu" & param == "log_global_r" ~ "Enhanced",
                                          group == "other" & param == "log_global_r" ~ "Unenhanced")) %>% 

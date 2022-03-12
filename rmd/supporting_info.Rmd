@@ -12,7 +12,7 @@ header-includes:
   \pagenumbering{gobble}
   \usepackage{amsmath}
 bibliography: reference.bib
-csl: science.csl
+csl: nature.csl
 ---
 
 ```{r setup, include=FALSE}
@@ -116,7 +116,7 @@ df_mcmc_reg <- list.files(path = here::here("result"), full.names = T) %>%
   }) %>% 
   bind_rows()
 
-## stocking data
+## release data
 source(here::here("code/data_fmt_stock.R"))
 
 df_stock_stage <- df_stock %>% 
@@ -135,14 +135,14 @@ df_stock_stage <- df_stock %>%
 
 ## Theory
 
-We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012]. In the basic formula without stock enhancement, the population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
+We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012]. In the basic formula without intentional release, the population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
 
 ```{=tex}
 \begin{align}
 N_{i,t+1} = N_{i,t}~exp\left[r_i \left(1-\frac{N_{i,t} + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
 \end{align}
 ```
-where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on $i$, $K_i$ the carrying capacity, and $\epsilon_{i,t}$ the species response to stochastic environmental fluctuations that obey an normal distribution $Normal(0, \sigma_{\epsilon}^2)$. We modified this formula to include the effects of stock enhancement (species 1) on reproduction and competition as follows:
+where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on $i$, $K_i$ the carrying capacity, and $\epsilon_{i,t}$ the species response to stochastic environmental fluctuations that obey an normal distribution $Normal(0, \sigma_{\epsilon}^2)$. We modified this formula to include the effects of intentional release (species 1) on reproduction and competition as follows:
 
 ```{=tex}
 \begin{align}
@@ -171,9 +171,9 @@ N_{i,t+1} = (N_{i,t}+\phi_i R_t)~exp \left[r_i \left(1-\frac{N_{i,t}+\alpha_{i1}
 ```
 In this model, intrinsic growth rates of unenhanced species $r_{i,i \ne 1}$ and interspecific competition $\alpha_{ij}$ are random draws from a uniform ($r_{i,i \ne 1} \sim Unif(0.5,r_{max})$) and an exponential distribution ($\alpha_{ij} \sim Exp(1/\bar{\alpha})$), respectively. We assumed constant values of intraspecific competition ($\alpha_{ii}=1$), carrying capacity $(K_i = K)$ and the number of releases $(R_t=R)$.
 
-Prior to the main simulation, we performed an extensive sensitivity analysis to identify parameters that strongly influence the relationship between community dynamics and stock enhancement (see **Supplementary text**). We identified five influential parameters (**Table S2-S4**), of which different values were considered in the main simulation as follows: intrinsic growth of enhanced species ($r_1 =$ `r unique(param_set$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(param_set$alpha)`), carrying capacity ($K=$ `r unique(param_set$k)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(param_set$phi)`). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(param_set$n_species)`), maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(param_set$r_max)`), and environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(param_set$sd_env)`). This simulation setup resulted in `r nrow(param_set)` sets of parameter combinations that cover a range of ecological scenarios.
+Prior to the main simulation, we performed an extensive sensitivity analysis to identify parameters that strongly influence the relationship between community dynamics and intentional release (see **Supplementary text**). We identified five influential parameters (**Table S2-S4**), of which different values were considered in the main simulation as follows: intrinsic growth of enhanced species ($r_1 =$ `r unique(param_set$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(param_set$alpha)`), carrying capacity ($K=$ `r unique(param_set$k)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(param_set$phi)`). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(param_set$n_species)`), maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(param_set$r_max)`), and environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(param_set$sd_env)`). This simulation setup resulted in `r nrow(param_set)` sets of parameter combinations that cover a range of ecological scenarios.
 
-Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_result$n_rep)` independent communities (i.e., simulation replicates). The number of released individuals $R$ was drawn randomly from a uniform distribution for each simulation replicate as $R \sim Unif(0,500)$. We initialized the community with populations of each species drawn from a Poisson distribution with a mean of five. We repeated the seeding procedure every 10 time steps over the first `r unique(sim_result$n_warmup)` time steps to allow species to establish populations and reach equilibrium without stock enhancement (initialization period). After the initialization period, we released $R$ individuals of the enhanced species every time step over the next `r unique(sim_result$n_burnin)` time steps to reach new equilibrium with selective stock enhancement (burn-in period). We continued the simulation run with stock enhancement and saved the last `r unique(sim_result$n_timestep)` time steps. We obtained the following summary statistics of the whole community $\sum_i^SN_j$: the coefficient of variation (CV), the number of species persist (defied as $N_i > 0.01$ at $t=1600$), the temporal mean ($\mu$), and the SD ($\sigma$). The temporal mean and SD were also calculated for the enhanced species ($N_1$) and unenhanced species ($\sum_{i,i \ne 1}^S N_i$) separately. We summarized values of simulation parameters in **Table S1**.
+Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_result$n_rep)` independent communities (i.e., simulation replicates). The number of released individuals $R$ was drawn randomly from a uniform distribution for each simulation replicate as $R \sim Unif(0,500)$. We initialized the community with populations of each species drawn from a Poisson distribution with a mean of five. We repeated the seeding procedure every 10 time steps over the first `r unique(sim_result$n_warmup)` time steps to allow species to establish populations and reach equilibrium without intentional release (initialization period). After the initialization period, we released $R$ individuals of the enhanced species every time step over the next `r unique(sim_result$n_burnin)` time steps to reach new equilibrium with selective intentional release (burn-in period). We continued the simulation run with intentional release and saved the last `r unique(sim_result$n_timestep)` time steps. We obtained the following summary statistics of the whole community $\sum_i^SN_j$: the coefficient of variation (CV), the number of species persist (defied as $N_i > 0.01$ at $t=1600$), the temporal mean ($\mu$), and the SD ($\sigma$). The temporal mean and SD were also calculated for the enhanced species ($N_1$) and unenhanced species ($\sum_{i,i \ne 1}^S N_i$) separately. We summarized values of simulation parameters in **Table S1**.
 
 ## Empirical analysis
 
@@ -181,7 +181,7 @@ Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_resu
 
 **Time-series data.** We assembled time-series fish data at `r n_distinct(d0$site_id)` sites within `r n_distinct(d0$river)` protected watersheds of Hokkaido Island, Japan. The Hokkaido Research Organization leads a long-term monitoring program at these watersheds, and the data are published as annual reports [@salmonandfreshwaterfisheriesresearchinstitutehokkaidoresearchorganizationAnnualReportMonitoring2021]. The program began in 1963, but an effective, standardized sampling method has been implemented since 1999 (two-pass sampling with a combination of electrofishing and cast net). Most data were collected in summer with irregular interannual intervals (1- to 3-year intervals for most cases), and sampling efforts were quantified by sampling area (average: `r op(mean(df_area$area))` $\pm$ `r op(sd(df_area$area))` m^2^). We confined our analysis to the sites that meet the following criteria: (i) the observation span (from the first to the last year of observation) exceeds 10 years, (ii) the number of observation years exceeds five years, and (iii) masu salmon is observed at least twice during the observation period. As a result, we used time-series data at `r n_distinct(df_fish$site_id)` sites within `r n_distinct(df_fish$river)` watersheds from 1999 to 2019. Summed abundance of first and second passes was used in the following analysis. **Table S5** summarizes observed species in these watersheds.
 
-**Fish stocking.** The stocking of masu salmon began in the 1950s. Hatchery fish are released in spring (fry and smolt stages) and fall (juvenile stage). Although the fish release occurs at multiple locations within a watershed, the stocking information is available only at the watershed level. For each release stage, we assembled annual records of stock enhancement (the number of fish released; 1999-2019) from annual investigations by the Japan Fisheries Research and Education Agency and Salmon and Freshwater Fisheries Research Institute. During the study period, the majority of stocking took place in spring at a fry stage (fry : juvenile : smolt = `r pull(df_stock_stage, ratio)[1]` : `r op(pull(df_stock_stage, ratio)[2])` : `r op(pull(df_stock_stage, ratio)[3])`)
+**Fish release.** The release of masu salmon began in the 1950s. Hatchery fish are released in spring (fry and smolt stages) and fall (juvenile stage). Although the fish release occurs at multiple locations within a watershed, the release information is available only at the watershed level. For each release stage, we assembled annual records of intentional release (the number of fish released; 1999-2019) from annual investigations by the Japan Fisheries Research and Education Agency and Salmon and Freshwater Fisheries Research Institute. During the study period, the majority of release took place in spring at a fry stage (fry : juvenile : smolt = `r pull(df_stock_stage, ratio)[1]` : `r op(pull(df_stock_stage, ratio)[2])` : `r op(pull(df_stock_stage, ratio)[3])`)
 
 **Environmental data.** At each sampling site, we measured the following environmental variables as potential covariates: upstream watershed area (km^2^; a proxy for stream size), proportional land use in the upstream watershed (forest, urban, agriculture), local climates (annual mean air temperature [$^\circ C$] and cumulative precipitation [mm]), and ocean productivity (sea surface chlorophyll *a* concentration [mg m^-3^]). We used MERIT Hydro [@yamazakiMERITHydroHighresolution2019] to delineate the upstream watershed polygon for each sampling site. We estimated the proportion of forest, urban, and agriculture in each watershed polygon based on land use data in 2015 from Copernicus Global Land Service (100-m resolution) [@marcelbuchhornCopernicusGlobalLand2020]. Climate data at each sampling site were extracted from CHELSA version 1.2 [@kargerClimatologiesHighResolution2017; @kargerDataClimatologiesHigh2018]. We extracted annual data of chlorophyll *a* concentration (2002-2019; resolution, 4.6 km^2^) from OceanColor [@seawifsmissionpageNasaOceanBiology2019] as a proxy for ocean productivity and calculated the average value within the 30-km radius of each river mouth. We used the following R packages to perform geospatial analysis: *sf* [@pebesmaSimpleFeaturesStandardized2018]*, raster* [@hijmansRasterGeographicData2020]*, exactextractr* [@bastonExactextractrFastExtraction2020]*, stars* [@pebesmaStarsSpatiotemporalArrays2020]*, whitebox* [@lindsayWhiteboxGATCase2016]*.*
 
@@ -196,7 +196,7 @@ In the observation model, we model observation processes. Fish abundance of eith
 N_{s,t} \sim Poisson(\lambda_{s,t} A_{s,t})
 \end{align}
 ```
-where $\lambda_{s,t}$ is the expected fish density (individual m^-2^) and $A_{s,t}$ the sampling area (m^2^). Since fish sampling was conducted after the spring stocking of masu salmon, captured fish may include individuals released in the observation year. We explicitly modeled this observation process to avoid biases in estimating temporal community trends:
+where $\lambda_{s,t}$ is the expected fish density (individual m^-2^) and $A_{s,t}$ the sampling area (m^2^). Since fish sampling was conducted after the spring release of masu salmon, captured fish may include individuals released in the observation year. We explicitly modeled this observation process to avoid biases in estimating temporal community trends:
 
 ```{=tex}
 \begin{align}
@@ -216,7 +216,7 @@ where $ln~r_{s}$ is the site-specific rate of change at site $s$, and $\epsilon_
 
 We assessed the predictive performance of our model using the Bayesian p-value [@keryIntroductionWinBUGSEcologists2010], a value of which takes a range of 0-1 and indicates over- (\~0.0), under- (\~1.0), or suitable-fitting (\~0.5) to the data. Bayesian p-values for our state-space models ranged from `r op(min(df_bp$mean))` to `r op(max(df_bp$mean))`, indicating that our model specification is appropriate.
 
-We used linear regression to quantify the impact of stock enhancement on community dynamics. Although our focus is stock enhancement, each model included climatic and local abiotic variables to account for important environmental differences among sites. Specifically, we developed the following linear regression model taking either the CV, species richness (the number of species present during the observation period), mean, or SD as a response variable $y_s$ with a normal or a Poisson distribution.
+We used linear regression to quantify the impact of intentional release on community dynamics. Although our focus is intentional release, each model included climatic and local abiotic variables to account for important environmental differences among sites. Specifically, we developed the following linear regression model taking either the CV, species richness (the number of species present during the observation period), mean, or SD as a response variable $y_s$ with a normal or a Poisson distribution.
 
 ```{=tex}
 \begin{align}
@@ -248,7 +248,7 @@ $\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$
 \mu_{\gamma,w} &=\delta_0+\sum_k\delta_k z_{k,w}
 \end{align}
 ```
-$\delta_{0}$ is the global intercept and $\delta_k (k > 0)$ are the regression coefficients. The watershed-level predictors $z_{k,w}$ include the yearly stocking of masu salmon (fry + juvenile + smolt; averaged for1999-2019) and ocean productivity (chlorophyll *a* concentration; averaged for 2002-2019). Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture. All predictors were standardized (mean = 0, SD = 1) before the analysis.
+$\delta_{0}$ is the global intercept and $\delta_k (k > 0)$ are the regression coefficients. The watershed-level predictors $z_{k,w}$ include the yearly release of masu salmon (fry + juvenile + smolt; averaged for1999-2019) and ocean productivity (chlorophyll *a* concentration; averaged for 2002-2019). Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture. All predictors were standardized (mean = 0, SD = 1) before the analysis.
 
 We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned weakly informative priors to parameters (**Table S6**). Three Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. Total MCMC interations ranged from `r min(df_mcmc_ssm$n_total_mcmc)` to `r max(df_mcmc_ssm$n_total_mcmc)` for the state-space models and was `r unique(df_mcmc_reg$n_total_mcmc)` for the regression models. The first `r unique(c(df_mcmc_ssm$n_burn, df_mcmc_reg$n_burn))` iterations were discarded as burn-in, and MCMC samples were saved every `r unique(df_mcmc_ssm$n_thin)` (state-space) and `r unique(df_mcmc_reg$n_thin)` iterations (regression) to reduce autocorrelation. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached \< 1.1 [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.1.0 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Table S7-S10**.
 
@@ -258,9 +258,9 @@ We fitted the models to the data using JAGS version 4.1.0 through *runjags* pack
 
 ## Sensitivity analysis
 
-We performed a sensitivity analysis of the community simulation to identify key simulation parameters that strongly affect the relationships between community dynamics (temporal mean and SD of density) and stock enhancement. We generated 500 sets of parameter combinations by randomly drawing values of seven simulation parameters from uniform distributions (**Table S1**). For each parameter combination, we simulated dynamics of 100 independent communities with varying numbers of stock enhancement $R$ (drawn randomly from $Unif(0, 500)$). This yields a total of $5 \times 10^4$ simulation replicates. In each simulation replicate, we ran 1600 time steps of community dynamics and obtained temporal means and SDs of the whole community ($\sum_i^SN_i$), enhanced species ($N_1$), and unenhanced species ($\sum_{i, i\ne1}^SN_i$) using the last 1000 time steps. The first 600 time steps were discarded as initialization and burn-in periods.
+We performed a sensitivity analysis of the community simulation to identify key simulation parameters that strongly affect the relationships between community dynamics (temporal mean and SD of density) and intentional release. We generated 500 sets of parameter combinations by randomly drawing values of seven simulation parameters from uniform distributions (**Table S1**). For each parameter combination, we simulated dynamics of 100 independent communities with varying numbers of intentional release $R$ (drawn randomly from $Unif(0, 500)$). This yields a total of $5 \times 10^4$ simulation replicates. In each simulation replicate, we ran 1600 time steps of community dynamics and obtained temporal means and SDs of the whole community ($\sum_i^SN_i$), enhanced species ($N_1$), and unenhanced species ($\sum_{i, i\ne1}^SN_i$) using the last 1000 time steps. The first 600 time steps were discarded as initialization and burn-in periods.
 
-For each parameter combination, we estimated Spearman's rank correlation $\xi$ between the number of releases $R$ and community dynamics, which indicate the effect of stock enhancement under a given ecological context. To examine influences of simulation parameters on $\xi$ (**Table S1**), we developed the following regression model taking $\xi$ as a response variable:
+For each parameter combination, we estimated Spearman's rank correlation $\xi$ between the number of releases $R$ and community dynamics, which indicate the effect of intentional release under a given ecological context. To examine influences of simulation parameters on $\xi$ (**Table S1**), we developed the following regression model taking $\xi$ as a response variable:
 
 $$
 \begin{aligned}
@@ -271,7 +271,7 @@ $$
 
 where $\xi_n$ is Spearman's rank correlation for parameter combination $n$, and $\zeta_k$ ($k = 0-7$) are the intercept ($\zeta_0$) and regression coefficients ($\zeta_{1-7}$). Explanatory variables were standardized (mean = 0, SD = 1) to compare regression coefficients.
 
-We found that regression coefficients of the following parameters ($\zeta$) never exceeded a value of 0.10: the number of species $S$, maximum intrinsic growth rate of unenhanced species $r_{max}$, environmental stochasticity $\sigma_{\epsilon}$, and relative fitness $f_R$. Therefore, these parameters have little influence on the qualitative relationship between the number of releases and community dynamics. In the main simulation, we fixed values of $S$, $r_{max}$, and $\sigma_{\epsilon}$ (**Table S1**). In the meantime, we varied values of $K$, $r_1$, $f_R$, and $\bar{\alpha}$ as they are potentially influential (**Table S1**). Although $f_R$ had little influence on stocking effects (**Table S1**), we varied this parameter given the significant interest in the relative fitness of captive-bred individuals in the wild.
+We found that regression coefficients of the following parameters ($\zeta$) never exceeded a value of 0.10: the number of species $S$, maximum intrinsic growth rate of unenhanced species $r_{max}$, environmental stochasticity $\sigma_{\epsilon}$, and relative fitness $f_R$. Therefore, these parameters have little influence on the qualitative relationship between the number of releases and community dynamics. In the main simulation, we fixed values of $S$, $r_{max}$, and $\sigma_{\epsilon}$ (**Table S1**). In the meantime, we varied values of $K$, $r_1$, $f_R$, and $\bar{\alpha}$ as they are potentially influential (**Table S1**). Although $f_R$ had little influence on release effects (**Table S1**), we varied this parameter given the significant interest in the relative fitness of captive-bred individuals in the wild.
 
 \newpage
 
@@ -313,7 +313,7 @@ table_stvy_chunk <- knit_chunk <- NULL
 
 for(i in 1:length(table_stvy)) {
   
-  table_legend <- paste0("Sensitivity analysis of the community simulation. Parameter estimates of linear regression models (standard errors in parenthesis) are shown. Response variables are Spearman's rank correlation between stock enhancement and either temporal mean density ($\\mu$) or SD ($\\sigma$) of ", c_text[i],". Explanatory variables (i.e., simulation parameters) were standardized (mean = 0, SD = 1) before the analysis.")
+  table_legend <- paste0("Sensitivity analysis of the community simulation. Parameter estimates of linear regression models (standard errors in parenthesis) are shown. Response variables are Spearman's rank correlation between intentional release and either temporal mean density ($\\mu$) or SD ($\\sigma$) of ", c_text[i],". Explanatory variables (i.e., simulation parameters) were standardized (mean = 0, SD = 1) before the analysis.")
   
   knit_chunk <- paste0("## Table S", i + j, " Sensitivity analysis (", c_text[i],") \n",
                        table_legend,
@@ -444,7 +444,7 @@ for(i in seq_len(nrow(df_param))) {
                        \n\n
                        ```\n",
                        
-                       "Theoretical predictions for the stocking effect on community dynamics. Rows represent different response variables, and columns show distinct simulation scenarios with different strength of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters are: ",
+                       "Theoretical predictions for the release effect on community dynamics. Rows represent different response variables, and columns show distinct simulation scenarios with different strength of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters are: ",
                        "number of species $S$ = `r df_param$n_species[",i,"]`; ",
                        "intrinsic growth rate of an enhanced species $r_1$ = `r df_param$r1[",i,"]`; ",
                        "maximum intrinsic growth rate of unenhanced species $r_{max}$ = `r df_param$r_max[",i,"]`; ",
