@@ -174,7 +174,7 @@ We should prioritize habitat conservation with a broader scope of ecosystem mana
 
 # Acknowledgments
 
-We are grateful to people involved in the long-term monitoring program at the protected watersheds in Hokkaido. We thank Genki Sahashi and Masato Yamamichi for helpful discussion on this manuscript.
+Blinded for double-blind review
 
 # Funding
 
@@ -182,15 +182,15 @@ No funding.
 
 # Author contributions
 
-AT conceived the project. AT, HU and BN assembled data for empirical analysis. AT analyzed data with inputs from HU, MS, and BN. AT wrote the first draft and HU, MS, and BN significantly contributed to the final version of the manuscript.
+Blinded for double-blind review
 
 # Competing interests
 
 None declared.
 
-# **Data and materials availability**
+# **Data and materials availability** 
 
-Data and codes are available at <https://github.com/aterui/public-proj_fishery-stability>.
+Data and codes will be made available upon the acceptance of the manuscript.
 
 \newpage
 
