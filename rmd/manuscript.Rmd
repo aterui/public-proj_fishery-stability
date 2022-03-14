@@ -119,6 +119,12 @@ df_stock_stage <- df_stock %>%
 
 ```
 
+**Authors:** Akira Terui^1\*^, Hirokazu Urabe^2^, Masayuki Senzaki^3^, Bungo Nishizawa^4^
+
+**\*Corresponding author:** hanabi0111\@gmail.com
+
+**Affiliations:** ^1^ Department of Biology, University of North Carolina at Greensboro, Greensboro, NC 27412, USA ^2^ Salmon and Freshwater Fisheries Research Institute, Hokkaido Research Organization, Eniwa, Hokkaido, 061-1433, Japan ^3^ Faculty of Environmental Earth Science, Hokkaido University, Sapporo, Hokkaido, 060-0810, Japan ^4^ National Institute of Polar Research, Tachikawa, Tokyo, 190-8518, Japan
+
 # Abstract
 
 The past decades have witnessed efforts to unveil ecological risks associated with massive releases of captive-bred native species ("intentional release"). Yet, this method is still pervasive in conservation and natural resource management, assuming that the demographic benefits exceed the associated risks. Here, contrary to this intuition, we show that intentional release triggers community collapse with little demographic benefit to the enhanced species. Our theory predicted that intentional release destabilizes community dynamics by facilitating competitive exclusion. In parallel, the excessive input of captive-bred individuals suppressed the natural recruitment of the enhanced species via intensified within-species competition. Consistent with this prediction, stream fish communities showed greater temporal fluctuations and fewer species richness in rivers with the intensive release of hatchery masu salmon - a major freshwater resource in Japan. Our findings alarm that the current overreliance on intentional release may accelerate global biodiversity loss, threatening the provisioning of ecosystem services.
@@ -172,9 +178,9 @@ Despite the significant attention to the fate of captive-bred individuals [@arak
 
 We should prioritize habitat conservation with a broader scope of ecosystem management for the sustainability of natural resources. Such efforts are particularly important in the Anthropocene because habitat degradation may exacerbate the undesired influence of intentional release. Protected areas and environmental restoration are promising tools to conserve biodiversity, and a smart spatial design is a key to achieving successful conservation. For example, coordinated placement of conservation sites considering spatial biodiversity patterns is crucial in improving the ecological outcomes [@teruiEmergentDualScaling2021; @koningNetworkGrassrootsReserves2020; @fontouraProtectingConnectivityPromotes2022]. Governance may also play a central role in enforcing environmental legislation, potentially determining the effectiveness of conservation investment [@amanoSuccessfulConservationGlobal2018]. These considerable potentials indicate that viable management options exist before blindly accepting intentional release. Without a comprehensive framework that appreciates the ecological integrity of natural communities, the intentional release will never be effective but impairs biodiversity.
 
-# Acknowledgments
+# Acknowledgements
 
-Blinded for double-blind review
+We are grateful to people involved in the long-term monitoring program at the protected watersheds in Hokkaido. We thank Genki Sahashi and Masato Yamamichi for helpful discussion on this manuscript.
 
 # Funding
 
@@ -182,16 +188,14 @@ No funding.
 
 # Author contributions
 
-Blinded for double-blind review
+AT conceived the project. AT, HU and BN assembled data for empirical analysis. AT analyzed data with inputs from HU, MS, and BN. AT wrote the first draft and HU, MS, and BN significantly contributed to the final version of the manuscript.
 
-# Competing interests
+# Competing interest
 
-None declared.
+None declared
 
-# **Data and materials availability** 
+# Data availability
 
-Data and codes will be made available upon the acceptance of the manuscript.
-
-\newpage
+Data and codes are available at <https://github.com/aterui/public-proj_fishery-stability>.
 
 # References
