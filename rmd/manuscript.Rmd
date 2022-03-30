@@ -5,7 +5,7 @@ output:
     latex_engine: xelatex
   #word_document:
   # reference_docx: word_format.docx
-csl: nature.csl
+csl: pnas.csl
 knit: (function(inputFile, encoding) {
         rmarkdown::render(inputFile, encoding = encoding, output_dir = "document_output")
       })
@@ -127,15 +127,23 @@ df_stock_stage <- df_stock %>%
 
 # Abstract
 
-The past decades have witnessed efforts to unveil ecological risks associated with massive releases of captive-bred native species ("intentional release"). Yet, this method is still pervasive in conservation and natural resource management, assuming that the demographic benefits exceed the associated risks. Here, contrary to this intuition, we show that intentional release triggers community collapse with little demographic benefit to the enhanced species. Our theory predicted that intentional release destabilizes community dynamics by facilitating competitive exclusion. In parallel, the excessive input of captive-bred individuals suppressed the natural recruitment of the enhanced species via intensified within-species competition. Consistent with this prediction, stream fish communities showed greater temporal fluctuations and fewer species richness in rivers with the intensive release of hatchery masu salmon - a major freshwater resource in Japan. Our findings alarm that the current overreliance on intentional release may accelerate global biodiversity loss, threatening the provisioning of ecosystem services.
+The past decades have witnessed efforts to unveil ecological risks associated with massive releases of captive-bred native species ("intentional release"). Yet, this method is still pervasive in conservation and natural resource management, assuming that the demographic benefits exceed the associated risks. However, such external inputs may disrupt the sensitive balance of species interactions that allows competing species to coexist, potentially compromising the long-term community stability. Here, we use theory and long-term data of stream fish communities to show that intentional release triggers community collapse with little demographic benefit to the enhanced species. Our theory predicted that intentional release intensifies interspecific competition, facilitating competitive exclusion of unenhanced species that otherwise stablely coexist. In parallel, the excessive input of captive-bred individuals suppressed the natural recruitment of the enhanced species via intensified within-species competition. Consequently, the ecological community with intentional release is predicted to show reduced community density with unstable temporal dynamics. Consistent with this prediction, stream fish communities showed greater temporal fluctuations and fewer species richness in rivers with the intensive release of hatchery salmon - a major fishery resource worldwide. Our findings alarm that the current overreliance on intentional release may accelerate global biodiversity loss, threatening the provisioning of ecosystem services.
 
-# Maintext
+# Significance
+
+Intentional release of captive-bred individuals is a common practice for conservation and natural resource management. However, we know little about its potential consequences for the whole ecological community. Here, we show that intentional release undermines community stability with little demographic benefit to the enhanced species. Theory and data agreed that intentional release destabilizes community dynamics by facilitating competitive exclusion while suppressing the natural recruitment of the enhanced species. The effect size of intentional release was striking in its magnitude, doubling temporal fluctuations of enhanced communities compared to those with no intentional release. Our findings point to major limitations of intentional release as a primary tool for biodiversity conservation and sustainability.
+
+**Key words:** coexistence theory, competition, resilience, ecological modeling, fishery
+
+# Introduction
 
 Human demands for natural resources are ever-increasing, such that active interventions are critical to the sustainable management of fisheries, forestry, and wildlife [@laikreCompromisingGeneticDiversity2010]. Captive breeding is a form of the efforts to enhance wild populations of diverse plant and animal taxa [@snyderLimitationsCaptiveBreeding1996; @laikreCompromisingGeneticDiversity2010]. Although releases of captive-bred native species ("intentional release") entail ecological risks such as the accumulation of deleterious alleles [@arakiGeneticEffectsCaptive2007; @krkosekDecliningWildSalmon2007], this method is still pervasive in conservation [@snyderLimitationsCaptiveBreeding1996] and natural resource management [@laikreCompromisingGeneticDiversity2010]. In fisheries, for example, billions of hatchery individuals are released annually across the globe [@kitadaEconomicEcologicalGenetic2018]. The widespread use of captive breeding is perhaps because of the "myth" that the demographic benefits of released individuals may exceed the associated risks.
 
 Current debates, however, overlook the fact that we have rarely assessed the community-wide impact of intentional release. Species are all embedded in the complex web of interacting organisms, and the stable coexistence of competing species through density-dependent feedback underpins the emergent stability of ecological communities [@tilmanEcologicalConsequencesChanges1999; @carrollNicheFitnessDifferences2011a; @loreauDoesFunctionalRedundancy2004]. Intentional release may disrupt the sensitive balance of species interactions because it introduces unnaturally high numbers of individuals into the wild [@careyNativeInvadersChallenges2012]. Hence, this form of species management may intervene in the ecological process that allows competing species to coexist, ultimately degrading the long-term community stability. Evidence for this hypothesis is lacking, however.
 
 Here, we show that intentional release undermines long-term community stability, which we define as the relative size of fluctuations in total community density over time [@tilmanEcologicalConsequencesChanges1999]. Our theory illuminates that intentional release compromises the stabilizing mechanism emerging from species niche differences. The present study further demonstrates the relevance of this general theory to natural systems by showing its congruence with Japanese stream fish communities, where \~10 million hatchery masu salmon (*Oncorhynchus masou masou*) are released annually for fisheries, recreation, and conservation purposes [@kitadaLessonsJapanMarine2020].
+
+# Results and Discussion
 
 We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012] to simulate community dynamics with the selective intentional release of a constituent species (species 1). Specifically, the population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
 

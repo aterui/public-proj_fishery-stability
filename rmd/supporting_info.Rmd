@@ -12,7 +12,7 @@ header-includes:
   \pagenumbering{gobble}
   \usepackage{amsmath}
 bibliography: reference.bib
-csl: nature.csl
+csl: pnas.csl
 ---
 
 ```{r setup, include=FALSE}
