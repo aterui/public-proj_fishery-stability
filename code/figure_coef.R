@@ -70,8 +70,8 @@ g_coef <- df_mcmc %>%
   geom_density_ridges(alpha = 0.5) +
   labs(y = "Response",
        x = "Release effect",
-       fill = "Species group") +
-  guides(color = "none") +
+       fill = "Species group",
+       color = "Species group") +
   theme_ridges()
 
 ggsave(g_coef,
