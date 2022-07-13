@@ -1,42 +1,32 @@
 
 # setup -------------------------------------------------------------------
 
-rm(list = ls(all.names = TRUE))
+rm(list = ls())
+source("code/library.R")
 
-pacman::p_load(here,
-               cdyns,
-               tidyverse,
-               foreach,
-               doParallel,
-               doSNOW)
-
-cl <- makeCluster(detectCores())
+cl <- makeCluster(detectCores() - 1)
 registerDoSNOW(cl)
 
 # set parameters ----------------------------------------------------------
 
 df_param <- expand.grid(n_timestep = 1000,
-                        n_warmup = 200,
-                        n_burnin = 400,
+                        n_warmup = 100,
+                        n_burnin = 100,
                         n_species = 10,
-                        k = c(100, 500),
+                        k = c(100, 400),
                         r_type = "constant",
-                        r1 = c(0.5, 1, 2),
+                        r1 = seq(0.5, 3.5, by = 1),
                         r_min = 0.5,
-                        r_max = 2,
+                        r_max = 3.5,
                         sd_env = 0.5,
                         phi = c(0.5, 1),
                         int_type = "random",
                         alpha = c(0.1, 0.5),
                         model = "ricker",
-                        seed = 5,
-                        seed_interval = 10)
+                        seed = 50)
 
 n_rep <- 1000
-repeat {
-  stock <- round(runif(n_rep, min = 0, max = 500))
-  if(min(stock) == 0 & max(stock) == 500) break    
-}
+stock <- seq(0, 500, length = n_rep)
 
 # run simulation ----------------------------------------------------------
 
@@ -52,6 +42,7 @@ result <- foreach(x = iter(df_param, by = 'row'),
                     df_set <- foreach(j = seq_len(n_rep),
                                       .combine = "bind_rows") %do% {
                                         
+                                        ## simulation
                                         dyn <- cdynsim(n_timestep = x$n_timestep,
                                                        n_warmup = x$n_warmup,
                                                        n_burnin = x$n_burnin,
@@ -68,6 +59,7 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                                        model = x$model,
                                                        seed = x$seed)
                                         
+                                        ## summarize temporal dynamics
                                         dyn_summary <- dyn$df_dyn %>% 
                                           mutate(status = case_when(species == 1 ~ "enhanced",
                                                                     species != 1 ~ "unenhanced")) %>% 
@@ -79,31 +71,34 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                           bind_rows(tibble(status = "all",
                                                            dyn$df_community))
                                         
-                                        var_sum <- sum(diag(dyn$vcov_matrix))
-                                        cov_sum <- sum(dyn$vcov_matrix[upper.tri(dyn$vcov_matrix)]) * 2
-                                        
-                                        n_sp_persist <- dyn$df_dyn %>% 
+                                        ## persisting species
+                                        n_sp_last <- dyn$df_dyn %>% 
                                           filter(density > 0.01,
                                                  timestep == max(timestep)) %>% 
                                           n_distinct(.$species)
                                         
+                                        n_sp_any <- dyn$df_dyn %>% 
+                                          group_by(species) %>% 
+                                          summarize(persist = ifelse(any(density > 0.01), 1, 0)) %>% 
+                                          pull(persist) %>% 
+                                          sum()
+                                        
+                                        ## output dataframe
                                         df <- tibble(n_rep = j,
                                                      x,
                                                      stock = stock[j],
                                                      dyn_summary,
-                                                     n_sp_persist = n_sp_persist,
-                                                     var_sum = var_sum,
-                                                     cov_sum = cov_sum)
+                                                     n_sp_last = n_sp_last,
+                                                     n_sp_any = n_sp_any)
                                         
                                         return(df)
                                       }
                     return(df_set)
                   }
 
-# return ------------------------------------------------------------------
-
 stopCluster(cl)
 
-sim_result <- result
-save(sim_result, file = "result/result_ricker.RData")
-#write_csv(result, "result/result_ricker.csv")
+
+# return ------------------------------------------------------------------
+
+saveRDS(result, file = "result/result_ricker.rds")

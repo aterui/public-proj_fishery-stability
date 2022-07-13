@@ -1,0 +1,7 @@
+pacman::p_load(tidyverse,
+               patchwork,
+               here,
+               cdyns,
+               foreach,
+               doParallel,
+               doSNOW)

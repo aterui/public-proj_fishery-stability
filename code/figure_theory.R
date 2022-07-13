@@ -1,7 +1,7 @@
 
 # setup -------------------------------------------------------------------
 
-#rm(list = ls(all.names = TRUE))
+rm(list = ls(all.names = TRUE))
 pacman::p_load(tidyverse,
                patchwork)
 
@@ -9,7 +9,7 @@ pacman::p_load(tidyverse,
 # data --------------------------------------------------------------------
 
 ## call `sim_result`
-load(file = here::here("result/result_ricker.RData"))
+sim_result <- readRDS(file = here::here("result/result_ricker.rds"))
 
 df0 <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 
@@ -17,11 +17,11 @@ df0 <- sim_result %>%
                names_to = "response",
                values_to = "value") %>% 
   filter(r_max == 2,
-         r1 == 1,
+         r1 == 0.5,
          sd_env == 0.5,
-         alpha == 0.5,
+         alpha == 0.1,
          phi == 0.5,
-         k == 100,
+         k == 400,
          response %in% c("n_sp_persist", "cv", "mean_density", "sd_density")) %>% 
   filter(!(response == "cv" & status != "all")) %>%
   filter(!(response == "n_sp_persist" & status != "all")) %>%
@@ -67,7 +67,9 @@ g_theory <- df0 %>%
   facet_wrap(facets = ~ response_name,
              nrow = 4,
              scales = "free_y",
-             labeller = label_parsed) +
+             labeller = label_parsed,
+             strip.position = "left") +
   guides(color = "none",
          fill = "none") +
-  theme(axis.title.y = element_blank())
+  theme(axis.title.y = element_blank(),
+        strip.placement = "outside")

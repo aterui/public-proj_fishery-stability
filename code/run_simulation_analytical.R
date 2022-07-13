@@ -1,14 +1,8 @@
 
 # setup -------------------------------------------------------------------
 
-rm(list = ls(all.names = TRUE))
-
-pacman::p_load(here,
-               cdyns,
-               tidyverse,
-               foreach,
-               doParallel,
-               doSNOW)
+rm(list = ls())
+source("code/library.R")
 
 n_core <- detectCores() - 1
 cl <- makeCluster(n_core)
