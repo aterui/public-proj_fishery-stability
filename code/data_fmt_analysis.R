@@ -44,35 +44,22 @@ group <- c("all", "masu", "other")
 
 # ssm data ----------------------------------------------------------------
 
-file_name <- list.files(path = here::here("data_fmt"), full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(value, "data_ssm")) %>% 
-  pull()
-
-list_ssm <- foreach(i = seq_len(length(file_name))) %do% {
-  
-  df_ssm <- read_csv(file_name[i]) %>% 
-    rename(median = '50%',
-           high = '97.5%',
-           low = '2.5%') %>% 
-    filter(str_detect(param_name, "log_d")) %>% 
-    group_by(river, site, site_id) %>% 
-    summarize(mu = mean(exp(median)),
-              sigma = sd(exp(median)),
-              cv = sigma / mu) %>% 
-    ungroup()
-  
-  df_m <- df_ssm %>% 
-    left_join(df_env, by = c("river", "site", "site_id")) %>% 
-    left_join(df_sp, by = c("river", "site", "site_id")) %>% 
-    left_join(df_stock_mu, by = "river") %>% 
-    left_join(df_ocean, by = "river") %>% 
-    pivot_longer(cols = c(mu, sigma, cv),
-                 names_to = "response",
-                 values_to = "value") %>%
-    mutate(group = group[i])
-  
-  return(df_m)
-}
-
-names(list_ssm) <- str_extract(file_name, c("all", "masu", "other"))
+df_ssm <- readRDS(file = here::here("data_fmt/data_ssm.rds")) %>% 
+  lapply(function(x) mutate(x, group = c(na.omit(unique(x$group))))) %>% 
+  bind_rows() %>% 
+  rename(median = '50%',
+         high = '97.5%',
+         low = '2.5%') %>% 
+  filter(str_detect(param_name, "log_d")) %>% 
+  group_by(river, site, site_id, group) %>%
+  summarize(mu = mean(exp(median)),
+            sigma = sd(exp(median)),
+            cv = sigma / mu) %>% 
+  ungroup() %>% 
+  left_join(df_env, by = c("river", "site", "site_id")) %>% 
+  left_join(df_sp, by = c("river", "site", "site_id")) %>% 
+  left_join(df_stock_mu, by = "river") %>% 
+  left_join(df_ocean, by = "river") %>% 
+  pivot_longer(cols = c(n_species, mu, sigma, cv),
+               names_to = "response",
+               values_to = "value")
