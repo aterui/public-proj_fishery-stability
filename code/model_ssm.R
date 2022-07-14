@@ -15,7 +15,9 @@ model {
   }
   
   for (j in 1:Nsite) {
-    log_d[j, St_year[j]] ~ dnorm(0, ninfo)
+    for(t in St_year[j]:(St_year[j] + Q - 1)) {
+      log_d[j, t] ~ dnorm(0, ninfo)
+    }
   }
   
   for (j in 1:Nsite) {
@@ -59,8 +61,8 @@ model {
   
   ## state
   for (j in 1:Nsite) {
-    for (t in St_year[j]:(End_year[j] - 1)) {
-      log_d[j, t + 1] <- log_r[j, t] + log_d[j, t]
+    for (t in (St_year[j] + Q):End_year[j]) {
+      log_d[j, t] <- log_r[j, t] + log_d[j, t - Q]
       log_r[j, t] ~ dnorm(log_mu_r[j], tau_r_time[j])
     }
   }

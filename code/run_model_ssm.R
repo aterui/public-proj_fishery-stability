@@ -70,7 +70,10 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                  Stock = df_fry$stock,
                  Year_stock = df_fry$year_release - min(df_fry$year_release) + 1,
                  Site_stock = df_fry$site_id_numeric,
-                 Nsample_stock = nrow(df_fry))
+                 Nsample_stock = nrow(df_fry),
+                 
+                 # order of auto-regressive process
+                 Q = ifelse(fish_group == "other", 1, 3))
                  
   ## model file ####
   m <- read.jagsfile("code/model_ssm.R")
@@ -139,10 +142,12 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                                 "site_id",
                                 "site_id_numeric"))
   
-
-  ## export ####
-  write_csv(est,
-            paste0("data_fmt/data_ssm_est_", fish_group, ".csv"))
-  
   return(est)
 }
+
+names(list_est) <- group
+
+
+# export ------------------------------------------------------------------
+
+saveRDS(list_est, here::here("data_fmt/data_ssm.rds"))
