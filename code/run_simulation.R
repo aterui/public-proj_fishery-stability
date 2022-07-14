@@ -11,19 +11,21 @@ registerDoSNOW(cl)
 
 df_param <- expand.grid(n_timestep = 1000,
                         n_warmup = 100,
-                        n_burnin = 100,
+                        n_burnin = 400,
                         n_species = 10,
                         k = c(100, 400),
                         r_type = "constant",
                         r1 = seq(0.5, 3.5, by = 1),
                         r_min = 0.5,
-                        r_max = 3.5,
+                        r_max = 2.5,
                         sd_env = 0.5,
                         phi = c(0.5, 1),
                         int_type = "random",
                         alpha = c(0.1, 0.5),
                         model = "ricker",
-                        seed = 50)
+                        seed = 5,
+                        seed_interval = 10,
+                        extinct = 0.01)
 
 n_rep <- 1000
 stock <- seq(0, 500, length = n_rep)
@@ -57,7 +59,8 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                                        int_type = x$int_type,
                                                        alpha = x$alpha,
                                                        model = x$model,
-                                                       seed = x$seed)
+                                                       seed = x$seed,
+                                                       extinct = x$extinct)
                                         
                                         ## summarize temporal dynamics
                                         dyn_summary <- dyn$df_dyn %>% 
@@ -73,23 +76,16 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                         
                                         ## persisting species
                                         n_sp_last <- dyn$df_dyn %>% 
-                                          filter(density > 0.01,
+                                          filter(density > 0,
                                                  timestep == max(timestep)) %>% 
                                           n_distinct(.$species)
-                                        
-                                        n_sp_any <- dyn$df_dyn %>% 
-                                          group_by(species) %>% 
-                                          summarize(persist = ifelse(any(density > 0.01), 1, 0)) %>% 
-                                          pull(persist) %>% 
-                                          sum()
                                         
                                         ## output dataframe
                                         df <- tibble(n_rep = j,
                                                      x,
                                                      stock = stock[j],
                                                      dyn_summary,
-                                                     n_sp_last = n_sp_last,
-                                                     n_sp_any = n_sp_any)
+                                                     n_sp_last = n_sp_last)
                                         
                                         return(df)
                                       }

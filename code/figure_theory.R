@@ -16,16 +16,15 @@ df0 <- sim_result %>%
   pivot_longer(cols = mean_density:cv,
                names_to = "response",
                values_to = "value") %>% 
-  filter(r_max == 2,
-         r1 == 0.5,
+  filter(r1 == 1.5,
          sd_env == 0.5,
-         alpha == 0.1,
+         alpha == 0.5,
          phi == 0.5,
-         k == 400,
-         response %in% c("n_sp_persist", "cv", "mean_density", "sd_density")) %>% 
+         k == 100,
+         response %in% c("n_sp_last", "cv", "mean_density", "sd_density")) %>% 
   filter(!(response == "cv" & status != "all")) %>%
-  filter(!(response == "n_sp_persist" & status != "all")) %>%
-  mutate(response_name = case_when(response == "n_sp_persist" ~ "Number~of~species~persist",
+  filter(!(response == "n_sp_last" & status != "all")) %>%
+  mutate(response_name = case_when(response == "n_sp_last" ~ "Number~of~species~persist",
                                    response == "cv" ~ "CV~sigma/mu",
                                    response == "mean_density" ~ "Mean~mu~(ind.)",
                                    response == "sd_density" ~ "SD~sigma~(ind.)"),
@@ -50,20 +49,23 @@ g_theory <- df0 %>%
              color = group_id,
              fill = group_id)) +
   geom_point(data = filter(df0, status == "enhanced"),
-             size = 0.25,
-             color = "darkseagreen2") +
+             size = 0.75,
+             color = hue_pal(h.start = 140, l = 90, c = 30)(1)) +
   geom_point(data = filter(df0, status == "unenhanced"),
-             size = 0.25,
-             color = "lightskyblue2") +
+             size = 0.75,
+             color = hue_pal(h.start = 250, l = 90, c = 50)(1)) +
   geom_point(data = filter(df0, status == "all"),
-             size = 0.25,
-             color = "pink") +
-  geom_smooth(size= 0.1,
+             size = 0.75,
+             color = hue_pal(h.start = 30, l = 90, c = 50)(1)) +
+  geom_smooth(size= 0.5,
               method = "loess") +
-  scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
+  scale_color_hue(h = c(30, 250),
+                  l = 70,
+                  labels = c("Whole", "Enhanced", "Unenhanced")) +
+  scale_fill_hue(h = c(30, 250),
+                 l = 70) +
   labs(x = "Number of releases (individuals)",
-       y = "Value",
-       color = "Species group") +
+       y = "Value") +
   facet_wrap(facets = ~ response_name,
              nrow = 4,
              scales = "free_y",

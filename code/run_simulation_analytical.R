@@ -11,19 +11,20 @@ registerDoSNOW(cl)
 # set parameters ----------------------------------------------------------
 
 df_param <- expand.grid(n_timestep = 1000,
-                        n_warmup = 0,
-                        n_burnin = 100,
+                        n_warmup = 100,
+                        n_burnin = 400,
                         n_species = 2,
                         k = seq(50, 500, length = 20),
                         r_type = "constant",
                         r1 = seq(0.5, 3.5, length = 20),
-                        sd_env = c(0, 0.5),
-                        phi = c(0.5, 1),
+                        sd_env = 0,
+                        phi = 1,
                         int_type = "constant",
                         alpha = c(0.1, 0.5),
                         model = "ricker",
                         seed = 50,
-                        seed_interval = 0) %>% 
+                        seed_interval = 0,
+                        extinct = 0.01) %>% 
   mutate(param_id = seq_len(nrow(.)))
 
 n_rep <- 100
@@ -58,7 +59,8 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                                        int_type = x$int_type,
                                                        alpha = x$alpha,
                                                        model = x$model,
-                                                       seed = x$seed)
+                                                       seed = x$seed,
+                                                       extinct = x$extinct)
                                         
                                         dyn_summary <- dyn$df_dyn %>% 
                                           mutate(status = case_when(species == 1 ~ "enhanced",
@@ -71,8 +73,8 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                           bind_rows(tibble(status = "all",
                                                            dyn$df_community))
                                         
-                                        n_sp_persist <- dyn$df_dyn %>% 
-                                          filter(density > 0.01,
+                                        n_sp_last <- dyn$df_dyn %>% 
+                                          filter(density > 0,
                                                  timestep == max(timestep)) %>% 
                                           n_distinct(.$species)
                                         
@@ -80,7 +82,7 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                                      x,
                                                      stock = stock[j],
                                                      dyn_summary,
-                                                     n_sp_persist = n_sp_persist)
+                                                     n_sp_last = n_sp_last)
                                         
                                         return(df)
                                       }

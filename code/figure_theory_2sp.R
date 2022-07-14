@@ -14,9 +14,9 @@ df_sim <- readRDS(here::here("result/result_ricker_2sp.rds")) %>%
   mutate(cv = sd_density / mean_density,
          sd_type = case_when(sd_env == 0 ~ "Deterministic",
                              sd_env == 0.5 ~ "Stochastic"),
-         alpha_label = case_when(alpha == 0.1 ~ sprintf('"Weak competition"~(alpha=="%.2f")',
+         alpha_label = case_when(alpha == 0.1 ~ sprintf('"Weak competition"~(alpha=="%.1f")',
                                                         alpha),
-                                 alpha == 0.5 ~ sprintf('"Strong competition"~(alpha=="%.2f")',
+                                 alpha == 0.5 ~ sprintf('"Strong competition"~(alpha=="%.1f")',
                                                         alpha))) %>% 
   pivot_longer(cols = c(mean_density,
                         sd_density,
@@ -128,4 +128,9 @@ g_ex <- df_g %>%
 
 # combine plot ------------------------------------------------------------
 
-g_d + g_ex + plot_annotation(tag_levels = "A")
+g_c <- g_d + g_ex + plot_annotation(tag_levels = "A")
+
+ggsave(g_c,
+       filename = here::here("figure/figure_2sp_model.pdf"),
+       height = 8.5,
+       width = 15)
