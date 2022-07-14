@@ -4,7 +4,7 @@
 rm(list = ls())
 source("code/library.R")
 
-cl <- makeCluster(detectCores())
+cl <- makeCluster(detectCores() - 1)
 registerDoSNOW(cl)
 
 # set parameters ----------------------------------------------------------
@@ -12,7 +12,7 @@ registerDoSNOW(cl)
 n_para <- 500
 df_param <- tibble(n_timestep = 1000,
                    n_warmup = 100,
-                   n_burnin = 100,
+                   n_burnin = 400,
                    n_species = round(runif(n_para, 5, 20)),
                    k = runif(n_para, 100, 1000),
                    r_type = "constant",
