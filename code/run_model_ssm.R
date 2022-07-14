@@ -73,7 +73,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                  Nsample_stock = nrow(df_fry),
                  
                  # order of auto-regressive process
-                 Q = ifelse(fish_group == "other", 1, 3))
+                 Q = ifelse(fish_group == "masu_salmon", 3, 1))
                  
   ## model file ####
   m <- read.jagsfile("code/model_ssm.R")
