@@ -9,8 +9,9 @@ pacman::p_load(foreach,
 # jags setup --------------------------------------------------------------
 
 source("code/data_fmt_analysis.R")
-df_m <- list_ssm$all %>% 
-  filter(response == "mu")
+df_m <- df_ssm %>% 
+  filter(group == "all",
+         response == "n_species")
 
 ## parameters ####
 para <- c("b",
@@ -48,7 +49,7 @@ df_river <- df_m %>%
   summarize(stock = unique(mean_stock),
             chr_a = unique(chr_a))
 
-d_jags <- list(Y = df_site$n_species,
+d_jags <- list(Y = df_site$value,
                Wsd_area = df_site$wsd_area,
                Temp = df_site$temp,
                Ppt = df_site$ppt,
@@ -91,7 +92,7 @@ while(max(mcmc_summary$Rhat) > 1.09) {
 }
 
 mcmc_sample <- post$mcmc
-save(mcmc_sample, file = "result/mcmc_all_richness.RData")
+saveRDS(mcmc_sample, file = "result/mcmc_all_richness.rds")
 
 ## output ####
 n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
@@ -113,4 +114,4 @@ out <- relocate(re, c(response, parameter))
 
 # export ------------------------------------------------------------------
 
-write_csv(out, "result/reg_rich.csv")
+saveRDS(out, here::here("result/reg_rich.rds"))

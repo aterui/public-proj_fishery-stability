@@ -9,7 +9,8 @@ pacman::p_load(foreach,
 # jags setup --------------------------------------------------------------
 
 source("code/data_fmt_analysis.R")
-df_m <- list_ssm$masu
+df_m <- df_ssm %>% 
+  filter(group == "masu_salmon")
 
 ## parameters ####
 para <- c("b",
@@ -40,7 +41,7 @@ for (j in 1:3) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 1
 
 variable <- c("cv", "mu", "sigma")
 mcmc_file <- paste0("mcmc_masu_", variable) %>%
-  paste0("result/", ., ".RData")
+  paste0("result/", ., ".rds")
 
 
 out <- foreach(i = seq_len(length(variable)),
@@ -99,7 +100,7 @@ out <- foreach(i = seq_len(length(variable)),
   }
   
   mcmc_sample <- post$mcmc
-  save(mcmc_sample, file = mcmc_file[i])
+  saveRDS(mcmc_sample, file = mcmc_file[i])
   
   ## output ####
   n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
@@ -124,4 +125,4 @@ out <- relocate(out, c(response, parameter))
 
 # export ------------------------------------------------------------------
 
-write_csv(out, "result/reg_masu_salmon.csv")
+saveRDS(out, here::here("result/reg_masu_salmon.rds"))
