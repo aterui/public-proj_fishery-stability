@@ -8,29 +8,24 @@ pacman::p_load(tidyverse,
 # time series data --------------------------------------------------------
 
 ## read data
-
-file_name <- list.files(path = here::here("data_fmt"), full.names = TRUE) %>%
-  as_tibble() %>% 
-  filter(str_detect(value, pattern = "data_ssm")) %>% 
-  pull()
-
+df0 <- readRDS(file = here::here("data_fmt/data_ssm.rds")) %>% 
+  lapply(function(x) mutate(x, group = c(na.omit(unique(x$group))))) %>% 
+  bind_rows() %>% 
+  rename(median = '50%',
+         high = '97.5%',
+         low = '2.5%') %>% 
+  filter(str_detect(param_name, "log_d")) %>% 
+  mutate(est_density = exp(median),
+         river = str_to_sentence(river))
 
 ## plot
-
 source(here::here("code/figure_set_theme.R"))
 theme_set(plt_theme)
 
-list_g_dyns <- foreach(i = seq_len(length(file_name))) %do% {
-  
-  df0 <- read_csv(file_name[i]) %>% 
-    filter(param_name == "log_d") %>%
-    rename(median = "50%",
-           lower = "2.5%",
-           upper = "97.5%") %>% 
-    mutate(est_density = exp(median),
-           river = str_to_sentence(river))
+list_g_dyns <- foreach(i = seq_len(length(unique(df0$group)))) %do% {
   
   g <- df0 %>% 
+    filter(group == unique(df0$group)[i]) %>% 
     ggplot() + 
     geom_line(aes(x = year_id + 1998,
                   y = est_density,
