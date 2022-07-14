@@ -2,32 +2,14 @@
 # setup -------------------------------------------------------------------
 
 #rm(list = ls())
-pacman::p_load(tidyverse,
-               patchwork)
-
+source(here::here("code/library.R"))
 
 # data --------------------------------------------------------------------
 
 ## raw data for cv, mean, sd
 source(here::here("code/data_fmt_analysis.R"))
 
-list_df <- lapply(list_ssm, function(x) {
-  x %>% 
-    pivot_wider(id_cols = c(river,
-                            site,
-                            site_id,
-                            group,
-                            mean_stock,
-                            n_species),
-                names_from = response,
-                values_from = value) %>% 
-    pivot_longer(cols = c(n_species, cv, mu, sigma),
-                 names_to = "response",
-                 values_to = "value")
-})
-
-
-df_m <- do.call(bind_rows, list_df) %>%
+df_m <- df_ssm %>%
   filter(!(group != "all" & response == "cv")) %>%
   filter(!(group != "all" & response == "n_species")) %>%
   mutate(response = case_when(response == "n_species" ~ "Species~richness",
@@ -44,18 +26,16 @@ df_m <- do.call(bind_rows, list_df) %>%
                                       "SD~sigma~(ind.~m^-2)")))
 
 ## parameter estimates
-file_name <- list.files(path = here::here("result"), full.names = TRUE) %>%
-  as_tibble() %>%
-  filter(str_detect(value, ".csv")) %>%
-  filter(!str_detect(value, "reg_rich")) %>% 
-  pull()
+file_name <- list.files(path = here::here("result"),
+                        full.names = TRUE,
+                        pattern = "reg_all|reg_masu|reg_other")
 
 df_beta <- lapply(file_name, 
                   FUN = function(x) {
-                    mutate(read_csv(x),
+                    mutate(readRDS(x),
                            group = str_extract(x, "all|masu|other"))
                   }) %>%
-  do.call(bind_rows, .) %>%
+  bind_rows() %>%
   filter(!(group != "all" & response == "cv")) %>%
   mutate(response = case_when(response == "richness" ~ "Species~richness",
                               response == "cv" ~ "CV~sigma/mu",
@@ -113,23 +93,27 @@ g_obs <- df_plot %>%
   facet_wrap(facets = ~ response,
              nrow = 4,
              scales = "free_y",
+             strip.position = "left",
              labeller = label_parsed) + 
-  geom_point(data = filter(df_plot, group == "masu"),
-             color = "darkseagreen2") +
+  geom_point(data = filter(df_plot, group == "masu_salmon"),
+             color = hue_pal(h.start = 140, l = 90, c = 40)(1)) +
   geom_point(data = filter(df_plot, group == "other"),
-             color = "lightskyblue2") +
+             color = hue_pal(h.start = 250, l = 90, c = 40)(1)) +
   geom_point(data = filter(df_plot, group == "all"),
-             color = "pink") +
+             color = hue_pal(h.start = 30, l = 90, c = 40)(1)) +
   geom_line(aes(y = y,
                 x = x,
                 color = group_id,
                 linetype = lty),
             data = df_y) +
-  scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
+  scale_color_hue(h = c(30, 250),
+                  l = 70,
+                  labels = c("Whole", "Enhanced", "Unenhanced")) +
   scale_linetype_manual(values = c("solid", "dashed", "dotted"),
                         labels = c("> 0.95", "0.90-0.95", "< 0.90")) +
   labs(x = expression("Number of releases (million fish year"^-1*")"),
        y = "Value",
        color = "Species group",
        linetype = "Posterior prob.") +
-  theme(axis.title.y = element_blank())
+  theme(axis.title.y = element_blank(),
+        strip.placement = "outside")

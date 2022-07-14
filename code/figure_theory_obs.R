@@ -29,6 +29,6 @@ g <- (g_theory + ggtitle("Theoretical prediction")) +
 
 ggsave(g,
        filename = here::here("figure/figure_theory_obs.pdf"),
-       width = 9,
-       height = 11)
+       width = 10,
+       height = 10)
 
