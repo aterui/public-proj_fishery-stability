@@ -60,6 +60,23 @@ site_selected <- d0 %>%
 df_selected <- d0 %>% 
   filter(site_id %in% site_selected)
 
+## selection criteria
+## complete observations for 1999-2019
+
+n_obs_threshold <- 20
+range_threshold <- 20
+
+site_complete <- d0 %>% 
+  group_by(site_id) %>% 
+  summarize(range_obs = max(year) - min(year) + 1,
+            n_obs = n_distinct(year)) %>% 
+  filter(range_obs > range_threshold &
+           n_obs > n_obs_threshold) %>% 
+  pull(site_id)
+
+df_complete <- d0 %>% 
+  filter(site_id %in% site_complete)
+
 
 # summarize data to community level ---------------------------------------
 
