@@ -24,7 +24,7 @@ df_param <- expand.grid(n_timestep = 1000,
                         model = "ricker",
                         seed = 50,
                         seed_interval = 0,
-                        extinct = 0.01) %>% 
+                        extinct = 0) %>% 
   mutate(param_id = seq_len(nrow(.)))
 
 n_rep <- 100
