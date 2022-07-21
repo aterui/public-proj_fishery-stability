@@ -61,7 +61,8 @@ d_jags <- list(N = df_subset$abundance,
                Nsample = nrow(df_subset),
                Nyr = n_distinct(df_subset$year),
                Nsp = n_distinct(df_subset$taxon),
-               Nd = n_distinct(df_subset$taxon),
+               Nf = floor(n_distinct(df_subset$taxon)/2),
+               Nd = floor(n_distinct(df_subset$taxon)/2),
                Q = 1,
                W = diag(n_distinct(df_subset$taxon)))
 
@@ -89,27 +90,36 @@ mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc) %>%
          lower = `2.5%`,
          upper = `97.5%`)
   
-print(max(mcmc_summary$Rhat))
+print(max(mcmc_summary$Rhat, na.rm = T))
 
-while(max(mcmc_summary$Rhat) > 1.09) {
-  post <- extend.jags(post,
-                      burnin = 0,
-                      sample = n_sample,
-                      adapt = n_ad,
-                      thin = n_thin,
-                      n.sims = 3,
-                      combine = TRUE)
-  
-  mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-  print(max(mcmc_summary$Rhat))
-}
+# while(max(mcmc_summary$Rhat, na.rm = T) > 1.09) {
+#   post <- extend.jags(post,
+#                       burnin = 0,
+#                       sample = n_sample,
+#                       adapt = n_ad,
+#                       thin = n_thin,
+#                       n.sims = 3,
+#                       combine = TRUE)
+# 
+#   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+#   print(max(mcmc_summary$Rhat))
+# }
 
 n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
+
+MCMCvis::MCMCtrace(post$mcmc,
+                   filename = here::here("result/MCMCtrace_ricker.pdf"))
 
 
 # output ------------------------------------------------------------------
 
-mcmc_summary %>% 
+m_rho <- mcmc_summary %>% 
   filter(str_detect(.$param, "rho")) %>% 
-  pull(`50%`) %>% 
+  pull(median) %>% 
   matrix(n_distinct(df_subset$taxon), n_distinct(df_subset$taxon))
+
+m_alpha <- mcmc_summary %>% 
+  filter(str_detect(.$param, "alpha")) %>% 
+  pull(median) %>% 
+  matrix(n_distinct(df_subset$taxon), n_distinct(df_subset$taxon))
+
