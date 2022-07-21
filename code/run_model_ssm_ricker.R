@@ -33,8 +33,10 @@ inits <- replicate(3,
 for (j in 1:3) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 1
 
 ## parameters ####
-para <- c("rho",
-          "log_r")
+para <- c("log_r",
+          "sigma",
+          "alpha",
+          "rho")
 
 # jags --------------------------------------------------------------------
 

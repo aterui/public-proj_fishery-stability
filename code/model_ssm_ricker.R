@@ -3,10 +3,12 @@ model {
   ninfo <- 0.1
   scale <- 2.5
   df <- 3
+  a1 <- 2
+  a2 <- 3
   
   # prior -------------------------------------------------------------------
   
-  ## low-level parameters
+  ## low-level parameters ####
   for (i in 1:Nsp) {
     log_d[1, i] ~ dnorm(0, ninfo)
     log_r[i] ~ dnorm(0, ninfo)
@@ -15,7 +17,7 @@ model {
     sd_obs[i] <- sqrt(1 / tau_obs[i])
   }  
   
-  ## factor analysis
+  ## process error ####
   for(t in 1:(Nyr - Q)) {
     for (k in 1:Nd) {
       nu[t, k] ~ dnorm(0, 1)
@@ -25,36 +27,56 @@ model {
   for (k in 1:Nd) {
     
     for(i in 1:Nsp) {
-      xi[k, i] ~ dnorm(0, phi[k, i] * theta[k])
-      phi[k, i] ~ dgamma(1.5, 1.5)
+      xi_eps[k, i] ~ dnorm(0, phi_eps[k, i] * theta_eps[k])
+      phi_eps[k, i] ~ dgamma(1.5, 1.5)
     }
     
   }
   
-  ## multiplicative gamma prior
-  a1 <- 2
-  a2 <- 3
-  
-  delta[1] ~ dgamma(a1, 1)
-  theta[1] <- delta[1]
+  ### multiplicative gamma prior for factor loadings xi
+  delta_eps[1] ~ dgamma(a1, 1)
+  theta_eps[1] <- delta_eps[1]
   
   for(k in 2:Nd) {
-    delta[k] ~ dgamma(a2, 1)
-    theta[k] <- theta[k - 1] * delta[k]
+    delta_eps[k] ~ dgamma(a2, 1)
+    theta_eps[k] <- theta_eps[k - 1] * delta_eps[k]
   }
   
   ## var-covar matrix
-  OMEGA[1:Nsp, 1:Nsp] <- t(xi[ , ]) %*% xi[ , ] + diag_omega[,]
-  TAU[1:Nsp, 1:Nsp] <- inverse(OMEGA[,])
+  OMEGA[1:Nsp, 1:Nsp] <- t(xi_eps[ , ]) %*% xi_eps[ , ] + diag_omega[ , ]
+  TAU[1:Nsp, 1:Nsp] <- inverse(OMEGA[ , ])
   
   for(i in 1:Nsp) {
-    tau[i] ~ dscaled.gamma(2.5, 3)
+    
+    tau[i] ~ dscaled.gamma(scale, df)
     sigma[i] <- sqrt(1 / tau[i])
+    
     for(j in 1:Nsp) {
+      
       diag_omega[i, j] <- W[i, j] * pow(sigma[j], 2)
       rho[i, j] <- OMEGA[i, j] / sqrt(OMEGA[i, i] * OMEGA[j, j])
+      alpha[i, j] ~ dnorm(0, 1)
+      
     }
   }
+  
+  # ## species interaction ####
+  # 
+  # for(i in 1:Nsp) {
+  #   for (k in 1:Nd) {
+  #     eta[i, k] ~ dnorm(0, 1)
+  #   }
+  # }
+  # 
+  # for (k in 1:Nd) {
+  #   
+  #   for(i in 1:Nsp) {
+  #     xi_alpha[k, i] ~ dnorm(0, phi_alpha[k, i] * theta_alpha[k])
+  #     phi_alpha[k, i] ~ dgamma(1.5, 1.5)
+  #   }
+  #   
+  # }
+  # 
   
   # likelihood --------------------------------------------------------------
   
@@ -74,9 +96,9 @@ model {
   ## state
   for (t in (1 + Q):Nyr) {
     log_d[t, 1:Nsp] ~ dmnorm(log_mu_d[t, ], TAU[ , ])
-    log_mu_d[t, 1:Nsp] <- log_r[] + log_d[t - Q, ] + eps[t - Q, ]
+    log_mu_d[t, 1:Nsp] <- log_d[t - Q, ] %*% alpha[ , ] + log_r[] + eps[t - Q, ]
   }
   
-  eps[1:(Nyr - Q), 1:Nsp] <- nu[ , ] %*% xi[ , ]
+  eps[1:(Nyr - Q), 1:Nsp] <- nu[ , ] %*% xi_eps[ , ]
   
 }
