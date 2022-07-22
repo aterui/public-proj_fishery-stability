@@ -1,20 +1,20 @@
 model {
   
-  ninfo <- 0.1
-  scale <- 2.5
-  df <- 1
+  tau0 <- 1 / 50
+  scale0 <- 2.5
+  df0 <- 1
   
   # prior -------------------------------------------------------------------
   
   ## low-level parameters ####
   for (i in 1:Nsp) {
-    log_d[1, i] ~ dnorm(0, ninfo)
-    log_r[i] ~ dnorm(0, ninfo)
+    log_d[1, i] ~ dnorm(0, tau0)
+    log_r[i] ~ dnorm(0, tau0)
     
-    tau_obs[i] ~ dscaled.gamma(scale, df)
+    tau_obs[i] ~ dscaled.gamma(scale0, df0)
     sigma_obs[i] <- sqrt(1 / tau_obs[i])
     
-    tau[i] ~ dscaled.gamma(scale, df)
+    tau[i] ~ dscaled.gamma(scale0, df0)
     sigma[i] <- sqrt(1 / tau[i])
   }  
   
@@ -27,17 +27,14 @@ model {
       diag_alpha[i, j] <- W[i, j] * alpha_hat[i]
       
       ### inter-specific
-      alpha_prime[i, j] ~ dnorm(0, tau_alpha[i, j])T(0, )
+      alpha_prime[i, j] ~ dnorm(0, tau_alpha[i, j])T(0,)
       tau_alpha[i, j] <- (1 - z[i, j]) * q1 + z[i, j] * q2
       z[i, j] ~ dbern(p)
     }
-    alpha_hat[i] ~ dnorm(mu_alpha_hat, tau_alpha_hat)
+    alpha_hat[i] ~ dnorm(0, 1)T(0,)
   }  
   
-  mu_alpha_hat ~ dnorm(0, 1)T(0,)
-  tau_alpha_hat ~ dscaled.gamma(scale, df)
-  
-  p ~ dunif(0, 1)
+  p ~ dbeta(1, 1)
   q1 <- 100
   q2 <- 1
   
@@ -45,6 +42,7 @@ model {
   
   ## observation
   for (n in 1:Nsample) {
+    loglik[n] <- dpois(N[n], lambda[Year[n], Species[n]] * Area[n])
     N[n] ~ dpois(lambda[Year[n], Species[n]] * Area[n])
   }
   
@@ -61,7 +59,10 @@ model {
   for (t in (1 + Q):Nyr) {
     for(i in 1:Nsp) {
       log_d[t, i] ~ dnorm(log_mu_d[t, i], tau[i])
-      log_mu_d[t, i] <- log_d[t - Q, i] + log_r[i] - inprod(alpha[i, ], d[t - Q, ])
+      log_mu_d[t, i] <- 
+        log_d[t - Q, i] + 
+        log_r[i] - 
+        inprod(alpha[i, ], d[t - Q, ])
     }
   }
   
