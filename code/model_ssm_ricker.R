@@ -3,8 +3,8 @@ model {
   ninfo <- 0.1
   scale <- 2.5
   df <- 3
-  a1 <- 2
-  a2 <- 3
+  a1 <- 10
+  a2 <- 10
   
   # prior -------------------------------------------------------------------
   
@@ -71,7 +71,7 @@ model {
   }
   
   for (i in 1:Nsp) {
-    alpha0[i] ~ dnorm(0, 1)T(,0)
+    alpha0[i] ~ dnorm(0, 1)
     for (j in 1:Nsp) {
       diag_alpha[i, j] <- W[i, j] * alpha0[i]
     }
@@ -98,7 +98,7 @@ model {
   
   for (t in 1:Nyr) {
     for (i in 1:Nsp) {
-      lambda[t, i] <- d_obs[t, i]
+      lambda[t, i] <- d_obs[t, i] / 100
       log(d_obs[t, i]) <- log_d_obs[t, i]
       log_d_obs[t, i] ~ dnorm(log_d[t, i], tau_obs[i])
       log(d[t, i]) <- log_d[t, i]
@@ -108,7 +108,7 @@ model {
   ## state
   for (t in (1 + Q):Nyr) {
     log_d[t, 1:Nsp] ~ dmnorm(log_mu_d[t, ], TAU[ , ])
-    log_mu_d[t, 1:Nsp] <- log_r[] + d[t - Q, ] %*% alpha[ , ] + eps[t - Q, ]
+    log_mu_d[t, 1:Nsp] <- log_d[t - Q, ] + log_r[] + d[t - Q, ] %*% alpha[ , ] + eps[t - Q, ]
   }
   
   eps[1:(Nyr - Q), 1:Nsp] <- nu[ , ] %*% xi_eps[ , ]

@@ -35,8 +35,8 @@ for (j in 1:3) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 1
 ## parameters ####
 para <- c("log_r",
           "sigma",
-          "alpha",
-          "rho")
+          "sigma_alpha",
+          "alpha")
 
 # jags --------------------------------------------------------------------
 
@@ -44,12 +44,11 @@ para <- c("log_r",
 unique_site <- unique(df_complete$site_id)
 
 df_subset <- df_complete %>% 
-  dplyr::filter(site_id == unique_site[1]) %>% 
-  mutate(p = ifelse(abundance > 0, 1, 0)) %>% 
+  dplyr::filter(site_id == unique_site[2]) %>% 
   group_by(taxon) %>% 
-  summarize(freq = sum(p, na.rm = T),
+  summarize(sum_n = sum(abundance, na.rm = T),
             site_id = unique(site_id)) %>% 
-  filter(freq > 4) %>% 
+  filter(sum_n > 0) %>% 
   select(taxon, site_id) %>% 
   left_join(df_complete,
             by = c("taxon", "site_id"))
@@ -62,13 +61,11 @@ d_jags <- list(N = df_subset$abundance,
                Nsample = nrow(df_subset),
                Nyr = n_distinct(df_subset$year),
                Nsp = n_distinct(df_subset$taxon),
-               Nf = n_distinct(df_subset$taxon),#floor(n_distinct(df_subset$taxon) / 2),
-               Nd = n_distinct(df_subset$taxon),#floor(n_distinct(df_subset$taxon) / 2),
                Q = 1,
                W = diag(n_distinct(df_subset$taxon)))
 
 ## model file ####
-m <- read.jagsfile("code/model_ssm_ricker.R")
+m <- read.jagsfile("code/model_ssm_sparse.R")
 
 ## run jags ####
 post <- run.jags(m$model,
@@ -90,7 +87,7 @@ mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc) %>%
   rename(median = `50%`,
          lower = `2.5%`,
          upper = `97.5%`)
-  
+
 print(max(mcmc_summary$Rhat, na.rm = T))
 
 # while(max(mcmc_summary$Rhat, na.rm = T) > 1.09) {
@@ -109,28 +106,23 @@ print(max(mcmc_summary$Rhat, na.rm = T))
 n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
 
 MCMCvis::MCMCtrace(post$mcmc,
-                   filename = "result/MCMCtrace_ricker")
+                   filename = "result/MCMCtrace_sparse")
 
 
 # output ------------------------------------------------------------------
 
-m_rho <- mcmc_summary %>% 
-  filter(str_detect(.$param, "rho")) %>% 
-  pull(median) %>% 
-  matrix(n_distinct(df_subset$taxon), n_distinct(df_subset$taxon)) %>% 
-  print()
-
 m_alpha <- mcmc_summary %>% 
   filter(str_detect(.$param, "alpha")) %>% 
+  filter(!str_detect(.$param, "sigma_alpha")) %>% 
   pull(median) %>% 
   matrix(n_distinct(df_subset$taxon), n_distinct(df_subset$taxon)) %>% 
   print()
 
-# df_subset %>% 
-#   filter(taxon == unique(.$taxon)[4]) %>% 
-#   arrange(year) %>% 
-#   mutate(density = abundance / area,
-#          log_r = c(diff(log(density)), NA)) %>% 
-#   ggplot(aes(x = density,
-#              y = log_r)) +
-#   geom_point()
+df_subset %>% 
+  filter(taxon == unique(.$taxon)[1]) %>% 
+  arrange(year) %>% 
+  mutate(density = abundance / area,
+         log_r = c(diff(log(density)), NA)) %>% 
+  ggplot(aes(x = density,
+             y = log_r)) +
+  geom_point()
