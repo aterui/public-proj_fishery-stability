@@ -2,7 +2,7 @@
 # setup -------------------------------------------------------------------
 
 #rm(list = ls())
-pacman::p_load(tidyverse, foreach)
+source(here::here("code/library.R"))
 
 
 # read data ---------------------------------------------------------------
