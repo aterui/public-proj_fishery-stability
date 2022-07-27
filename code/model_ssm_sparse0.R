@@ -19,19 +19,12 @@ model {
   }  
   
   ## sparse prior for alpha[i, j] for i != j ####
-  alpha[1:Nsp, 1:Nsp] <- diag_alpha[ , ] + (1 - W[ , ]) * alpha_prime[ , ]      
-  
   for (i in 1:Nsp) {
     for (j in 1:Nsp) {
-      ### intra-specific
-      diag_alpha[i, j] <- W[i, j] * alpha_hat[i]
-      
-      ### inter-specific
-      alpha_prime[i, j] ~ dnorm(0, tau_alpha[i, j])T(0,)
+      alpha[i, j] ~ dnorm(0, tau_alpha[i, j])T(0,)
       tau_alpha[i, j] <- (1 - z[i, j]) * q1 + z[i, j] * q2
       z[i, j] ~ dbern(p)
     }
-    alpha_hat[i] ~ dnorm(0, 1)T(0,)
   }  
   
   p ~ dbeta(1, 1)  
@@ -42,7 +35,7 @@ model {
   
   ## observation
   for (n in 1:Nsample) {
-    loglik[n] <- dpois(N[n], lambda[Year[n], Species[n]] * Area[n])
+    loglik[n] <- logdensity.pois(N[n], lambda[Year[n], Species[n]] * Area[n])
     N[n] ~ dpois(lambda[Year[n], Species[n]] * Area[n])
   }
   

@@ -76,7 +76,6 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                                    Nyr = n_distinct(df_subset$year),
                                    Nsp = n_distinct(df_subset$taxon),
                                    Q = 1,
-                                   W = diag(n_distinct(df_subset$taxon)),
                                    z = z)
                     
                     ## run jags ####
