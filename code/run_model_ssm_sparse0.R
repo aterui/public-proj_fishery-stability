@@ -32,6 +32,9 @@ inits <- replicate(3,
 
 for (j in 1:3) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 1
 
+## model file ####
+m <- read.jagsfile("code/model_ssm_sparse0.R")
+
 ## parameters ####
 para <- c("p",
           "log_r",
@@ -47,6 +50,7 @@ unique_site <- unique(df_complete$site_id)
 df_est <- foreach(i = seq_len(length(unique_site)),
                   .combine = bind_rows) %do% {
                     
+                    ## subset data ####
                     df_subset <- df_complete %>% 
                       dplyr::filter(site_id == unique_site[i]) %>% 
                       mutate(p = ifelse(abundance > 0, 1, 0)) %>% 
@@ -59,6 +63,10 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                                 by = c("taxon", "site_id")) %>% 
                       mutate(taxon_id = as.numeric(factor(.$taxon)))
                     
+                    ## latent variable for inclusion ###
+                    z <- diag(n_distinct(df_subset$taxon))
+                    z[z == 0] <- NA
+                    
                     ## data for jags ####
                     d_jags <- list(N = df_subset$abundance,
                                    Year = df_subset$year - min(df_subset$year) + 1,
@@ -68,10 +76,8 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                                    Nyr = n_distinct(df_subset$year),
                                    Nsp = n_distinct(df_subset$taxon),
                                    Q = 1,
-                                   W = diag(n_distinct(df_subset$taxon)))
-                    
-                    ## model file ####
-                    m <- read.jagsfile("code/model_ssm_sparse0.R")
+                                   W = diag(n_distinct(df_subset$taxon)),
+                                   z = z)
                     
                     ## run jags ####
                     post <- run.jags(m$model,
@@ -115,6 +121,11 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                     MCMCvis::MCMCtrace(post$mcmc,
                                        filename = paste0("result/mcmc_trace_sparse0_",
                                                          unique_site[i]))
+                    
+                    loglik <- sapply(1:nrow(df_subset), function(i)
+                      unlist(post$mcmc[, paste0("loglik[", i, "]")]))
+                    
+                    print(loo::waic(loglik))
                     
                     mcmc_summary <- mcmc_summary %>% 
                       mutate(param_name = str_remove(param,
@@ -182,7 +193,7 @@ saveRDS(df_est, file = here::here("result/est_ssm_sparse0.rds"))
 #   
 # # waic --------------------------------------------------------------------
 # 
-# loglik <- sapply(1:nrow(df_subset), function(i) 
+# loglik <- sapply(1:nrow(df_subset), function(i)
 #   unlist(post$mcmc[, paste0("loglik[", i, "]")]))
 # 
 # loo::waic(loglik)
