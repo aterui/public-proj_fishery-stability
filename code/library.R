@@ -5,4 +5,5 @@ pacman::p_load(tidyverse,
                foreach,
                doParallel,
                doSNOW,
-               scales)
+               scales,
+               runjags)
