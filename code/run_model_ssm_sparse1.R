@@ -3,16 +3,9 @@
 
 rm(list = ls())
 source(here::here("code/library.R"))
-
-fn_brrm <- function(x) {
-  y <- lapply(str_extract_all(x, pattern = "\\[.{1,}\\]"),
-              FUN = function(z) ifelse(identical(z, character(0)),
-                                       NA,
-                                       z))
-  str_remove_all(y, pattern = "\\[|\\]")
-}
-
+source(here::here("code/function_set.R"))
 source(here::here("code/data_fmt_fishdata.R"))
+
 
 # common setup ------------------------------------------------------------
 
@@ -39,6 +32,7 @@ para <- c("p0",
           "log_r",
           "sigma",
           "alpha",
+          "rho",
           "loglik")
 
 # jags --------------------------------------------------------------------
@@ -70,6 +64,9 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                                    Nsample = nrow(df_subset),
                                    Nyr = n_distinct(df_subset$year),
                                    Nsp = n_distinct(df_subset$taxon),
+                                   Nf = ifelse(n_distinct(df_subset$taxon) > 2,
+                                               n_distinct(df_subset$taxon) - 2,
+                                               1),
                                    W = diag(n_distinct(df_subset$taxon)),
                                    Q = 1)
                     
@@ -101,14 +98,16 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                                           combine = TRUE)
                       
                       mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-                      print(max(mcmc_summary$Rhat))
+                      print(max(mcmc_summary$Rhat, na.rm = T))
                     }
                     
                     ## waic ####                    
                     loglik <- sapply(1:nrow(df_subset), function(i)
                       unlist(post$mcmc[, paste0("loglik[", i, "]")]))
                     
-                    waic_est <- loo::waic(loglik)$waic
+                    waic_hat <- loo::waic(loglik)
+                    waic_bar <- waic_hat$estimates["waic", "Estimate"]
+                    waic_se <- waic_hat$estimates["waic", "SE"]
                     
                     ## reformat mcmc_summary ####
                     n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
@@ -128,7 +127,8 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                              n_thin = n_thin,
                              n_burn = n_burn,
                              n_chain = n_chain,
-                             waic = waic_est) %>% 
+                             waic_hat = waic_bar,
+                             waic_se = waic_se) %>% 
                       separate(col = x,
                                into = c("x1", "x2"),
                                sep = ",",
@@ -136,16 +136,43 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                                convert = TRUE) %>% 
                       filter(!str_detect(param, "loglik")) %>% 
                       left_join(distinct(df_subset, taxon, taxon_id),
-                                by = c("x1" = "taxon_id"))
+                                by = c("x1" = "taxon_id")) %>% 
+                      left_join(distinct(df_subset, taxon, taxon_id),
+                                by = c("x2" = "taxon_id"))
                     
                     ## trace plot output ####
                     MCMCvis::MCMCtrace(post$mcmc,
-                                       filename = paste0("result/mcmc_trace_sparse1_",
+                                       filename = paste0("result/mcmc_trace_sparse1_fa_",
                                                          unique_site[i]))
                     
                     return(mcmc_summary)
                   }
 
+# join functional distance ------------------------------------------------
 
-df_waic <- distinct(df_est, site, waic)
-saveRDS(list(df_est, df_waic), file = here::here("result/est_ssm_sparse1.rds"))
+## read funcational distance matrix
+m_fd <- readRDS(here::here("data_fmt/data_fd.rds"))
+df_fd <- m2v(m_fd) %>% 
+  rename(fd = value)
+
+df_pd <- df_est %>% 
+  filter(param_name %in% c("alpha", "rho")) %>% 
+  left_join(df_fd,
+            by = c("taxon.x" = "row",
+                   "taxon.y" = "col")) %>% 
+  select(site, param_name, median, fd) %>% 
+  filter(fd != 0)
+
+df_pd %>% 
+  ggplot(aes(x = fd,
+             y = median,
+             color = site)) +
+  geom_point() +
+  facet_wrap(facets = ~param_name,
+             scale = "free")
+
+
+# export ------------------------------------------------------------------
+
+df_waic <- distinct(df_est, site, waic_hat)
+saveRDS(list(df_est, df_waic), file = here::here("result/est_ssm_sparse1_fa.rds"))
