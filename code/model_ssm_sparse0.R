@@ -23,11 +23,11 @@ model {
     for (j in 1:Nsp) {
       alpha[i, j] ~ dnorm(0, tau_alpha[i, j])T(0,)
       tau_alpha[i, j] <- (1 - z[i, j]) * q1 + z[i, j] * q2
-      z[i, j] ~ dbern(p)
+      z[i, j] ~ dbern(p0)
     }
   }  
   
-  p ~ dbeta(1, 1)  
+  p0 ~ dbeta(1, 1)  
   q1 <- 100
   q2 <- 1
   
