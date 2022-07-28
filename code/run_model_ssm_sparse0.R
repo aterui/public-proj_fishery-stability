@@ -3,16 +3,9 @@
 
 rm(list = ls())
 source(here::here("code/library.R"))
-
-fn_brrm <- function(x) {
-  y <- lapply(str_extract_all(x, pattern = "\\[.{1,}\\]"),
-              FUN = function(z) ifelse(identical(z, character(0)),
-                                       NA,
-                                       z))
-  str_remove_all(y, pattern = "\\[|\\]")
-}
-
+source(here::here("code/function_set.R"))
 source(here::here("code/data_fmt_fishdata.R"))
+
 
 # common setup ------------------------------------------------------------
 
@@ -107,7 +100,9 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                     loglik <- sapply(1:nrow(df_subset), function(i)
                       unlist(post$mcmc[, paste0("loglik[", i, "]")]))
                     
-                    waic_est <- loo::waic(loglik)$waic
+                    waic_hat <- loo::waic(loglik)
+                    waic_bar <- waic_hat$estimates["waic", "Estimate"]
+                    waic_se <- waic_hat$estimates["waic", "SE"]
                     
                     ## reformat mcmc_summary ####
                     n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
@@ -127,7 +122,8 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                              n_thin = n_thin,
                              n_burn = n_burn,
                              n_chain = n_chain,
-                             waic = waic_est) %>% 
+                             waic_hat = waic_bar,
+                             waic_se = waic_se) %>% 
                       separate(col = x,
                                into = c("x1", "x2"),
                                sep = ",",
@@ -146,5 +142,5 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                   }
 
 
-df_waic <- distinct(df_est, site, waic)
+df_waic <- distinct(df_est, site, waic_hat)
 saveRDS(list(df_est, df_waic), file = here::here("result/est_ssm_sparse0.rds"))
