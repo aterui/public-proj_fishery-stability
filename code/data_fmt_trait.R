@@ -3,20 +3,7 @@
 
 rm(list = ls())
 source(here::here("code/library.R"))
-
-f_num <- function(x) {
-  y <- unique(na.omit(x))
-  
-  if (length(y) == 0) {
-    y <- NA
-  }
-  
-  if (length(y) > 1) {
-    y <- mean(x, na.rm = T)
-  }
-  
-  return(round(y, 1))
-}
+source(here::here("code/function_set.R"))
 
 
 # data --------------------------------------------------------------------
