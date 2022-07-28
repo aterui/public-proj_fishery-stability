@@ -15,7 +15,7 @@ pacman::p_load(tidyverse,
 wbt_init()
 
 source("code/gis_crs_fmt.R")
-source("code/function_arc2d8.R")
+source(here::here("code/function_set.R"))
 
 
 # define function ---------------------------------------------------------
