@@ -10,7 +10,7 @@ model {
   
   ## low-level parameters ####
   for (i in 1:Nsp) {
-    log_d[1, i] ~ dnorm(0, tau0)
+    log_d[Nyr1, i] ~ dnorm(0, tau0)
     log_r[i] ~ dnorm(0, tau0)
     
     tau_obs[i] ~ dscaled.gamma(scale0, df0)
@@ -21,21 +21,22 @@ model {
   for (i in 1:Nsp) {
     for (j in 1:Nsp) {
       alpha[i, j] ~ dnorm(0, tau_alpha[i, j])T(0,)
-      tau_alpha[i, j] <- (1 - z[i, j]) * q1 + z[i, j] * q2
+      tau_alpha[i, j] <- (1 - z[i, j]) * q0 + z[i, j] * q1
       z[i, j] ~ dbern(p[i, j])
       p[i, j] <- W[i, j] * p0[1] + (1 - W[i, j]) * p0[2]
     }
   }  
   
-  p0[1] ~ dbeta(1.6, 0.4)  
+  p0[1] ~ dbeta(1.6, 0.4)
   p0[2] ~ dbeta(1, 1)  
-  q1 <- 100
-  q2 <- 1
+  q0 <- 100
+  q1 ~ dscaled.gamma(1, df0)
+  sigma_alpha1 <- sqrt(1 / q1)
   
   ## factor analysis for epsilon ###
   
   ### latent variables
-  for(t in 1:(Nyr - Q)) {
+  for(t in Nyr1:(Nyr - Q)) {
     for (k in 1:Nf) {
       eta[t, k] ~ dnorm(0, 1)
     }
@@ -75,7 +76,6 @@ model {
     }
   }
   
-    
   
   # likelihood --------------------------------------------------------------
   
@@ -85,7 +85,7 @@ model {
     N[n] ~ dpois(lambda[Year[n], Species[n]] * Area[n])
   }
   
-  for (t in 1:Nyr) {
+  for (t in Nyr1:Nyr) {
     for (i in 1:Nsp) {
       lambda[t, i] <- d_obs[t, i]
       log(d_obs[t, i]) <- log_d_obs[t, i]
@@ -95,7 +95,7 @@ model {
   }  
   
   ## state
-  for (t in (1 + Q):Nyr) {
+  for (t in (Nyr1 + Q):Nyr) {
     for(i in 1:Nsp) {
       log_d[t, i] ~ dnorm(log_mu_d[t, i], tau_r[i])
       

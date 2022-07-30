@@ -31,6 +31,7 @@ m <- read.jagsfile("code/model_ssm_sparse1.R")
 para <- c("p0",
           "log_r",
           "sigma",
+          "sigma_alpha1",
           "alpha",
           "rho",
           "loglik")
@@ -38,7 +39,16 @@ para <- c("p0",
 # jags --------------------------------------------------------------------
 
 ## data screening
-unique_site <- unique(df_complete$site_id)
+unique_site <- df_complete %>% 
+  mutate(p = ifelse(abundance > 0, 1, 0)) %>% 
+  group_by(site_id, taxon) %>% 
+  summarize(freq = sum(p, na.rm = T),
+            site_id = unique(site_id)) %>% 
+  filter(freq > 4) %>% 
+  group_by(site_id) %>% 
+  summarize(n_taxa = n_distinct(taxon)) %>% 
+  filter(n_taxa > 1) %>% 
+  pull(site_id)
 
 df_est <- foreach(i = seq_len(length(unique_site)),
                   .combine = bind_rows) %do% {
@@ -62,11 +72,12 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                                    Species = as.numeric(factor(df_subset$taxon)),
                                    Area = df_subset$area,
                                    Nsample = nrow(df_subset),
-                                   Nyr = n_distinct(df_subset$year),
+                                   Nyr1 = min(df_subset$year, na.rm = T) - 1999 + 1,
+                                   Nyr = max(df_subset$year, na.rm = T) - min(df_subset$year, na.rm = T) + 1,
                                    Nsp = n_distinct(df_subset$taxon),
                                    Nf = ifelse(n_distinct(df_subset$taxon) > 2,
-                                               n_distinct(df_subset$taxon) - 2,
-                                               1),
+                                               yes = 2,
+                                               no = 1),
                                    W = diag(n_distinct(df_subset$taxon)),
                                    Q = 1)
                     
@@ -145,31 +156,9 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                                        filename = paste0("result/mcmc_trace_sparse1_fa_",
                                                          unique_site[i]))
                     
+                    print(paste(i, "/", length(unique_site)))
                     return(mcmc_summary)
                   }
-
-# join functional distance ------------------------------------------------
-
-## read funcational distance matrix
-m_fd <- readRDS(here::here("data_fmt/data_fd.rds"))
-df_fd <- m2v(m_fd) %>% 
-  rename(fd = value)
-
-df_pd <- df_est %>% 
-  filter(param_name %in% c("alpha", "rho")) %>% 
-  left_join(df_fd,
-            by = c("taxon.x" = "row",
-                   "taxon.y" = "col")) %>% 
-  select(site, param_name, median, fd) %>% 
-  filter(fd != 0)
-
-df_pd %>% 
-  ggplot(aes(x = fd,
-             y = median,
-             color = site)) +
-  geom_point() +
-  facet_wrap(facets = ~param_name,
-             scale = "free")
 
 
 # export ------------------------------------------------------------------
