@@ -72,10 +72,6 @@ df_trait_l <- df_trait %>%
                           comment)) %>% 
   filter(!(trait %in% c("longevity", "maximum_fecundity")))
 
-saveRDS(df_trait_l,
-        here::here("data_fmt/data_trait.rds"))
-
-
 ## wide format
 df_trait_w <- df_trait_l %>% 
   pivot_wider(id_cols = taxon,
@@ -107,6 +103,9 @@ df_trait_w <- df_trait_l %>%
                 .fns = function(x) x / standard_length)) %>% 
   select(-standard_length, -total_weight)
 
+saveRDS(df_trait_w,
+        here::here("data_fmt/data_trait.rds"))
+
 
 # functional distance -----------------------------------------------------
 
@@ -119,7 +118,7 @@ df_trait_value <- df_trait_w %>%
 
 rownames(df_trait_value) <- df_trait_w$taxon
 
-df_trait_type <- sapply(select(df_trait_w, -taxon),
+df_trait_type <- sapply(df_trait_value,
                         function(x) ifelse(class(x)=="factor", "N", "Q")) %>% 
   tibble(trait_name = names(.),
          trait_type = .)
