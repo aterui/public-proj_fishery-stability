@@ -53,20 +53,28 @@ site_selected <- d0 %>%
             n_obs = n_distinct(year),
             n_obs_masu = sum(abundance[taxon == "Oncorhynchus_masou_masou"] > 0)) %>% 
   filter(range_obs > range_threshold &
-         n_obs > n_obs_threshold &
-         n_obs_masu > n_obs_masu_threshold) %>% 
+           n_obs > n_obs_threshold &
+           n_obs_masu > n_obs_masu_threshold) %>% 
   pull(site_id)
 
 df_selected <- d0 %>% 
   filter(site_id %in% site_selected)
 
 ## selection criteria
-## complete observations for 1999-2019
+## near-complete observations for 1999-2019 & no stocking
 
-n_obs_threshold <- 20
-range_threshold <- 20
+n_obs_threshold <- 16
+range_threshold <- 0
 
 site_complete <- d0 %>% 
+  filter(river %in% c("atsuta",
+                      "haraki",
+                      "mogusa",
+                      "okushibetsu",
+                      "ookamotsu",
+                      "shakotan",
+                      "shimonaefutoro",
+                      "toshibetsu" )) %>% 
   group_by(site_id) %>% 
   summarize(range_obs = max(year) - min(year) + 1,
             n_obs = n_distinct(year)) %>% 
@@ -94,7 +102,7 @@ df_group <- df_selected %>%
             density = abundance / area) %>% 
   ungroup() %>% 
   mutate(site_id_numeric = as.numeric(factor(site_id)))
-       
+
 ## summarize data as community
 ## combine with group data
 df_fish <- df_selected %>% 
