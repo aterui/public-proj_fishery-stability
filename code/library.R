@@ -6,4 +6,5 @@ pacman::p_load(tidyverse,
                doParallel,
                doSNOW,
                scales,
-               runjags)
+               runjags,
+               ggside)
