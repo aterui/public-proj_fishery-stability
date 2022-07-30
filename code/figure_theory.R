@@ -16,7 +16,7 @@ df0 <- sim_result %>%
                values_to = "value") %>% 
   filter(r1 == 1.5,
          sd_env == 0.5,
-         alpha == 0.5,
+         alpha == 0.1,
          phi == 0.5,
          k == 100,
          response %in% c("n_sp_last", "cv", "mean_density", "sd_density")) %>% 
@@ -29,6 +29,11 @@ df0 <- sim_result %>%
          group_id = case_when(status == "all" ~ "a",
                               status == "enhanced" ~ "b",
                               status == "unenhanced" ~ "c")) %>% 
+  bind_rows(tibble(group_id = "a",
+                   status = "dummy",
+                   response_name = "SD~sigma~(ind.)",
+                   value = max(.$value[.$response == "mean_density"]),
+                   stock = 0)) %>% 
   mutate(response_name = factor(response_name,
                                 levels = c("CV~sigma/mu",
                                            "Number~of~species~persist",
@@ -48,13 +53,15 @@ g_theory <- df0 %>%
              fill = group_id)) +
   geom_point(data = filter(df0, status == "enhanced"),
              size = 0.75,
-             color = hue_pal(h.start = 140, l = 90, c = 30)(1)) +
+             color = hue_pal(h.start = 140, l = 85, c = 30)(1)) +
   geom_point(data = filter(df0, status == "unenhanced"),
              size = 0.75,
-             color = hue_pal(h.start = 250, l = 90, c = 50)(1)) +
+             color = hue_pal(h.start = 250, l = 85, c = 50)(1)) +
   geom_point(data = filter(df0, status == "all"),
              size = 0.75,
-             color = hue_pal(h.start = 30, l = 90, c = 50)(1)) +
+             color = hue_pal(h.start = 30, l = 85, c = 50)(1)) +
+  geom_point(data = filter(df0, status == "dummy"),
+             color = NA) +
   geom_smooth(size= 0.5,
               method = "loess") +
   scale_color_hue(h = c(30, 250),
@@ -73,3 +80,4 @@ g_theory <- df0 %>%
          fill = "none") +
   theme(axis.title.y = element_blank(),
         strip.placement = "outside")
+
