@@ -128,23 +128,37 @@ g_alpha <- df_plot %>%
                outlier.colour = NA) +
   geom_jitter(height = 0.1,
               width = 0,
-              color = grey(0.5),
-              alpha = 0.5) +
+              color = grey(0.6)) +
   geom_vline(aes(xintercept = median(value)),
              col = grey(0.5),
              linetype = "dashed") +
-  geom_xsidehistogram(fill = grey(0.5),
+  geom_xsidehistogram(aes(fill = taxon.y),
                       color = NA,
-                      alpha = 0.5,
+                      alpha = 0.8,
                       binwidth = 0.01) +
   labs(y = expression("Taxon"~italic("j")~"affecting taxon"~italic("i")),
        x = expression("Competition coefficient"~alpha[ij])) +
   guides(color = "none",
          fill = "none") +
   MetBrewer::scale_fill_met_d("Hiroshige", direction = -1) +
-  theme_bw() +
+  ggridges::theme_ridges() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
-        axis.text.y = element_text(face = "italic"))
+        axis.text.y = element_text(face = "italic"),
+        axis.line.x = element_line(color = "gray"),
+        axis.ticks.x = element_line(color = "gray"))
 
 print(g_alpha)
+
+
+# export ------------------------------------------------------------------
+
+ggsave(g_alpha_site,
+       filename = here::here("figure/figure_alpha_site.pdf"),
+       height = 10,
+       width = 11)
+
+ggsave(g_alpha,
+       filename = here::here("figure/figure_alpha_dist.pdf"),
+       height = 10,
+       width = 11)
