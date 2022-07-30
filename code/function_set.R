@@ -73,3 +73,46 @@ f_num <- function(x) {
   
   return(round(y, 1))
 }
+
+
+# species abbreviation ----------------------------------------------------
+
+spabb <- function(x, sep = "\\s") {
+  
+  y <- str_split(x, sep)
+  
+  z <- lapply(y, FUN = function(q) {
+    
+    if (any(is.na(q)) | any(is.null(q))) z <- NA
+    
+    if (length(q) > 1) {
+      ## length > 1
+      if (any(str_detect(q, "spp|sp"))) {
+        ## sp or spp
+        z <- paste(str_to_sentence(q[1]),
+                   paste0(na.omit(str_extract(q, "(^sp{1,2})$")),
+                          "."))
+      } else {
+        ## full name      
+        q[1:(length(q) - 1)] <- sapply(1:(length(q) - 1),
+                                       FUN = function(i) str_extract(q[i], "^."))
+        
+        z <- q[1]
+        
+        for (i in 2:length(q)) {
+          z <- paste(z, q[i], sep = ". ")
+        }
+        
+      }
+    } else {
+      ## length <= 1
+      z <- q
+    }
+    
+    return(z)
+  })
+  
+  z <- str_to_sentence(z)
+    
+  return(z)
+}
