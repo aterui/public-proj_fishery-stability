@@ -89,7 +89,7 @@ g_alpha_site <- df_plot  %>%
   ggplot(aes(y = factor(taxon.x, levels = rev(sort(unique(taxon.x)))),
              x = taxon.y,
              fill = value,
-             label = round(value, 2))) +
+             label = sprintf("%.2f", value))) +
   geom_tile() +
   geom_text() +
   facet_wrap(facets = ~site_id,
