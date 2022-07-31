@@ -28,45 +28,13 @@ df_sim <- readRDS(here::here("result/result_ricker_2sp.rds")) %>%
                                   metric == "sd_density" ~ "SD~sigma"))
 
 
-
-# plot --------------------------------------------------------------------
-
-## deterministic
-g_d <- df_sim  %>%
-  filter(sd_env == 0) %>% 
-  group_by(r1, k, alpha, sd_env, metric) %>% 
-  mutate(rho = cor(x = value,
-                   y = stock,
-                   method = "spearman")) %>% 
-  ggplot(aes(x = r1,
-             y = k,
-             fill = rho)) +
-  geom_raster(alpha = 0.8) +
-  geom_vline(aes(xintercept = 1.43),
-             color = grey(1),
-             linetype = "dashed") +
-  facet_grid(cols = vars(alpha_label),
-             rows = vars(metric_label),
-             labeller = label_parsed) +
-  MetBrewer::scale_fill_met_c("Hiroshige",
-                              direction = -1) +
-  geom_point(data = expand.grid(r1 = seq(0.5, 3.5, by = 1),
-                                k = c(100, 400)),
-             aes(x = r1,
-                 y = k),
-             shape = 21,
-             color = "salmon",
-             fill = grey(1, 0.5)) +
-  labs(y = "Carrying capacity K",
-       x = "Intrinsic growth rate r",
-       fill = expression("Correlation"~rho)) +
-  theme_classic() +
-  theme(strip.background = element_blank())
+# simulation --------------------------------------------------------------
 
 ## example time-series
 df_para <- expand.grid(r = seq(0.5, 3.5, by = 1),
-                       alpha = c(0.1, 0.5),
+                       alpha = 0.1,
                        stock = seq(0, 500, by = 250),
+                       sd_env = c(0, 0.5),
                        k = c(100, 400))
 
 df_g <- foreach(i = seq_len(nrow(df_para)),
@@ -79,7 +47,7 @@ df_g <- foreach(i = seq_len(nrow(df_para)),
                                      n_species = 2,
                                      n_stock_start = 11,
                                      stock = df_para$stock[i],
-                                     sd_env = 0,
+                                     sd_env = df_para$sd_env[i],
                                      alpha = df_para$alpha[i],
                                      r = df_para$r[i],
                                      k = df_para$k[i],
@@ -97,40 +65,83 @@ df_g <- foreach(i = seq_len(nrow(df_para)),
                   
                 }
 
-g_ex <- df_g %>% 
-  mutate(alpha_label = case_when(alpha == 0.1 ~ sprintf('"Weak competition"~(alpha=="%.1f")',
+df_g <- df_g%>% 
+  mutate(sd_type = case_when(sd_env == 0 ~ "Deterministic",
+                             sd_env == 0.5 ~ "Stochastic"),
+         alpha_label = case_when(alpha == 0.1 ~ sprintf('"Weak competition"~(alpha=="%.1f")',
                                                         alpha),
                                  alpha == 0.5 ~ sprintf('"Strong competition"~(alpha=="%.1f")',
                                                         alpha)),
-         r_label = case_when(r == 0.5 ~ sprintf('r=="%.1f"', r),
-                             r == 1.5 ~ sprintf('r=="%.1f"', r),
-                             r == 2.5 ~ sprintf('r=="%.1f"', r),
-                             r == 3.5 ~ sprintf('r=="%.1f"', r))) %>% 
-  ggplot(aes(x = timestep,
-             y = density,
-             color = factor(stock),
-             linetype = factor(k))) +
-  geom_line() +
-  geom_vline(aes(xintercept = 11),
-             col = grey(0.5),
-             linetype = "dashed") +
-  facet_grid(rows = vars(r_label),
-             cols = vars(alpha_label),
-             labeller = label_parsed,
-             scales = "free_y") +
-  MetBrewer::scale_color_met_d("Hiroshige",
-                               direction = -1) +
-  labs(y = "Community density",
-       x = "Time step",
-       color = "Release level",
-       linetype = "Carrying capacity K")
+         r_label = case_when(r %in% seq(0.5, 3.5, by = 1) ~ sprintf('r=="%.1f"', r))) 
 
 
-# combine plot ------------------------------------------------------------
+# plot --------------------------------------------------------------------
 
-g_c <- g_d + g_ex + plot_annotation(tag_levels = "A")
+list_g_c <- foreach(x = c(0.1, 0.5)) %do% {
 
-ggsave(g_c,
+  ## column by stochasticity plot
+  g_d <- df_sim  %>%
+    filter(alpha == x) %>% 
+    group_by(r1, k, alpha, sd_env, metric) %>% 
+    mutate(rho = cor(x = value,
+                     y = stock,
+                     method = "spearman")) %>% 
+    ggplot(aes(x = r1,
+               y = k,
+               fill = rho)) +
+    geom_raster(alpha = 0.8) +
+    geom_vline(aes(xintercept = 1.43),
+               color = grey(1),
+               linetype = "dashed") +
+    facet_grid(cols = vars(sd_type),
+               rows = vars(metric_label),
+               labeller = label_parsed) +
+    MetBrewer::scale_fill_met_c("Hiroshige",
+                                direction = -1) +
+    geom_point(data = expand.grid(r1 = seq(0.5, 3.5, by = 1),
+                                  k = c(100, 400)),
+               aes(x = r1,
+                   y = k),
+               shape = 21,
+               color = "salmon",
+               fill = grey(1, 0.5)) +
+    labs(y = "Carrying capacity K",
+         x = "Intrinsic growth rate r",
+         fill = expression("Correlation"~rho)) +
+    theme_classic() +
+    theme(strip.background = element_blank())
+  
+  ## example time-series  
+  g_ex <- df_g %>% 
+    ggplot(aes(x = timestep,
+               y = density,
+               color = factor(stock),
+               linetype = factor(k))) +
+    geom_line() +
+    geom_vline(aes(xintercept = 11),
+               col = grey(0.5),
+               linetype = "dashed") +
+    facet_grid(rows = vars(r_label),
+               cols = vars(sd_type),
+               labeller = label_parsed,
+               scales = "free_y") +
+    MetBrewer::scale_color_met_d("Hiroshige",
+                                 direction = -1) +
+    labs(y = "Community density",
+         x = "Time step",
+         color = "Release level",
+         linetype = "Carrying capacity K")
+  
+  
+  # combine plot ------------------------------------------------------------
+  
+  g_c <- g_d + g_ex + plot_annotation(tag_levels = "A")
+  
+  return(g_c)  
+}
+
+ggsave(list_g_c[[1]],
        filename = here::here("figure/figure_2sp_model.pdf"),
        height = 8.5,
        width = 15)
+
