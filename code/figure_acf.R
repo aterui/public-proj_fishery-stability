@@ -16,15 +16,31 @@ site_comp <- df_fish %>%
   filter(n == 21) %>% 
   pull(site_id)
 
-foreach(i = seq_len(length(site_comp))) %do% {
+df_acf <- foreach(i = seq_len(length(site_comp)),
+                    .combine = bind_rows) %do% {
   
-  df_fish %>% 
-    filter(group == "all") %>% 
+  x <- df_fish %>% 
+    filter(group == "masu_salmon") %>% 
     filter(site_id == site_comp[i]) %>% 
     right_join(tibble(year = 1999:2019),
                by = "year") %>% 
     arrange(year) %>% 
     pull(density) %>% 
-    acf()
+    acf(plot = FALSE,
+        lag.max = 5)
   
+  df0 <- tibble(site_id = site_comp[i],
+                y = c(x$acf),
+                lag = c(x$lag))  
+  
+  return(df0)
 }
+
+df_acf %>% 
+  ggplot(aes(x = lag,
+             y = y)) +
+  geom_point() +
+  geom_segment(aes(xend = lag, yend = 0)) +
+  #geom_line() +
+  geom_hline(yintercept = 0) + 
+  facet_wrap(facets = ~site_id)

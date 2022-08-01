@@ -29,7 +29,7 @@ df_est <- list_df0[[1]] %>%
 
 # join functional distance ------------------------------------------------
 
-## read funcational distance matrix
+## read functional distance matrix
 m_fd <- readRDS(here::here("data_fmt/data_fd.rds"))
 df_fd <- m2v(m_fd) %>% 
   rename(fd = value) %>% 

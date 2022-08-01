@@ -7,4 +7,5 @@ pacman::p_load(tidyverse,
                doSNOW,
                scales,
                runjags,
-               ggside)
+               ggside,
+               forecast)
