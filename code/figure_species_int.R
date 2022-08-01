@@ -147,7 +147,7 @@ g_alpha <- df_plot %>%
   geom_vline(aes(xintercept = median(value)),
              col = grey(0.5),
              linetype = "dashed") +
-  geom_xsidedensity(fill = lbs.y,
+  geom_xsidedensity(aes(fill = lbs.y),
                     color = NA,
                     alpha = 0.8,
                     position = "stack") +

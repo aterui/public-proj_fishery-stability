@@ -3,7 +3,6 @@
 
 rm(list = ls())
 source("code/library.R")
-
 source(here::here("code/figure_set_theme.R"))
 
 # read data ---------------------------------------------------------------
@@ -32,7 +31,7 @@ df_sim <- readRDS(here::here("result/result_ricker_2sp.rds")) %>%
 
 ## example time-series
 df_para <- expand.grid(r = seq(0.5, 3.5, by = 1),
-                       alpha = 0.1,
+                       alpha = c(0.1, 0.5),
                        stock = seq(0, 500, by = 250),
                        sd_env = c(0, 0.5),
                        k = c(100, 400))
@@ -77,11 +76,14 @@ df_g <- df_g%>%
 
 # plot --------------------------------------------------------------------
 
-list_g_c <- foreach(x = c(0.1, 0.5)) %do% {
+v_alpha <- sort(unique(df_sim$alpha))
+lbs <- c("weak", "strong")
+
+list_g_c <- foreach(x = 1:length(v_alpha)) %do% {
 
   ## column by stochasticity plot
   g_d <- df_sim  %>%
-    filter(alpha == x) %>% 
+    filter(alpha == v_alpha[x]) %>% 
     group_by(r1, k, alpha, sd_env, metric) %>% 
     mutate(rho = cor(x = value,
                      y = stock,
@@ -109,10 +111,14 @@ list_g_c <- foreach(x = c(0.1, 0.5)) %do% {
          x = "Intrinsic growth rate r",
          fill = expression("Correlation"~rho)) +
     theme_classic() +
-    theme(strip.background = element_blank())
+    theme(strip.background = element_blank(),
+          axis.title = element_text(size = 12),
+          strip.text.x = element_text(size = 10),
+          strip.text.y = element_text(size = 10))
   
   ## example time-series  
   g_ex <- df_g %>% 
+    filter(alpha == v_alpha[x]) %>% 
     ggplot(aes(x = timestep,
                y = density,
                color = factor(stock),
@@ -137,11 +143,10 @@ list_g_c <- foreach(x = c(0.1, 0.5)) %do% {
   
   g_c <- g_d + g_ex + plot_annotation(tag_levels = "A")
   
+  ggsave(g_c,
+         filename = here::here(paste0("figure/figure_2sp_model_", lbs[x], ".pdf")),
+         height = 8.5,
+         width = 15)
+    
   return(g_c)  
 }
-
-ggsave(list_g_c[[1]],
-       filename = here::here("figure/figure_2sp_model.pdf"),
-       height = 8.5,
-       width = 15)
-
