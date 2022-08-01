@@ -14,8 +14,18 @@ df_trait_cat <- df_trait %>%
 
 df_est <- list_df0[[1]] %>% 
   mutate(taxon.y = spabb(taxon.y, sep = "_"),
-         taxon.x = spabb(taxon.x, sep = "_"))
-
+         taxon.x = spabb(taxon.x, sep = "_"),
+         lbs.y = ifelse(test = str_detect(taxon.y, "\\sspp\\."),
+                        yes = paste0('italic("',
+                                     str_remove(taxon.y, "\\sspp\\."),
+                                     '")~spp.'),
+                        no = paste0('italic("', taxon.y, '")')),
+         lbs.x = ifelse(test = str_detect(taxon.x, "\\sspp\\."),
+                        yes = paste0('italic("',
+                                     str_remove(taxon.x, "\\sspp\\."),
+                                     '")~spp.'),
+                        no = paste0('italic("', taxon.x, '")'))
+  )
 
 # join functional distance ------------------------------------------------
 
@@ -53,7 +63,9 @@ df_pd <- df_est %>%
          alpha0,
          fd,
          taxon.x,
-         taxon.y) %>%
+         taxon.y,
+         lbs.y,
+         lbs.x) %>%
   mutate(alpha_prime = median / alpha0,
          value = ifelse(param_name == "alpha", alpha_prime, median),
          site_id = str_replace(site,
@@ -83,15 +95,15 @@ df_plot <- df_pd %>%
 
 # figure ------------------------------------------------------------------
 
-## by site
-g_alpha_site <- df_plot  %>%
+## by site ####
+g_alpha_site <- df_plot %>%
   filter(alpha_prime != 1) %>% 
-  ggplot(aes(y = factor(taxon.x, levels = rev(sort(unique(taxon.x)))),
-             x = taxon.y,
+  ggplot(aes(y = factor(lbs.x, levels = rev(sort(unique(lbs.x)))),
+             x = lbs.y,
              fill = value,
              label = sprintf("%.2f", value))) +
   geom_tile() +
-  geom_text() +
+  geom_text(size = 3) +
   facet_wrap(facets = ~site_id,
              scales = "free",
              nrow = 3,
@@ -102,8 +114,9 @@ g_alpha_site <- df_plot  %>%
         axis.text.x = element_text(face = "italic",
                                    angle = 75,
                                    vjust = 0.5,
-                                   hjust = 0.5),
-        axis.text.y = element_text(face = "italic")) +
+                                   hjust = 0.5)) +
+  scale_x_discrete(labels = label_parse()) +
+  scale_y_discrete(labels = label_parse()) +
   MetBrewer::scale_fill_met_c("Hiroshige", direction = -1) +
   labs(y = expression("Taxon"~italic("i")),
        x = expression("Taxon"~italic("j")),
@@ -111,42 +124,46 @@ g_alpha_site <- df_plot  %>%
 
 print(g_alpha_site)
 
-## by taxa
+## by taxa ####
 taxon_ordered <- df_plot %>%
-  group_by(taxon.y) %>% 
+  group_by(lbs.y) %>% 
   summarize(alpha50 = median(alpha_prime)) %>% 
   arrange(alpha50) %>% 
-  pull(taxon.y)
+  pull(lbs.y)
 
 g_alpha <- df_plot %>% 
-  mutate(taxon.y = factor(taxon.y,
-                          levels = taxon_ordered)) %>% 
-  ggplot(aes(y = taxon.y,
+  mutate(lbs.y = factor(lbs.y,
+                        levels = taxon_ordered)) %>% 
+  ggplot(aes(y = lbs.y,
              x = value)) +
-  geom_boxplot(aes(fill = taxon.y),
+  geom_boxplot(aes(fill = lbs.y),
+               color = grey(0.4),
                alpha = 0.75,
                outlier.colour = NA) +
   geom_jitter(height = 0.1,
               width = 0,
-              color = grey(0.6)) +
+              size = 1,
+              color = grey(0.2)) +
   geom_vline(aes(xintercept = median(value)),
              col = grey(0.5),
              linetype = "dashed") +
-  geom_xsidehistogram(aes(fill = taxon.y),
-                      color = NA,
-                      alpha = 0.8,
-                      binwidth = 0.01) +
+  geom_xsidedensity(fill = lbs.y,
+                    color = NA,
+                    alpha = 0.8,
+                    position = "stack") +
   labs(y = expression("Taxon"~italic("j")~"affecting taxon"~italic("i")),
        x = expression("Competition coefficient"~alpha[ij])) +
   guides(color = "none",
          fill = "none") +
+  scale_y_discrete(labels = label_parse()) +
   MetBrewer::scale_fill_met_d("Hiroshige", direction = -1) +
   ggridges::theme_ridges() +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        axis.text.y = element_text(face = "italic"),
-        axis.line.x = element_line(color = "gray"),
-        axis.ticks.x = element_line(color = "gray"))
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(color = "black"),
+        axis.text.y = element_text(),
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_line(color = "gray"),
+        axis.line = element_line(color = "gray"))
 
 print(g_alpha)
 
@@ -160,5 +177,5 @@ ggsave(g_alpha_site,
 
 ggsave(g_alpha,
        filename = here::here("figure/figure_alpha_dist.pdf"),
-       height = 10,
-       width = 11)
+       height = 7,
+       width = 8)
