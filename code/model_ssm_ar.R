@@ -14,14 +14,15 @@ model {
     log_r[j] ~ dnorm(log_mu_r, tau_r_space)
     
     for (q in 1:Q) {
-      theta[j, q] ~ dnorm(0, tau_prime[j, q])
-      tau_prime[j, q] <- z[j, q] * tau_one + (1 - z[j, q]) * tau_zero
-      z[j, q] ~ dbern(p[q])
+      theta[j, q] ~ dnorm(mu_theta[q], tau_theta[q])
     }
   }
   
-  tau_one <- 1
-  tau_zero <- 1000
+  for (q in 1:Q) {
+    mu_theta[q] ~ dnorm(0, tau0)
+    tau_theta[q] ~ dscaled.gamma(scale, df)
+    sigma_theta[q] <- sqrt(1 / tau_theta[q])
+  }
   
   for (j in 1:Nsite) {
     for(t in St_year[j]:(St_year[j] + Q - 1)) {
@@ -40,10 +41,6 @@ model {
   tau_r_space ~ dscaled.gamma(scale, df)
   sd_r_space <- sqrt(1 / tau_r_space)
   
-  for (q in 1:Q) {
-    p[q] ~ dunif(0, 1)
-  }
-  
   ## regression parameters
   
   for (j in 1:Nsite) {
@@ -59,7 +56,10 @@ model {
   
   ## observation
   for (i in 1:Nsample) {
-    N[i] ~ dpois(lambda[Site[i], Year[i]] * Area[i])
+    loglik[i] <- logdensity.pois(N[i], n_hat[i])
+    N[i] ~ dpois(n_hat[i])
+    
+    n_hat[i] <- lambda[Site[i], Year[i]] * Area[i]
   }
   
   for (j in 1:Nsite) {
@@ -76,8 +76,7 @@ model {
   for (j in 1:Nsite) {
     for (t in (St_year[j] + Q):End_year[j]) {
       log_d[j, t] ~ dnorm(log_mu_d[j, t], tau_r_time[j])
-      log_mu_d[j, t] <- log_r[j] + 
-        inprod(theta[j, 1:Q], log_d[j, (t - Q):(t - 1)])
+      log_mu_d[j, t] <- log_r[j] + inprod(theta[j, 1:Q], log_d[j, (t - Q):(t - 1)])
     }
   }
   

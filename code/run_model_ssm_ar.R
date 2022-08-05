@@ -21,12 +21,14 @@ fn_brrm <- function(x) {
 ## "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
 source("code/data_fmt_stock.R")
 group <- c("all", "masu_salmon", "other")
+Order <- 3
 
 ## mcmc setup ####
 n_ad <- 100
 n_iter <- 1.0E+4
 n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
+n_chain <- 4
 n_sample <- ceiling(n_iter / n_thin)
 
 inits <- replicate(3,
@@ -41,7 +43,8 @@ m <- read.jagsfile("code/model_ssm_ar.R")
 
 ## parameters ####
 para <- c("bp_value",
-          "p",
+          "mu_theta",
+          "sigma_theta",
           "log_mu_r",
           "sd_r_space",
           "sd_obs",
@@ -51,72 +54,105 @@ para <- c("bp_value",
           "mu_b",
           "b",
           "sd_b",
-          "log_d")
+          "log_d",
+          "loglik")
 
 # jags --------------------------------------------------------------------
 
+## loop over all, masu, and other fish groups
 list_est <- foreach(i = seq_len(length(group))) %do% {
   
   fish_group <- group[i]
   df_subset <- filter(df_fish, group == fish_group)
   
-  ## data for jags ####
-  d_jags <- list(N = df_subset$abundance,
-                 Site = df_subset$site_id_numeric,
-                 Year = df_subset$year - min(df_subset$year) + 1,
-                 St_year = df_year$St_year,
-                 End_year = df_year$End_year,
-                 Area = df_subset$area,
-                 Nsample = nrow(df_subset),
-                 Nsite = n_distinct(df_subset$site_id),
-                 
-                 # Psi = 0 for fish group "other" because no stocking effect would be expected
-                 Psi = ifelse(fish_group == "other", 0, 1),
-                 Stock = df_fry$stock,
-                 Year_stock = df_fry$year_release - min(df_fry$year_release) + 1,
-                 Site_stock = df_fry$site_id_numeric,
-                 Nsample_stock = nrow(df_fry),
-                 
-                 # order of auto-regressive process
-                 Q = 3)
-  
-  ## run jags ####
-  post <- run.jags(m$model,
-                   monitor = para,
-                   data = d_jags,
-                   n.chains = 3,
-                   inits = inits,
-                   method = "parallel",
-                   burnin = n_burn,
-                   sample = n_sample,
-                   adapt = n_ad,
-                   thin = n_thin,
-                   n.sims = 3,
-                   module = "glm")
-  
-  mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-  print(max(mcmc_summary$Rhat, na.rm = T))
-  
-  while(max(mcmc_summary$Rhat, na.rm = T) >= 1.1) {
-    post <- extend.jags(post,
-                        burnin = 0,
-                        sample = n_sample,
-                        adapt = n_ad,
-                        thin = n_thin,
-                        n.sims = 3,
-                        combine = TRUE)
-
+  ## loop over AR order Q
+  list_m <- foreach(Q = 1:Order) %do% {
+    ## data for jags ####
+    d_jags <- list(N = df_subset$abundance,
+                   Site = df_subset$site_id_numeric,
+                   Year = df_subset$year - min(df_subset$year) + 1,
+                   St_year = df_year$St_year,
+                   End_year = df_year$End_year,
+                   Area = df_subset$area,
+                   Nsample = nrow(df_subset),
+                   Nsite = n_distinct(df_subset$site_id),
+                   
+                   # Psi = 0 for fish group "other" because no stocking effect would be expected
+                   Psi = ifelse(fish_group == "other", 0, 1),
+                   Stock = df_fry$stock,
+                   Year_stock = df_fry$year_release - min(df_fry$year_release) + 1,
+                   Site_stock = df_fry$site_id_numeric,
+                   Nsample_stock = nrow(df_fry),
+                   
+                   # order of auto-regressive process
+                   Q = Q)
+    
+    ## run jags ####
+    post <- run.jags(m$model,
+                     monitor = para,
+                     data = d_jags,
+                     n.chains = n_chain,
+                     inits = inits,
+                     method = "parallel",
+                     burnin = n_burn,
+                     sample = n_sample,
+                     adapt = n_ad,
+                     thin = n_thin,
+                     n.sims = n_chain,
+                     module = "glm")
+    
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
     print(max(mcmc_summary$Rhat, na.rm = T))
+    
+    while(max(mcmc_summary$Rhat, na.rm = T) >= 1.1) {
+      post <- extend.jags(post,
+                          burnin = 0,
+                          sample = n_sample,
+                          adapt = n_ad,
+                          thin = n_thin,
+                          n.sims = 3,
+                          combine = TRUE)
+
+      mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+      print(max(mcmc_summary$Rhat, na.rm = T))
+    }
+    
+    loglik <- sapply(1:nrow(df_subset), function(n)
+      unlist(post$mcmc[, paste0("loglik[", n, "]")]))
+    
+    r_eff <- relative_eff(x = exp(loglik),
+                          chain_id = rep(1:n_chain,
+                                         each = post$sample))
+    
+    loo_hat <- loo(loglik,
+                   r_eff = r_eff,
+                   save_psis = TRUE)
+    
+    looic <- loo_hat$estimates["looic", "Estimate"]
+    looic_se <- loo_hat$estimates["looic", "SE"]
+    
+    return(list(post = post,
+                looic = looic,
+                looic_se = looic_se))
+    
   }
   
+  print(sapply(list_m, function(m) m$looic))
+  
+  ## save waic values
+  tibble(order = 1:Order,
+         looic = sapply(list_m, function(m) m$looic),
+         looic_se = sapply(list_m, function(m) m$looic_se)) %>% 
+    saveRDS(file = here::here(paste0("result/looic_", fish_group, ".rds")))
+    
+  ## order with minimum looic
+  w <- which.min(sapply(list_m, function(m) m$looic))
+  
+  post <- list_m[[w]]$post
+  mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
   n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
   
-  
   ## format output ####
-  param <- rownames(mcmc_summary)
-  param_name <- str_remove(param, pattern = "\\[.{1,}\\]")
-  
   df_site <- df_subset %>% 
     distinct(site_id_numeric,
              river,
@@ -124,14 +160,16 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
              site_id)
   
   est <- mcmc_summary %>% 
-    as_tibble() %>% 
-    mutate(n_total_mcmc = n_total_mcmc,
+    mutate(order = w,
+           n_total_mcmc = n_total_mcmc,
            n_sample = post$sample,
            n_thin = n_thin,
            n_burn = n_burn,
-           param_name = param_name,
-           param = param,
+           param = rownames(.),
+           param_name = str_remove(param,
+                                   pattern = "\\[.{1,}\\]"),
            character_id = fn_brrm(param)) %>% 
+    as_tibble() %>% 
     separate(character_id,
              into = c("site_id_numeric", "year_id_numeric"),
              convert = TRUE,
@@ -148,13 +186,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
              site_id,
              site_id_numeric,
              year_id_numeric) %>% 
-    mutate(site_id = ifelse(param_name == "p",
-                            NA,
-                            site_id),
-           site_id_numeric = ifelse(param_name == "p",
-                                    NA,
-                                    site_id_numeric),
-           year_id_numeric = ifelse(param_name == "p"|param_name == "theta",
+    mutate(year_id_numeric = ifelse(param_name == "theta",
                                     NA,
                                     year_id_numeric))
   

@@ -8,4 +8,5 @@ pacman::p_load(tidyverse,
                scales,
                runjags,
                ggside,
-               forecast)
+               forecast,
+               loo)
