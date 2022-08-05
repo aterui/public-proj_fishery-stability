@@ -8,7 +8,7 @@ pacman::p_load(tidyverse,
 # time series data --------------------------------------------------------
 
 ## read data
-df0 <- readRDS(file = here::here("data_fmt/data_ssm.rds")) %>% 
+df0 <- readRDS(file = here::here("data_fmt/data_ssm_ar.rds")) %>% 
   lapply(function(x) mutate(x, group = c(na.omit(unique(x$group))))) %>% 
   bind_rows() %>% 
   rename(median = '50%',
@@ -27,10 +27,10 @@ list_g_dyns <- foreach(i = seq_len(length(unique(df0$group)))) %do% {
   g <- df0 %>% 
     filter(group == unique(df0$group)[i]) %>% 
     ggplot() + 
-    geom_line(aes(x = year_id + 1998,
+    geom_line(aes(x = year_id_numeric + 1998,
                   y = est_density,
                   color = factor(site))) +
-    geom_point(aes(x = year_id + 1998,
+    geom_point(aes(x = year_id_numeric + 1998,
                    y = density,
                    color = factor(site)),
                alpha = 0.5) +
