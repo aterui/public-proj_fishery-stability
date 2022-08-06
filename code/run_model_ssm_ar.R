@@ -31,12 +31,12 @@ n_burn <- ceiling(max(10, n_iter/2))
 n_chain <- 4
 n_sample <- ceiling(n_iter / n_thin)
 
-inits <- replicate(3,
+inits <- replicate(n_chain,
                    list(.RNG.name = "base::Mersenne-Twister",
                         .RNG.seed = NA),
                    simplify = FALSE)
 
-for (j in 1:3) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 1
+for (j in 1:n_chain) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 1
 
 ## model file ####
 m <- read.jagsfile("code/model_ssm_ar.R")
@@ -110,13 +110,14 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                           sample = n_sample,
                           adapt = n_ad,
                           thin = n_thin,
-                          n.sims = 3,
+                          n.sims = n_chain,
                           combine = TRUE)
 
       mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
       print(max(mcmc_summary$Rhat, na.rm = T))
     }
     
+    ## information criterion ####
     loglik <- sapply(1:nrow(df_subset), function(n)
       unlist(post$mcmc[, paste0("loglik[", n, "]")]))
     
