@@ -24,7 +24,7 @@ group <- c("all", "masu_salmon", "other")
 Order <- 3
 
 ## mcmc setup ####
-n_ad <- 100
+n_ad <- 1000
 n_iter <- 1.0E+4
 n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
@@ -99,7 +99,8 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                      adapt = n_ad,
                      thin = n_thin,
                      n.sims = n_chain,
-                     module = "glm")
+                     module = "glm", 
+                     silent.jags = TRUE)
     
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
     print(max(mcmc_summary$Rhat, na.rm = T))
@@ -111,7 +112,8 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                           adapt = n_ad,
                           thin = n_thin,
                           n.sims = n_chain,
-                          combine = TRUE)
+                          combine = TRUE,
+                          silent.jags = TRUE)
 
       mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
       print(max(mcmc_summary$Rhat, na.rm = T))
@@ -125,33 +127,54 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                           chain_id = rep(1:n_chain,
                                          each = post$sample))
     
-    loo_hat <- loo(loglik,
-                   r_eff = r_eff,
-                   save_psis = TRUE)
+    ic_hat <- list(loo = loo(loglik,
+                             r_eff = r_eff,
+                             save_psis = TRUE),
+                   waic = waic(loglik,
+                               r_eff = r_eff,
+                               save_psis = TRUE))
     
-    looic <- loo_hat$estimates["looic", "Estimate"]
-    looic_se <- loo_hat$estimates["looic", "SE"]
+    df_ic <- lapply(ic_hat, function(x) c(x$estimates[3, "Estimate"],
+                                          x$estimates[3, "SE"])) %>% 
+      bind_rows() %>% 
+      mutate(metric = c("estimate", "se"))
+    
+    ## export ####
+    saveRDS(post,
+            file = here::here(paste0("result/post_ssm_ar", Q,
+                                     "_", fish_group, ".rds")))
+    
+    print(paste("update: i =", i, "Q =", Q))
     
     return(list(post = post,
-                looic = looic,
-                looic_se = looic_se))
+                ic = df_ic))
     
   }
   
-  print(sapply(list_m, function(m) m$looic))
-  
   ## save waic values
   tibble(order = 1:Order,
-         looic = sapply(list_m, function(m) m$looic),
-         looic_se = sapply(list_m, function(m) m$looic_se)) %>% 
-    saveRDS(file = here::here(paste0("result/looic_", fish_group, ".rds")))
+         looic = sapply(list_m, function(m) m$ic %>%
+                          filter(metric == "estimate") %>% 
+                          pull(loo)),
+         looic_se = sapply(list_m, function(m) m$ic %>%
+                             filter(metric == "se") %>% 
+                             pull(loo)),
+         waic = sapply(list_m, function(m) m$ic %>%
+                  filter(metric == "estimate") %>% 
+                  pull(waic)),
+         waic_se = sapply(list_m, function(m) m$ic %>%
+                  filter(metric == "se") %>% 
+                  pull(waic))) %>% 
+    saveRDS(file = here::here(paste0("result/ic_ssm_ar_", fish_group, ".rds")))
     
   ## order with minimum looic
-  w <- which.min(sapply(list_m, function(m) m$looic))
+  w <- which.min(sapply(list_m, function(m) m$ic %>%
+                          filter(metric == "estimate") %>% 
+                          pull(waic)))
   
   post <- list_m[[w]]$post
   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-  n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
+  n_total_mcmc <- (post$sample / n_sample) * n_iter + post$burnin
   
   ## format output ####
   df_site <- df_subset %>% 
