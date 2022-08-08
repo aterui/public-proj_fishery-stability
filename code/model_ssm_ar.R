@@ -3,68 +3,52 @@ model {
   tau0 <- 0.1
   scale0 <- 2.5
   df0 <- 1
-  a1 <- 2
-  a2 <- 3
+  v_scale0 <- rep(scale0, Q + 1)
   
   # prior -------------------------------------------------------------------
   
-  ## local parameters
-  for (j in 1:Nsite) {
+  ## local parameters ####
+  for (i in 1:Nsite) {
     
-    log_r[j] ~ dnorm(0, tau0)
+    log_r[i] <- zeta[i, 1]
     
-    for (q in 1:Q) {
-      nu[j, q] ~ dnorm(0, tau0)
+    for (q in 2:(Q + 1)) {
+      nu[i, q - 1] <- zeta[i, q]
+    }
+    
+    zeta[i, 1:(Q + 1)] ~ dmnorm(mu_zeta[], TAU[ , ])
+  }
+  
+  for (i in 1:Nsite) {
+    for(t in St_year[i]:(St_year[i] + Q - 1)) {
+      log_d[i, t] ~ dnorm(0, tau0)
     }
   }
   
-  for (j in 1:Nsite) {
-    for(t in 1:Q) {
-      log_d[j, t] ~ dnorm(0, tau0)
-    }
-  }
-  
-  for (j in 1:Nsite) {
-    tau_obs[j] ~ dscaled.gamma(scale0, df0)
-    sd_obs[j] <- sqrt(1 / tau_obs[j])
+  for (i in 1:Nsite) {
+    tau_r_time[i] ~ dscaled.gamma(scale0, df0)
+    sd_r_time[i] <- sqrt(1 / tau_r_time[i])
+    
+    tau_obs[i] ~ dscaled.gamma(scale0, df0)
+    sd_obs[i] <- sqrt(1 / tau_obs[i])
   }  
   
-  ## regression parameters
-  for (j in 1:Nsite) {
-    b[j] ~ dnorm(mu_b, tau_b)
+  ## regression parameters ####
+  for (i in 1:Nsite) {
+    b[i] ~ dnorm(mu_b, tau_b)
   }
   
   mu_b ~ dnorm(0, tau0)
   tau_b ~ dscaled.gamma(scale0, df0)
   sd_b <- sqrt(1 / tau_b)
   
-  ### multiplicative gamma prior for factor loading
-  delta[1] ~ dgamma(a1, 1)
-  theta[1] <- delta[1]
-  
-  for(k in 2:Nf) {
-    delta[k] ~ dgamma(a2, 1)
-    theta[k] <- theta[k - 1] * delta[k]
+  ## hyper-parameters ####
+  for (k in 1:(Q + 1)) {
+    mu_zeta[k] ~ dnorm(0, tau0)
   }
   
-  ### var-covar matrix
-  OMEGA[1:Nsite, 1:Nsite] <- t(xi[ , ]) %*% xi[ , ] + diag_omega[ , ]
-  TAU[1:Nsite, 1:Nsite] <- inverse(OMEGA[ , ])
-  
-  for(i in 1:Nsite) {
-    #### process error precision
-    tau_r_time[i] <- TAU[i, i]
-    sd_r_time[j] <- sqrt(1 / tau_r_time[j])
-    
-    #### unique error for site-level time series
-    tau[i] ~ dscaled.gamma(scale0, df0)
-    sigma[i] <- sqrt(1 / tau[i])
-    
-    for(j in 1:Nsite) {
-      diag_omega[i, j] <- W[i, j] * pow(sigma[j], 2)
-      rho[i, j] <- OMEGA[i, j] / sqrt(OMEGA[i, i] * OMEGA[j, j])
-    }
-  }
+  TAU[1:(Q + 1), 1:(Q + 1)] ~ dscaled.wishart(v_scale0[], 2)
+  OMEGA[1:(Q + 1), 1:(Q + 1)] <- inverse(TAU[ , ])
   
   
   # likelihood --------------------------------------------------------------
@@ -83,41 +67,24 @@ model {
       log(d_obs[i, t]) <- log_d_obs[i, t]
       log_d_obs[i, t] ~ dnorm(log_d[i, t], tau_obs[i])
       
+      log_d_prime[i, t] <- log_d[i, t]
       log(d[i, t]) <- log_d[i, t]
     }
   }  
   
   ## state ####
   for (i in 1:Nsite) {
-    for (t in (1 + Q):Nyear) {
+    for (t in (St_year[i] + Q):End_year[i]) {
       log_d[i, t] ~ dnorm(log_mu_d[i, t], tau_r_time[i])
       log_mu_d[i, t] <- 
         log_r[i] + 
-        inprod(nu[i, 1:Q], log_d[i, (t - Q):(t - 1)]) +
-        inprod(xi[ , i], eta[t - Q, ])
+        inprod(nu[i, 1:Q], log_d[i, (t - Q):(t - 1)])
     }
   }
   
-  ## factor analysis for epsilon ###
-  
-  ### latent variables
-  for(t in 1:(Nyr - Q)) {
-    for (k in 1:Nf) {
-      eta[t, k] ~ dnorm(0, 1)
-    }
-  }
-  
-  for (k in 1:Nf) {
-    for(i in 1:Nsite) {
-      xi[k, i] ~ dnorm(0, phi[k, i] * theta[k])
-      phi[k, i] ~ dgamma(1.5, 1.5)
-    }
-  }
-  
-  
+
   # Bayesian p-value --------------------------------------------------------
   
-  ## observation
   for (n in 1:Nsample) {
     y_predict[n] <- lambda[Site[n], Year[n]] * Area[n]
     
