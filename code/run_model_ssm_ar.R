@@ -43,13 +43,10 @@ m <- read.jagsfile("code/model_ssm_ar.R")
 
 ## parameters ####
 para <- c("bp_value",
-          "mu_theta",
-          "sigma_theta",
-          "log_mu_r",
-          "sd_r_space",
+          "mu_zeta",
+          "OMEGA",
+          "zeta",
           "sd_obs",
-          "theta",
-          "log_r",
           "sd_r_time",
           "mu_b",
           "b",
@@ -99,8 +96,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                      adapt = n_ad,
                      thin = n_thin,
                      n.sims = n_chain,
-                     module = "glm", 
-                     silent.jags = TRUE)
+                     module = "glm")
     
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
     print(max(mcmc_summary$Rhat, na.rm = T))
@@ -112,8 +108,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                           adapt = n_ad,
                           thin = n_thin,
                           n.sims = n_chain,
-                          combine = TRUE,
-                          silent.jags = TRUE)
+                          combine = TRUE)
 
       mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
       print(max(mcmc_summary$Rhat, na.rm = T))
