@@ -1,8 +1,8 @@
 model {
   
-  tau0 <- 0.1
+  tau0 <- 1 / 25
   scale0 <- 2.5
-  df0 <- 1
+  df0 <- 3
   v_scale0 <- rep(scale0, Q + 1)
   
   # prior -------------------------------------------------------------------
@@ -85,13 +85,12 @@ model {
   # Bayesian p-value --------------------------------------------------------
   
   for (n in 1:Nsample) {
-    y_predict[n] <- lambda[Site[n], Year[n]] * Area[n]
+    residual[n] <- N[n] - n_hat[n]
+    sq[n] <- pow(residual[n], 2) / n_hat[n]
     
-    residual[n] <- N[n] - y_predict[n]
-    sq[n] <- pow(residual[n], 2)
-    
-    y_new[n] ~ dpois(lambda[Site[n], Year[n]] * Area[n])
-    sq_new[n] <- pow(y_new[n] - y_predict[n], 2)
+    y_new[n] ~ dpois(n_hat[n])
+    residual_new[n] <- y_new[n] - n_hat[n]
+    sq_new[n] <- pow(residual_new[n], 2) / n_hat[n]
   }
   
   fit <- sum(sq[])
