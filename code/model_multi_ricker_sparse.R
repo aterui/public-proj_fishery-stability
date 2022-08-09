@@ -1,6 +1,6 @@
 model {
   
-  tau0 <- 1 / 25
+  tau0 <- 1 / 50
   scale0 <- 2.5
   df0 <- 3
   a1 <- 2
