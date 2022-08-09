@@ -15,13 +15,13 @@ group <- c("all", "masu_salmon", "other")
 Order <- 3
 
 ## mcmc setup ####
-n_ad <- 100
-n_iter <- 1E+2
+n_ad <- 1000
+n_iter <- 1E+4
 n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
 n_chain <- 4
 n_sample <- ceiling(n_iter / n_thin)
-sj <- F
+sj <- FALSE
 
 inits <- replicate(n_chain,
                    list(.RNG.name = "base::Mersenne-Twister",
@@ -40,8 +40,9 @@ para <- c("bp_value",
           "OMEGA",
           "zeta",
           "RHO",
-          "sd_obs",
           "sd_r_time",
+          "sd_river",
+          "sd_obs",
           "mu_b",
           "b",
           "sd_b",
@@ -101,19 +102,19 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
   print(max(mcmc_summary$Rhat, na.rm = T))
   
-  # while(max(mcmc_summary$Rhat, na.rm = T) >= 1.1) {
-  #   post <- extend.jags(post,
-  #                       burnin = 0,
-  #                       sample = n_sample,
-  #                       adapt = n_ad,
-  #                       thin = n_thin,
-  #                       n.sims = n_chain,
-  #                       combine = TRUE,
-  #                       silent.jags = sj)
-  #   
-  #   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-  #   print(max(mcmc_summary$Rhat, na.rm = T))
-  # }
+  while(max(mcmc_summary$Rhat, na.rm = T) >= 1.1) {
+    post <- extend.jags(post,
+                        burnin = 0,
+                        sample = n_sample,
+                        adapt = n_ad,
+                        thin = n_thin,
+                        n.sims = n_chain,
+                        combine = TRUE,
+                        silent.jags = sj)
+
+    mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+    print(max(mcmc_summary$Rhat, na.rm = T))
+  }
 
   saveRDS(post,
           file = here::here(paste0("result/post_arfa_sparse_",
@@ -165,6 +166,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                                     NA,
                                     year_id_numeric))
   
+  print(fish_group)  
   return(est)
 }
 

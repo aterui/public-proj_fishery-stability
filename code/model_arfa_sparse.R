@@ -5,8 +5,8 @@ model {
   scale0 <- 2.5
   df0 <- 3
   v_scale0 <- rep(scale0, Q + 1)
-  a1 <- 2
-  a2 <- 3
+  a1 <- 10
+  a2 <- 10
   
   # prior -------------------------------------------------------------------
   
@@ -72,6 +72,7 @@ model {
   for(r in 1:Nriver) {
     ### process error precision
     tau_river[r] <- KAPPA[r, r]
+    sd_river[r] <- sqrt(1 / tau_river[r])
     
     ### unique error for river-level time series
     tau[r] ~ dscaled.gamma(scale0, df0)
