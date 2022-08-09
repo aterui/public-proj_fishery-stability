@@ -30,13 +30,14 @@ n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
 n_chain <- 4
 n_sample <- ceiling(n_iter / n_thin)
+sj <- TRUE
 
 inits <- replicate(n_chain,
                    list(.RNG.name = "base::Mersenne-Twister",
                         .RNG.seed = NA),
                    simplify = FALSE)
 
-for (j in 1:n_chain) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 1
+for (j in 1:n_chain) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 2
 
 ## model file ####
 m <- read.jagsfile("code/model_ssm_ar_sparse.R")
@@ -95,7 +96,8 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                    adapt = n_ad,
                    thin = n_thin,
                    n.sims = n_chain,
-                   module = "glm")
+                   module = "glm",
+                   silent.jags = sj)
   
   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
   print(max(mcmc_summary$Rhat, na.rm = T))
@@ -107,7 +109,8 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                         adapt = n_ad,
                         thin = n_thin,
                         n.sims = n_chain,
-                        combine = TRUE)
+                        combine = TRUE,
+                        silent.jags = sj)
     
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
     print(max(mcmc_summary$Rhat, na.rm = T))
@@ -116,6 +119,13 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   saveRDS(post,
           file = here::here(paste0("result/post_ssm_ar_sparse",
                                    fish_group, ".rds")))
+  
+  MCMCvis::MCMCtrace(post$mcmc,
+                     params = para[-which(para %in% c("bp_value",
+                                                      "log_d",
+                                                      "loglik"))],
+                     filename = paste0("result/mcmc_trace_ar_sparse_",
+                                       fish_group))
   
   ## format output ####
   n_total_mcmc <- (post$sample / n_sample) * n_iter + post$burnin
@@ -127,8 +137,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
              site_id)
   
   est <- mcmc_summary %>% 
-    mutate(order = w,
-           n_total_mcmc = n_total_mcmc,
+    mutate(n_total_mcmc = n_total_mcmc,
            n_sample = post$sample,
            n_thin = n_thin,
            n_burn = n_burn,
