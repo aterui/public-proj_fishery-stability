@@ -40,7 +40,7 @@ inits <- replicate(n_chain,
 for (j in 1:n_chain) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 2
 
 ## model file ####
-m <- read.jagsfile("code/model_ssm_ar_sparse.R")
+m <- read.jagsfile("code/model_ar_sparse.R")
 
 ## parameters ####
 para <- c("bp_value",
