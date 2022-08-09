@@ -2,17 +2,8 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-pacman::p_load(tidyverse,
-               runjags,
-               foreach)
-
-fn_brrm <- function(x) {
-  y <- lapply(str_extract_all(x, pattern = "\\[.{1,}\\]"),
-              FUN = function(z) ifelse(identical(z, character(0)),
-                                       NA,
-                                       z))
-  str_remove_all(y, pattern = "\\[|\\]")
-}
+source(here::here("code/library.R"))
+source(here::here("code/function_set.R"))
 
 
 # common setup ------------------------------------------------------------

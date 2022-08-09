@@ -2,8 +2,7 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-pacman::p_load(foreach,
-               tidyverse)
+source(here::here("code/library.R"))
 
 
 # jags setup --------------------------------------------------------------
@@ -79,7 +78,7 @@ post <- runjags::run.jags(m$model,
 
 mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
 
-while(max(mcmc_summary$Rhat) > 1.09) {
+while(max(mcmc_summary$Rhat) >= 1.1) {
   post <- runjags::extend.jags(post,
                                burnin = 0,
                                sample = n_sample,
