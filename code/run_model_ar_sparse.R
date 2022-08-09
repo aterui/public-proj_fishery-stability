@@ -25,7 +25,7 @@ Order <- 3
 
 ## mcmc setup ####
 n_ad <- 1000
-n_iter <- 1E+4
+n_iter <- 2E+4
 n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
 n_chain <- 4
@@ -117,7 +117,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   }
   
   saveRDS(post,
-          file = here::here(paste0("result/post_ssm_ar_sparse_",
+          file = here::here(paste0("result/post_ar_sparse_",
                                    fish_group, ".rds")))
   
   MCMCvis::MCMCtrace(post$mcmc,
