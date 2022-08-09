@@ -117,7 +117,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   }
   
   saveRDS(post,
-          file = here::here(paste0("result/post_ssm_ar_sparse",
+          file = here::here(paste0("result/post_ssm_ar_sparse_",
                                    fish_group, ".rds")))
   
   MCMCvis::MCMCtrace(post$mcmc,
