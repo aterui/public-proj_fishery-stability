@@ -12,7 +12,7 @@ source(here::here("code/function_set.R"))
 ## "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
 source("code/data_fmt_stock.R")
 group <- c("all", "masu_salmon", "other")
-Order <- 1
+Order <- 3
 
 ## mcmc setup ####
 n_ad <- 1000
@@ -31,13 +31,13 @@ inits <- replicate(n_chain,
 for (j in 1:n_chain) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 2
 
 ## model file ####
-m <- read.jagsfile("code/model_ar.R")
+m <- read.jagsfile("code/model_ar0.R")
 
 ## parameters ####
 para <- c("bp_value",
-          "mu_zeta",
-          "OMEGA",
-          "zeta",
+          "log_mu_r",
+          "log_r",
+          "sd_r_space",
           "sd_r_time",
           "sd_obs",
           "mu_b",
@@ -109,7 +109,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   }
   
   saveRDS(post,
-          file = here::here(paste0("result/post_ar",
+          file = here::here(paste0("result/post_ar0",
                                    Order,
                                    "_",
                                    fish_group, ".rds")))
@@ -118,7 +118,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                      params = para[-which(para %in% c("bp_value",
                                                       "log_d",
                                                       "loglik"))],
-                     filename = paste0("result/mcmc_trace_ar",
+                     filename = paste0("result/mcmc_trace_ar0",
                                        Order,
                                        "_",
                                        fish_group))
@@ -171,4 +171,4 @@ names(list_est) <- group
 
 # export ------------------------------------------------------------------
 
-saveRDS(list_est, here::here(paste0("data_fmt/data_ar", Order, ".rds")))
+saveRDS(list_est, here::here(paste0("data_fmt/data_ar0", Order, ".rds")))
