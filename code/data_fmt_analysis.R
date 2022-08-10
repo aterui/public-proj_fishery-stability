@@ -44,7 +44,7 @@ group <- c("all", "masu", "other")
 
 # ssm data ----------------------------------------------------------------
 
-df_ssm <- readRDS(file = here::here("data_fmt/data_ssm_ar.rds")) %>% 
+df_ssm <- readRDS(file = here::here("data_fmt/data_ar.rds")) %>% 
   lapply(function(x) mutate(x, group = c(na.omit(unique(x$group))))) %>% 
   bind_rows() %>% 
   rename(median = '50%',
