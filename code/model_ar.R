@@ -5,6 +5,7 @@ model {
   scale0 <- 2.5
   df0 <- 3
   v_scale0 <- rep(scale0, Q + 1)
+  mu0 <- c(0, rep(1, Q))
   
   # prior -------------------------------------------------------------------
   
@@ -45,16 +46,11 @@ model {
   
   ## hyper-parameters ####
   for (k in 1:(Q + 1)) {
-    mu_zeta[k] ~ dnorm(0, tau0)
+    mu_zeta[k] ~ dnorm(mu0[k], tau0)
   }
   
   TAU[1:(Q + 1), 1:(Q + 1)] ~ dscaled.wishart(v_scale0[], 2)
   OMEGA[1:(Q + 1), 1:(Q + 1)] <- inverse(TAU[ , ])
-  
-  for(r in 1:Nriver) {
-    tau_river[r] ~ dscaled.gamma(scale0, df0)
-    sd_river[r] <- sqrt(1 / tau_river[r])
-  }
   
   
   # likelihood --------------------------------------------------------------
@@ -72,8 +68,7 @@ model {
       log(lambda[i, t]) <- log_d_obs[i, t]
       log_d_obs[i, t] ~ dnorm(log_d_prime[i, t], tau_obs[i])
       
-      log_d_prime[i, t] <- log_d[i, t] + Psi * b[i] * scl_stock[i, t]
-      scl_stock[i, t] <- (stock[i, t] - mean(stock[ , ])) / sd(stock[ , ])
+      log_d_prime[i, t] <- log_d[i, t] + Psi * b[i] * stock[i, t]
     }
   }  
   
@@ -83,14 +78,7 @@ model {
       log_d[i, t] ~ dnorm(log_mu_d[i, t], tau_r_time[i])
       log_mu_d[i, t] <- 
         log_r[i] + 
-        inprod(nu[i, 1:Q], log_d[i, (t - Q):(t - 1)]) +
-        eps[River[i], t]
-    }
-  }
-  
-  for (t in (1 + Q):Nyear) {
-    for(r in 1:Nriver) {
-      eps[r, t] ~ dnorm(0, tau_river[r])
+        inprod(nu[i, 1:Q], log_d[i, (t - Q):(t - 1)])
     }
   }
   
