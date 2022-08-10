@@ -14,11 +14,13 @@ model {
     logit_nu[i] ~ dnorm(logit_mu_nu, tau_nu)
   }
   
+  logit(mu_nu) <- logit_mu_nu
+  logit_mu_nu ~ dnorm(0, tau0)
   tau_nu ~ dscaled.gamma(scale0, df0)
-  sigma_nu <- sqrt(1 / tau_nu)
+  sd_nu <- sqrt(1 / tau_nu)
   
   for (i in 1:Nsite) {
-    for(t in St_year[i]:(St_year[i] + Q - 1)) {
+    for(t in St_year[i]:(St_year[i] + Q)) {
       log_d[i, t] ~ dnorm(0, tau0)
     }
   }
@@ -71,7 +73,7 @@ model {
   
   ## state ####
   for (i in 1:Nsite) {
-    for (t in (St_year[i] + Q):End_year[i]) {
+    for (t in (St_year[i] + Q + 1):End_year[i]) {
       log_d[i, t] ~ dnorm(log_mu_d[i, t], tau_r_time[i])
       log_mu_d[i, t] <- 
         log_d[i, t - 1] +

@@ -12,7 +12,6 @@ source(here::here("code/function_set.R"))
 ## "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
 source("code/data_fmt_stock.R")
 group <- c("all", "masu_salmon", "other")
-Order <- 3
 
 ## mcmc setup ####
 n_ad <- 1000
@@ -31,13 +30,12 @@ inits <- replicate(n_chain,
 for (j in 1:n_chain) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 2
 
 ## model file ####
-m <- read.jagsfile("code/model_ar.R")
+m <- read.jagsfile("code/model_smooth.R")
 
 ## parameters ####
 para <- c("bp_value",
-          "mu_zeta",
-          "OMEGA",
-          "zeta",
+          "mu_nu",
+          "sd_nu",
           "sd_r_time",
           "sd_river",
           "sd_obs",
@@ -76,7 +74,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                  Nsample_stock = nrow(df_fry),
                  
                  # order of auto-regressive process
-                 Q = Order)
+                 Q = ifelse(fish_group == "masu_salmon", 3, 1))
   
   ## run jags ####
   post <- run.jags(m$model,
@@ -113,18 +111,14 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   }
   
   saveRDS(post,
-          file = here::here(paste0("result/post_ar",
-                                   Order,
-                                   "_",
+          file = here::here(paste0("result/post_smooth_",
                                    fish_group, ".rds")))
   
   MCMCvis::MCMCtrace(post$mcmc,
                      params = para[-which(para %in% c("bp_value",
                                                       "log_d",
                                                       "loglik"))],
-                     filename = paste0("result/mcmc_trace_ar",
-                                       Order,
-                                       "_",
+                     filename = paste0("result/mcmc_trace_smooth_",
                                        fish_group))
   
   ## format output ####
@@ -175,4 +169,4 @@ names(list_est) <- group
 
 # export ------------------------------------------------------------------
 
-saveRDS(list_est, here::here(paste0("data_fmt/data_ar", Order, ".rds")))
+saveRDS(list_est, here::here(paste0("data_fmt/data_smooth.rds")))
