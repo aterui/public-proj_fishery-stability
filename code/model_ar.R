@@ -72,7 +72,8 @@ model {
       log(lambda[i, t]) <- log_d_obs[i, t]
       log_d_obs[i, t] ~ dnorm(log_d_prime[i, t], tau_obs[i])
       
-      log_d_prime[i, t] <- log_d[i, t] + Psi * b[i] * stock[i, t]
+      log_d_prime[i, t] <- log_d[i, t] + Psi * b[i] * scl_stock[i, t]
+      scl_stock[i, t] <- (stock[i, t] - mean(stock[ , ])) / sd(stock[ , ])
     }
   }  
   
