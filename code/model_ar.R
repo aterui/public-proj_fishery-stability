@@ -65,10 +65,9 @@ model {
   
   for (i in 1:Nsite) {
     for (t in St_year[i]:End_year[i]) {
-      log(lambda[i, t]) <- log_d_obs[i, t]
-      log_d_obs[i, t] ~ dnorm(log_d_prime[i, t], tau_obs[i])
-      
-      log_d_prime[i, t] <- log_d[i, t] + Psi * b[i] * stock[i, t]
+      lambda[i, t] <- d_obs[i, t] + Psi * b[i] * stock[i, t]
+      log(d_obs[i, t]) <- log_d_obs[i, t]
+      log_d_obs[i, t] ~ dnorm(log_d[i, t], tau_obs[i])
     }
   }  
   
