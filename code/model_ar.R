@@ -21,7 +21,7 @@ model {
   }
   
   for (i in 1:Nsite) {
-    for(t in 1:Q) {
+    for(t in St_year[i]:(St_year[i] + Q - 1)) {
       log_d[i, t] ~ dnorm(0, tau0)
     }
   }
@@ -69,42 +69,42 @@ model {
   
   for (i in 1:Nsite) {
     for (t in St_year[i]:End_year[i]) {
-      lambda[i, t] <- d_obs[i, t] + Psi * b[i] * stock[i, t]
-      log(d_obs[i, t]) <- log_d_obs[i, t]
-      log_d_obs[i, t] ~ dnorm(log_d[i, t], tau_obs[i])
+      log(lambda[i, t]) <- log_d_obs[i, t]
+      log_d_obs[i, t] ~ dnorm(log_d_prime[i, t], tau_obs[i])
       
-      log_d_prime[i, t] <- log_d[i, t]
-      log(d[i, t]) <- log_d[i, t]
+      log_d_prime[i, t] <- log_d[i, t] + Psi * b[i] * stock[i, t]
     }
   }  
   
   ## state ####
-  for (t in (1 + Q):Nyear) {
-    for (i in 1:Nsite) {
+  for (i in 1:Nsite) {
+    for (t in (St_year[i] + Q):End_year[i]) {
       log_d[i, t] ~ dnorm(log_mu_d[i, t], tau_r_time[i])
       log_mu_d[i, t] <- 
         log_r[i] + 
         inprod(nu[i, 1:Q], log_d[i, (t - Q):(t - 1)]) +
         eps[River[i], t]
     }
-    
+  }
+  
+  for (t in (1 + Q):Nyear) {
     for(r in 1:Nriver) {
       eps[r, t] ~ dnorm(0, tau_river[r])
     }
   }
   
-
+  
   # Bayesian p-value --------------------------------------------------------
   
   for (n in 1:Nsample) {
     residual[n] <- N[n] - n_hat[n]
     sq[n] <- pow(residual[n], 2) / n_hat[n]
-    
+
     y_new[n] ~ dpois(n_hat[n])
     residual_new[n] <- y_new[n] - n_hat[n]
     sq_new[n] <- pow(residual_new[n], 2) / n_hat[n]
   }
-  
+
   fit <- sum(sq[])
   fit_new <- sum(sq_new[])
   bp_value <- step(fit_new - fit)
