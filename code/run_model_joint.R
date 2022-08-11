@@ -11,12 +11,12 @@ source(here::here("code/function_set.R"))
 ## fish data ####
 ## "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
 source("code/data_fmt_stock.R")
-Order <- 1
+Order <- 3
 model <- "joint"
 
 ## mcmc setup ####
 n_ad <- 100
-n_iter <- 1E+4
+n_iter <- 1E+3
 n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
 n_chain <- 4
@@ -34,11 +34,12 @@ for (j in 1:n_chain) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 2
 m <- read.jagsfile(paste0("code/model_", model, ".R"))
 
 ## parameters ####
-para <- c("log_mu_r",
-          "sd_r_space",
+para <- c("bp_value",
+          "nu0",
+          "mu_xi",
+          "OMEGA",
           "sd_r_time",
           "sd_obs",
-          "log_r",
           "mu_b",
           "b",
           "sd_b",
@@ -47,12 +48,17 @@ para <- c("log_mu_r",
 # jags --------------------------------------------------------------------
 
 ## data for jags ####
-
 df_fish <- df_fish %>% 
   mutate(group = factor(group, levels = c("masu_salmon",
                                           "other",
                                           "all")),
          group_numeric = as.numeric(group))
+
+df_t1 <- df_fish %>% 
+  group_by(site_id_numeric, group_numeric) %>% 
+  summarize(log_mu_d = log(mean(density)),
+            log_max_d = log(3 * max(density))) %>%
+  ungroup()
 
 d_jags <- list(N = df_fish$abundance,
                Group = df_fish$group_numeric,
@@ -73,7 +79,14 @@ d_jags <- list(N = df_fish$abundance,
                Nsample_stock = nrow(df_fry),
                
                # order of auto-regressive process
-               Q = Order)
+               Q = Order,
+               
+               # max for initial densities
+               N_t1 = nrow(df_t1),
+               Log_d1 = df_t1$log_mu_d,
+               Log_max_d = df_t1$log_max_d,
+               Site_t1 = df_t1$site_id_numeric,
+               Group_t1 = df_t1$group_numeric)
 
 ## run jags ####
 post <- run.jags(m$model,
@@ -130,16 +143,30 @@ est <- mcmc_summary %>%
          character_id = fn_brrm(param)) %>% 
   as_tibble() %>% 
   separate(character_id,
-           into = c("site_id_numeric", "year_id_numeric"),
+           into = c("site_id_numeric",
+                    "year_id_numeric",
+                    "group_numeric"),
            convert = TRUE,
-           fill = "right") %>% 
-  mutate(year = year_id_numeric + 1998) %>% 
+           fill = "right") %>%
+  group_by(param_name) %>% 
+  mutate(n_site_id = n_distinct(site_id_numeric),
+         n_year_id = n_distinct(year_id_numeric),
+         group_numeric = ifelse(n_site_id == 2, site_id_numeric, group_numeric),
+         group_numeric = ifelse(n_year_id == 2, year_id_numeric, group_numeric),
+         site_id_numeric = ifelse(n_site_id == 2, NA, site_id_numeric),
+         year_id_numeric = ifelse(n_year_id == 2, NA, year_id_numeric)) %>% 
+  select(-n_site_id, -n_year_id) %>% 
+  mutate(year = year_id_numeric + 1998,
+         group = case_when(group_numeric == 1 ~ "masu_salmon",
+                           group_numeric == 2 ~ "other",
+                           group_numeric == 3 ~ "all")) %>% 
   left_join(df_site, by = "site_id_numeric") %>% 
   left_join(df_fish, by = c("year",
                             "river",
                             "site",
                             "site_id",
-                            "site_id_numeric")) %>% 
+                            "site_id_numeric",
+                            "group")) %>% 
   relocate(param_name,
            param,
            site_id,

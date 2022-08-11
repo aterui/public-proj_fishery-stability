@@ -36,7 +36,7 @@ m <- read.jagsfile("code/model_geom.R")
 
 ## parameters ####
 para <- c("bp_value",
-          "nu0",
+          "phi0",
           "mu_beta",
           "beta",
           "sd_r_time",
@@ -54,6 +54,12 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   
   fish_group <- group[i]
   df_subset <- filter(df_fish, group == fish_group)
+  
+  df_t1 <- df_subset %>% 
+    group_by(site_id_numeric) %>% 
+    summarize(log_mu_d = log(mean(density)),
+              log_max_d = log(3 * max(density))) %>%
+    ungroup()
   
   ## data for jags ####
   d_jags <- list(N = df_subset$abundance,
@@ -73,7 +79,11 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                  Nsample_stock = nrow(df_fry),
                  
                  # order of auto-regressive process
-                 Q = Order)
+                 Q = Order,
+                 
+                 # max for initial densities
+                 Log_d1 = df_t1$log_mu_d,
+                 Log_max_d = df_t1$log_max_d)
   
   ## run jags ####
   post <- run.jags(m$model,
@@ -103,12 +113,12 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                         n.sims = n_chain,
                         combine = TRUE,
                         silent.jags = sj)
-    
+
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
     print(paste(max(mcmc_summary$Rhat, na.rm = T),
                 rownames(mcmc_summary)[which.max(mcmc_summary$Rhat)]))
   }
-  
+
   saveRDS(post,
           file = here::here(paste0("result/post_",
                                    model,

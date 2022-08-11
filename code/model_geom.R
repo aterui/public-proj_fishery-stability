@@ -10,20 +10,20 @@ model {
   # prior -------------------------------------------------------------------
   
   ## local parameters ####
-  nu0 ~ dunif(0, 1)
+  phi0 ~ dunif(0, 1)
   for (q in 1:Q) {
-    nu[q] <- pow(nu0, Q - q + 1)
+    phi[q] <- pow(phi0, Q - q + 1)
   }
   
   for (i in 1:Nsite) {
     log_r[i] <- beta[i, 1]
-    zeta[i] <- beta[i, 2]
+    xi[i] <- beta[i, 2]
     beta[i, 1:2] ~ dmnorm(mu_beta[], TAU[ , ])
   }
   
   for (i in 1:Nsite) {
     for(t in St_year[i]:(St_year[i] + Q - 1)) {
-      log_d[i, t] ~ dnorm(0, tau0)
+      log_d[i, t] ~ dnorm(Log_d1[i], 0.2)T(, Log_max_d[i])
     }
   }
   
@@ -64,7 +64,8 @@ model {
   
   for (i in 1:Nsite) {
     for (t in St_year[i]:End_year[i]) {
-      lambda[i, t] <- d_obs[i, t] + Psi * b[i] * stock[i, t]
+      lambda[i, t] <- max(lambda0[i, t], 0)
+      lambda0[i, t] <- d_obs[i, t] + Psi * b[i] * stock[i, t]
       log(d_obs[i, t]) <- log_d_obs[i, t]
       log_d_obs[i, t] ~ dnorm(log_d[i, t], tau_obs[i])
     }
@@ -74,11 +75,8 @@ model {
   for (i in 1:Nsite) {
     for (t in (St_year[i] + Q):End_year[i]) {
       log_d[i, t] ~ dnorm(log_mu_d[i, t], tau_r_time[i])
-      log_mu_d[i, t] <- 
-        log_r[i] + 
-        zeta[i] * w_log_d[i, t]
-      
-      w_log_d[i, t] <- inprod(nu[1:Q], log_d[i, (t - Q):(t - 1)]) / sum(nu[1:Q])
+      log_mu_d[i, t] <- log_r[i] + xi[i] * w_log_d[i, t]
+      w_log_d[i, t] <- inprod(phi[1:Q], log_d[i, (t - Q):(t - 1)]) / sum(phi[1:Q])
     }
   }
   
@@ -87,11 +85,11 @@ model {
   
   for (n in 1:Nsample) {
     residual[n] <- N[n] - n_hat[n]
-    sq[n] <- pow(residual[n], 2) / n_hat[n]
+    sq[n] <- pow(residual[n], 2)
     
     y_new[n] ~ dpois(n_hat[n])
     residual_new[n] <- y_new[n] - n_hat[n]
-    sq_new[n] <- pow(residual_new[n], 2) / n_hat[n]
+    sq_new[n] <- pow(residual_new[n], 2)
   }
   
   fit <- sum(sq[])

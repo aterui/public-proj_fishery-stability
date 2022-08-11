@@ -8,7 +8,7 @@ pacman::p_load(tidyverse,
 # time series data --------------------------------------------------------
 
 ## read data
-df0 <- readRDS(file = here::here("data_fmt/data_ar1.rds")) %>% 
+df0 <- readRDS(file = here::here("data_fmt/data_geom3.rds")) %>% 
   lapply(function(x) mutate(x, group = c(na.omit(unique(x$group))))) %>% 
   bind_rows() %>% 
   rename(median = '50%',
@@ -39,7 +39,8 @@ list_g_dyns <- foreach(i = seq_len(length(unique(df0$group)))) %do% {
                scales = "free_y") +
     ylab(expression("Density (ind."~m^-2*")")) +
     xlab("Year") +
-    labs(color = "Site")
+    labs(color = "Site") +
+    theme_bw()
   
   ggsave(g,
          filename = here::here(paste0("figure/figure_obs_dyn_",
