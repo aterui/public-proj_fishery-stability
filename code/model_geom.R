@@ -23,7 +23,7 @@ model {
   
   for (i in 1:Nsite) {
     for(t in St_year[i]:(St_year[i] + Q - 1)) {
-      log_d[i, t] ~ dt(Log_d1[i], 0.1, 1)T(, Log_max_d[i])
+      log_d[i, t] ~ dnorm(Log_d1[i], 0.1)T(, Log_max_d[i])
     }
   }
   
