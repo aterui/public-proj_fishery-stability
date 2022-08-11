@@ -16,7 +16,7 @@ Order <- 3
 model <- "geom"
 
 ## mcmc setup ####
-n_ad <- 1000
+n_ad <- 100
 n_iter <- 1E+4
 n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
@@ -32,7 +32,7 @@ inits <- replicate(n_chain,
 for (j in 1:n_chain) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 2
 
 ## model file ####
-m <- read.jagsfile("code/model_geom.R")
+m <- read.jagsfile(paste0("code/model_", model, ".R"))
 
 ## parameters ####
 para <- c("bp_value",
@@ -58,8 +58,9 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   df_t1 <- df_subset %>% 
     group_by(site_id_numeric) %>% 
     summarize(log_mu_d = log(mean(density)),
-              log_max_d = log(3 * max(density))) %>%
-    ungroup()
+              log_max_d = log(5 * max(density))) %>%
+    ungroup() %>% 
+    arrange(site_id_numeric)
   
   ## data for jags ####
   d_jags <- list(N = df_subset$abundance,
@@ -127,7 +128,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                                    fish_group, ".rds")))
   
   MCMCvis::MCMCtrace(post$mcmc,
-                     params = c("nu0", "mu_beta", "mu_b"),
+                     params = c("phi0", "mu_beta", "mu_b"),
                      filename = paste0("result/mcmc_trace_",
                                        model,
                                        Order,
