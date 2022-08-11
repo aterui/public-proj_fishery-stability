@@ -160,7 +160,7 @@ saveRDS(post,
                                  ".rds")))
 
 MCMCvis::MCMCtrace(post$mcmc,
-                   params = c("nu0", "mu_beta", "mu_b"),
+                   params = para[-which(para %in% c("log_d", "b", "loglik"))],
                    filename = paste0("result/mcmc_trace_",
                                      model,
                                      Order))
