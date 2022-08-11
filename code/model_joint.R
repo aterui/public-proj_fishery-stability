@@ -5,7 +5,7 @@ model {
   ## observation ####
   for (n in 1:Nsample) {
     N[n] ~ dpois(n_hat[n])
-    n_hat[n] <- lambda[Group[n], Site[n], Year[n]] * Area[n]
+    n_hat[n] <- lambda[Site[n], Year[n], Group[n]] * Area[n]
   }
   
   for (i in 1:Nsite) {
