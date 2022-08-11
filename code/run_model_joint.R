@@ -16,7 +16,7 @@ model <- "joint"
 
 ## mcmc setup ####
 n_ad <- 100
-n_iter <- 1E+3
+n_iter <- 1E+4
 n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
 n_chain <- 4
@@ -34,14 +34,15 @@ for (j in 1:n_chain) inits[[j]]$.RNG.seed <- (j - 1) * 10 + 2
 m <- read.jagsfile(paste0("code/model_", model, ".R"))
 
 ## parameters ####
-para <- c(#"bp_value",
-  "log_r",
-  "sd_r_time",
-  "sd_obs",
-  "mu_b",
-  "b",
-  "sd_b",
-  "log_d")
+para <- c("log_mu_r",
+          "sd_r_space",
+          "sd_r_time",
+          "sd_obs",
+          "log_r",
+          "mu_b",
+          "b",
+          "sd_b",
+          "log_d")
 
 # jags --------------------------------------------------------------------
 

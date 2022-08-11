@@ -30,6 +30,8 @@ model {
           log_r[i, g] + 
           inprod(nu[1:Q], log_d[i, (t - Q):(t - 1), g])
       }
+      
+      log_d[i, t, 3] <- log(exp(log_d[i, t, 1]) + exp(log_d[i, t, 2]))
     }
   }
   
@@ -62,9 +64,8 @@ model {
   
   ### population parameters
   for (i in 1:Nsite) {
-    log_r[i, 1:2] ~ dmnorm(v_log_r[], TAU[ , ])
-    
     for (g in 1:(Ng - 1)) {
+      log_r[i, g] ~ dmnorm(log_mu_r[g], tau_r_space[g])
       tau_r_time[i, g] ~ dscaled.gamma(scale0, df0)
       sd_r_time[i, g] <- sqrt(1 / tau_r_time[i, g])
       
@@ -92,17 +93,10 @@ model {
   
   ## hyper parameters ####
   for (g in 1:(Ng - 1)) {
-    v_log_r[g] ~ dnorm(0, tau0)
+    log_mu_r[g] ~ dnorm(0, tau0)
+    tau_r_space[g] ~ dscaled.gamma(scale0, df0)
+    sd_r_space[g] <- sqrt(1 / tau_r_space[g])
   }  
-  
-  TAU[1:(Ng - 1), 1:(Ng - 1)] ~ dscaled.wishart(v_scale0[], 2)
-  OMEGA[1:(Ng - 1), 1:(Ng - 1)] <- inverse(TAU[ , ])
-  
-  for (g in 1:(Ng - 1)) {
-    for (h in 1:(Ng - 1)) {
-      rho[g, h] <- OMEGA[g, h] / sqrt(OMEGA[g, g] * OMEGA[h, h])
-    }
-  }
   
   mu_b ~ dnorm(0, tau0)
   tau_b ~ dscaled.gamma(scale0, df0)
