@@ -11,13 +11,13 @@ model {
   for (i in 1:Nsite) {
     for (t in St_year[i]:End_year[i]) {
       for (g in 1:(Ng - 1)) {
-        lambda[g, i, t] <- max(lambda0[g, i, t], 0) # remove negative values
-        lambda0[g, i, t] <- d_obs[g, i, t] + Psi[g] * b[i] * stock[i, t]
-        log(d_obs[g, i, t]) <- log_d_obs[g, i, t]
-        log_d_obs[g, i, t] ~ dnorm(log_d[g, i, t], tau_obs[g, i])
+        lambda[i, t, g] <- max(lambda0[i, t, g], 0) # remove negative values
+        lambda0[i, t, g] <- d_obs[i, t, g] + Psi[g] * b[i] * stock[i, t]
+        log(d_obs[i, t, g]) <- log_d_obs[i, t, g]
+        log_d_obs[i, t, g] ~ dnorm(log_d[i, t, g], tau_obs[i, g])
       }
       
-      lambda[3, i, t] <- sum(lambda[1:2, i, t])
+      lambda[i, t, 3] <- sum(lambda[i, t, 1:2])
     }  
   }
   
@@ -25,10 +25,10 @@ model {
   for (i in 1:Nsite) {
     for (t in (St_year[i] + Q):End_year[i]) {
       for (g in 1:(Ng - 1)) {
-        log_d[g, i, t] ~ dnorm(log_mu_d[g, i, t], tau_r_time[g, i])
-        log_mu_d[g, i, t] <- 
-          log_r[g, i] + 
-          inprod(nu[1:Q], log_d[g, i, (t - Q):(t - 1)])
+        log_d[i, t, g] ~ dnorm(log_mu_d[i, t, g], tau_r_time[i, g])
+        log_mu_d[i, t, g] <- 
+          log_r[i, g] + 
+          inprod(nu[1:Q], log_d[i, (t - Q):(t - 1), g])
       }
     }
   }
@@ -61,13 +61,13 @@ model {
   ## local parameters ####
   for (i in 1:Nsite) {
     for (g in 1:(Ng - 1)) {
-      log_r[g, i] ~ dnorm(0, tau0)
+      log_r[i, g] ~ dnorm(0, tau0)
 
-      tau_r_time[g, i] ~ dscaled.gamma(scale0, df0)
-      sd_r_time[g, i] <- sqrt(1 / tau_r_time[g, i])
+      tau_r_time[i, g] ~ dscaled.gamma(scale0, df0)
+      sd_r_time[i, g] <- sqrt(1 / tau_r_time[i, g])
       
-      tau_obs[g, i] ~ dscaled.gamma(scale0, df0)
-      sd_obs[g, i] <- sqrt(1 / tau_obs[g, i])
+      tau_obs[i, g] ~ dscaled.gamma(scale0, df0)
+      sd_obs[i, g] <- sqrt(1 / tau_obs[i, g])
     }
   }
   
@@ -78,7 +78,7 @@ model {
   for (i in 1:Nsite) {
     for(t in St_year[i]:(St_year[i] + Q - 1)) {
       for (g in 1:(Ng - 1)) {
-        log_d[g, i, t] ~ dnorm(0, tau0)
+        log_d[i, t, g] ~ dnorm(0, tau0)
       }
     }
   }
