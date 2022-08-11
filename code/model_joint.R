@@ -56,13 +56,15 @@ model {
   tau100 <- 100
   scale0 <- 2.5
   df0 <- 3
-  v_scale0 <- rep(scale0, 2)
+  v_scale0 <- rep(scale0, Ng - 1)
   
   ## local parameters ####
+  
+  ### population parameters
   for (i in 1:Nsite) {
+    log_r[i, 1:2] ~ dmnorm(v_log_r[], TAU[ , ])
+    
     for (g in 1:(Ng - 1)) {
-      log_r[i, g] ~ dnorm(0, tau0)
-
       tau_r_time[i, g] ~ dscaled.gamma(scale0, df0)
       sd_r_time[i, g] <- sqrt(1 / tau_r_time[i, g])
       
@@ -83,9 +85,23 @@ model {
     }
   }
   
-  ## regression parameters ####
+  ### regression parameterS
   for (i in 1:Nsite) {
     b[i] ~ dnorm(mu_b, tau_b)
+  }
+  
+  ## hyper parameters ####
+  for (g in 1:(Ng - 1)) {
+    v_log_r[g] ~ dnorm(0, tau0)
+  }  
+  
+  TAU[1:(Ng - 1), 1:(Ng - 1)] ~ dscaled.wishart(v_scale0[], 2)
+  OMEGA[1:(Ng - 1), 1:(Ng - 1)] <- inverse(TAU[ , ])
+  
+  for (g in 1:(Ng - 1)) {
+    for (h in 1:(Ng - 1)) {
+      rho[g, h] <- OMEGA[g, h] / sqrt(OMEGA[g, g] * OMEGA[h, h])
+    }
   }
   
   mu_b ~ dnorm(0, tau0)
