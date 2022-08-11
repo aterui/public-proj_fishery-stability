@@ -10,15 +10,15 @@ model {
   # prior -------------------------------------------------------------------
   
   ## local parameters ####
+  nu0 ~ dunif(0, 1)
+  for (q in 1:Q) {
+    nu[q] <- pow(nu0, Q - q + 1)
+  }
+  
   for (i in 1:Nsite) {
     log_r[i] <- beta[i, 1]
     zeta[i] <- beta[i, 2]
-    nu0[i] ~ dunif(0, 1)
     beta[i, 1:2] ~ dmnorm(mu_beta[], TAU[ , ])
-        
-    for (q in 1:Q) {
-      nu[i, q] <- pow(nu0[i], Q - q + 1)
-    }
   }
   
   for (i in 1:Nsite) {
@@ -78,7 +78,7 @@ model {
         log_r[i] + 
         zeta[i] * w_log_d[i, t]
       
-      w_log_d[i, t] <- inprod(nu[i, 1:Q], log_d[i, (t - Q):(t - 1)]) / sum(nu[i, 1:Q])
+      w_log_d[i, t] <- inprod(nu[1:Q], log_d[i, (t - Q):(t - 1)]) / sum(nu[1:Q])
     }
   }
   
