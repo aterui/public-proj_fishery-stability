@@ -44,7 +44,8 @@ para <- c("bp_value",
           "mu_b",
           "b",
           "sd_b",
-          "log_d")
+          "log_d",
+          "loglik")
 
 # jags --------------------------------------------------------------------
 
@@ -57,7 +58,7 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
   df_t1 <- df_subset %>% 
     group_by(site_id_numeric) %>% 
     summarize(log_mu_d = log(mean(density)),
-              log_max_d = log(5 * max(density))) %>%
+              log_max_d = log(3 * max(density))) %>%
     ungroup() %>% 
     arrange(site_id_numeric)
   
@@ -101,10 +102,14 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                    silent.jags = sj)
   
   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-  print(paste(max(mcmc_summary$Rhat, na.rm = T),
-              rownames(mcmc_summary)[which.max(mcmc_summary$Rhat)]))
   
-  while(max(mcmc_summary$Rhat, na.rm = T) >= 1.1) {
+  df_rhat <- mcmc_summary %>% 
+    filter(!str_detect(rownames(.), "loglik|bp_value"))
+  
+  print(paste(max(df_rhat$Rhat, na.rm = T),
+              rownames(df_rhat)[which.max(df_rhat$Rhat)]))
+  
+  while(max(df_rhat$Rhat, na.rm = T) >= 1.1) {
     post <- extend.jags(post,
                         burnin = 0,
                         sample = n_sample,
@@ -115,8 +120,12 @@ list_est <- foreach(i = seq_len(length(group))) %do% {
                         silent.jags = sj)
 
     mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-    print(paste(max(mcmc_summary$Rhat, na.rm = T),
-                rownames(mcmc_summary)[which.max(mcmc_summary$Rhat)]))
+    
+    df_rhat <- mcmc_summary %>% 
+      filter(!str_detect(rownames(.), "loglik|bp_value"))
+    
+    print(paste(max(df_rhat$Rhat, na.rm = T),
+                rownames(df_rhat)[which.max(df_rhat$Rhat)]))
   }
 
   saveRDS(post,

@@ -56,6 +56,7 @@ model {
   
   ## observation ####
   for (n in 1:Nsample) {
+    loglik[n] <- logdensity.pois(N[n], n_hat[n])
     N[n] ~ dpois(n_hat[n])
     n_hat[n] <- lambda[Site[n], Year[n]] * Area[n]
   }
