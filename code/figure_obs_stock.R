@@ -96,11 +96,11 @@ g_obs <- df_plot %>%
              strip.position = "left",
              labeller = label_parsed) + 
   geom_point(data = filter(df_plot, group == "masu_salmon"),
-             color = hue_pal(h.start = 140, l = 90, c = 40)(1)) +
+             color = hue_pal(h.start = 140, l = 85, c = 40)(1)) +
   geom_point(data = filter(df_plot, group == "other"),
-             color = hue_pal(h.start = 250, l = 90, c = 40)(1)) +
+             color = hue_pal(h.start = 250, l = 85, c = 40)(1)) +
   geom_point(data = filter(df_plot, group == "all"),
-             color = hue_pal(h.start = 30, l = 90, c = 40)(1)) +
+             color = hue_pal(h.start = 15, l = 85, c = 40)(1)) +
   geom_line(aes(y = y,
                 x = x,
                 color = group_id,
