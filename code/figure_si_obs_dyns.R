@@ -8,7 +8,7 @@ pacman::p_load(tidyverse,
 # time series data --------------------------------------------------------
 
 ## read data
-df0 <- readRDS(file = here::here("data_fmt/data_geom3.rds")) %>% 
+df0 <- readRDS(file = here::here("data_fmt/data_geom4.rds")) %>% 
   lapply(function(x) mutate(x, group = c(na.omit(unique(x$group))))) %>% 
   bind_rows() %>% 
   rename(median = '50%',
