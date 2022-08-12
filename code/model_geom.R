@@ -23,7 +23,7 @@ model {
   
   for (i in 1:Nsite) {
     for(t in St_year[i]:(St_year[i] + Q - 1)) {
-      log_d[i, t] ~ dnorm(Log_d1[i], 0.1)T(, Log_max_d[i])
+      log_d[i, t] ~ dt(Log_d1[i], 0.1, 5)T(, Log_max_d[i])
     }
   }
   
@@ -56,9 +56,7 @@ model {
   
   ## observation ####
   for (n in 1:Nsample) {
-    loglik[n] <- logdensity.pois(N[n], n_hat[n])
     N[n] ~ dpois(n_hat[n])
-    
     n_hat[n] <- lambda[Site[n], Year[n]] * Area[n]
   }
   
