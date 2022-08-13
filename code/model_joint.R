@@ -15,6 +15,8 @@ model {
         lambda0[i, t, g] <- d_obs[i, t, g] + Psi[g] * b[i] * stock[i, t]
         log(d_obs[i, t, g]) <- log_d_obs[i, t, g]
         log_d_obs[i, t, g] ~ dnorm(log_d[i, t, g], tau_obs[i, g])
+        
+        log_d_prime[i, t, g] <- log_d[i, t, g]
       }
       
       lambda[i, t, 3] <- sum(lambda[i, t, 1:2])
@@ -23,13 +25,13 @@ model {
   
   ## state ####
   for (i in 1:Nsite) {
-    for (t in (St_year[i] + Q):End_year[i]) {
+    for (t in (1 + Q):End_year[i]) {
       for (g in 1:(Ng - 1)) {
         log_d[i, t, g] ~ dnorm(log_mu_d[i, t, g], tau_r_time[i, g])
         log_mu_d[i, t, g] <- 
           xi[i, 1, g] + 
           xi[i, 2, g] * w_log_d[i, t, g]
-          
+        
         w_log_d[i, t, g] <- inprod(nu[1:Q, g], log_d[i, (t - Q):(t - 1), g]) / sum(nu[1:Q, g])
       }
     }
@@ -45,12 +47,12 @@ model {
   for (n in 1:Nsample) {
     residual[n] <- N[n] - n_hat[n]
     sq[n] <- pow(residual[n], 2)
-
+    
     y_new[n] ~ dpois(n_hat[n])
     residual_new[n] <- y_new[n] - n_hat[n]
     sq_new[n] <- pow(residual_new[n], 2)
   }
-
+  
   fit <- sum(sq[])
   fit_new <- sum(sq_new[])
   bp_value <- step(fit_new - fit)
@@ -69,7 +71,6 @@ model {
   ### population parameters
   for (g in 1:(Ng - 1)) {
     for (i in 1:Nsite) {
-      # log_r[i, g] ~ dmnorm(log_mu_r[g], tau_r_space[g])
       tau_r_time[i, g] ~ dscaled.gamma(scale0, df0)
       sd_r_time[i, g] <- sqrt(1 / tau_r_time[i, g])
       tau_obs[i, g] ~ dscaled.gamma(scale0, df0)
@@ -80,9 +81,9 @@ model {
   }
   
   for (i in 1:Nsite) {
-    for(t in St_year[i]:(St_year[i] + Q - 1)) {
+    for(t in 1:Q) {
       for (g in 1:(Ng - 1)) {
-        log_d[i, t, g] ~ dnorm(log_d1[i, g], 0.1)T(, log_max_d[i, g])
+        log_d[i, t, g] ~ dnorm(log_d1[t, g], tau_t1[t, g])
       }
     }
   }
@@ -94,9 +95,6 @@ model {
   
   ## hyper parameters ####
   for (g in 1:(Ng - 1)) {
-    # log_mu_r[g] ~ dnorm(0, tau0)
-    # tau_r_space[g] ~ dscaled.gamma(scale0, df0)
-    # sd_r_space[g] <- sqrt(1 / tau_r_space[g])
     mu_xi[1, g] ~ dnorm(0, tau0)
     mu_xi[2, g] ~ dnorm(1, tau0)
     
@@ -113,13 +111,13 @@ model {
   tau_b ~ dscaled.gamma(scale0, df0)
   sd_b <- sqrt(1 / tau_b)
   
-  # for (t in 1:(max(St_year[]) + Q - 1)) {
-  #   for (g in 1:(Ng - 1)) {
-  #     mu_t1[t, g] ~ dnorm(0, tau0)
-  #     tau_t1[t, g] ~ dscaled.gamma(scale0, df0) 
-  #     sd_t1[t, g] <- sqrt(1 / tau_t1[t, g])
-  #   }    
-  # }
+  for (t in 1:Q) {
+    for (g in 1:(Ng - 1)) {
+      log_d1[t, g] ~ dnorm(0, tau0)
+      tau_t1[t, g] ~ dscaled.gamma(scale0, df0)
+      sd_t1[t, g] <- sqrt(1 / tau_t1[t, g])
+    }
+  }
 }
 
 
@@ -134,5 +132,5 @@ data {
     log_d1[Site_t1[n], Group_t1[n]] <- Log_d1[n]
     log_max_d[Site_t1[n], Group_t1[n]] <- Log_max_d[n]
   }
-    
+  
 }
