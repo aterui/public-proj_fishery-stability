@@ -16,7 +16,7 @@ model <- "joint"
 
 ## mcmc setup ####
 n_ad <- 100
-n_iter <- 1E+3
+n_iter <- 1E+4
 n_thin <- max(3, ceiling(n_iter / 250))
 n_burn <- ceiling(max(10, n_iter/2))
 n_chain <- 4
@@ -43,33 +43,34 @@ para <- c("bp_value",
           "mu_b",
           "b",
           "sd_b",
-          "log_d")
+          "log_d_prime")
 
 # jags --------------------------------------------------------------------
 
 ## data for jags ####
-df_fish <- df_fish %>% 
+df_subset <- df_fish %>% 
   mutate(group = factor(group, levels = c("masu_salmon",
                                           "other",
                                           "all")),
-         group_numeric = as.numeric(group))
+         group_numeric = as.numeric(group)) %>% 
+  filter(group != "all")
 
-df_t1 <- df_fish %>% 
-  group_by(site_id_numeric, group_numeric) %>% 
+df_t1 <- df_subset %>%
+  group_by(site_id_numeric, group_numeric) %>%
   summarize(log_mu_d = log(mean(density)),
-            log_max_d = log(3 * max(density))) %>%
+            log_max_d = log(max(density))) %>%
   ungroup()
 
-d_jags <- list(N = df_fish$abundance,
-               Group = df_fish$group_numeric,
-               Site = df_fish$site_id_numeric,
-               Year = df_fish$year - min(df_fish$year) + 1,
+d_jags <- list(N = df_subset$abundance,
+               Group = df_subset$group_numeric,
+               Site = df_subset$site_id_numeric,
+               Year = df_subset$year - min(df_subset$year) + 1,
                St_year = df_year$St_year,
                End_year = df_year$End_year,
-               Area = df_fish$area,
-               Ng = n_distinct(df_fish$group),
-               Nsample = nrow(df_fish),
-               Nsite = n_distinct(df_fish$site_id),
+               Area = df_subset$area,
+               Ng = n_distinct(df_subset$group),
+               Nsample = nrow(df_subset),
+               Nsite = n_distinct(df_subset$site_id),
                
                # Psi = 0 for fish group "other" because no stocking effect would be expected
                Psi = c(1, 0),
@@ -80,7 +81,7 @@ d_jags <- list(N = df_fish$abundance,
                
                # order of auto-regressive process
                Q = Order,
-               
+
                # max for initial densities
                N_t1 = nrow(df_t1),
                Log_d1 = df_t1$log_mu_d,
@@ -116,7 +117,7 @@ print(paste(max(mcmc_summary$Rhat, na.rm = T),
 #                       n.sims = n_chain,
 #                       combine = TRUE,
 #                       silent.jags = sj)
-#   
+# 
 #   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
 #   print(paste(max(mcmc_summary$Rhat, na.rm = T),
 #               rownames(mcmc_summary)[which.max(mcmc_summary$Rhat)]))
@@ -188,7 +189,7 @@ saveRDS(post,
                                  ".rds")))
 
 MCMCvis::MCMCtrace(post$mcmc,
-                   params = para[-which(para %in% c("log_d", "b", "loglik"))],
+                   params = para[-which(para %in% c("log_d_prime", "b", "loglik"))],
                    filename = paste0("result/mcmc_trace_",
                                      model,
                                      Order))
