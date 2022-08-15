@@ -44,8 +44,7 @@ group <- c("all", "masu", "other")
 
 # ssm data ----------------------------------------------------------------
 
-df_ssm <- readRDS(file = here::here("data_fmt/data_geom4.rds")) %>% 
-  lapply(function(x) mutate(x, group = c(na.omit(unique(x$group))))) %>% 
+df_ssm <- readRDS(file = here::here("data_fmt/data_joint3.rds")) %>% 
   bind_rows() %>% 
   rename(median = '50%',
          high = '97.5%',
