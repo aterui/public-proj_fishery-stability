@@ -108,20 +108,20 @@ mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
 print(paste(max(mcmc_summary$Rhat, na.rm = T),
             rownames(mcmc_summary)[which.max(mcmc_summary$Rhat)]))
 
-# while(max(mcmc_summary$Rhat, na.rm = T) >= 1.1) {
-#   post <- extend.jags(post,
-#                       burnin = 0,
-#                       sample = n_sample,
-#                       adapt = n_ad,
-#                       thin = n_thin,
-#                       n.sims = n_chain,
-#                       combine = TRUE,
-#                       silent.jags = sj)
-# 
-#   mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
-#   print(paste(max(mcmc_summary$Rhat, na.rm = T),
-#               rownames(mcmc_summary)[which.max(mcmc_summary$Rhat)]))
-# }
+while(max(mcmc_summary$Rhat, na.rm = T) >= 1.1) {
+  post <- extend.jags(post,
+                      burnin = 0,
+                      sample = n_sample,
+                      adapt = n_ad,
+                      thin = n_thin,
+                      n.sims = n_chain,
+                      combine = TRUE,
+                      silent.jags = sj)
+
+  mcmc_summary <- MCMCvis::MCMCsummary(post$mcmc)
+  print(paste(max(mcmc_summary$Rhat, na.rm = T),
+              rownames(mcmc_summary)[which.max(mcmc_summary$Rhat)]))
+}
 
 
 ## format output ####
