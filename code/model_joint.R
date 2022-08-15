@@ -25,7 +25,7 @@ model {
   
   ## state ####
   for (i in 1:Nsite) {
-    for (t in (1 + Q):End_year[i]) {
+    for (t in (St_year[i] + Q):End_year[i]) {
       for (g in 1:Ng) {
         log_d[i, t, g] ~ dnorm(log_mu_d[i, t, g], tau_r_time[i, g])
         log_mu_d[i, t, g] <- 
@@ -36,7 +36,7 @@ model {
       }
     }
     
-    for (t in 1:End_year[i]) {
+    for (t in St_year[i]:End_year[i]) {
       log_d[i, t, 3] <- log(exp(log_d[i, t, 1]) + exp(log_d[i, t, 2]))
     }
   }
@@ -53,9 +53,9 @@ model {
     sqr0[n] <- pow(rs0[n], 2)
   }
   
-  fit <- sum(sqr[])
-  fit0 <- sum(sqr0[])
-  bp_value <- step(fit0 - fit)
+  ssqr <- sum(sqr[])
+  ssqr0 <- sum(sqr0[])
+  bp_value <- step(ssqr0 - ssqr)
   
   
   # prior -------------------------------------------------------------------
@@ -82,9 +82,10 @@ model {
   
   for (i in 1:Nsite) {
     for (g in 1:Ng) {
-      for(t in 1:Q) {
+      for(t in St_year[i]:(St_year[i] + Q - 1)) {
         log_d[i, t, g] ~ dt(log_d1[i, g], tau_t1[i, g], 5)
       }
+      
       tau_t1[i, g] <- pow(log_max_d[i, g] - log_d1[i, g], -2)
     }
   }
@@ -112,13 +113,6 @@ model {
   tau_b ~ dscaled.gamma(scale0, df0)
   sd_b <- sqrt(1 / tau_b)
   
-  # for (t in 1:Q) {
-  #   for (g in 1:Ng) {
-  #     log_d1[t, g] ~ dnorm(0, tau0)
-  #     tau_t1[t, g] ~ dscaled.gamma(scale0, df0)
-  #     sd_t1[t, g] <- sqrt(1 / tau_t1[t, g])
-  #   }
-  # }
 }
 
 
