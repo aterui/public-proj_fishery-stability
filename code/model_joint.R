@@ -16,14 +16,17 @@ model {
         log(d_obs[i, t, g]) <- log_d_obs[i, t, g]
         log_d_obs[i, t, g] ~ dnorm(log_d[i, t, g], tau_obs[i, g])
         
+        ### copy log_d[i, t, g] for St_year:End_year
         log_d_prime[i, t, g] <- log_d[i, t, g]
       }
       
+      ### copy log_d[i, t, g] for St_year:End_year
       log_d_prime[i, t, 3] <- log_d[i, t, 3]
     }  
   }
   
   ## state ####
+  ### Q is the order of the auto-regressive process
   for (i in 1:Nsite) {
     for (t in (St_year[i] + Q):End_year[i]) {
       for (g in 1:Ng) {
@@ -32,11 +35,14 @@ model {
           xi[i, 1, g] + 
           xi[i, 2, g] * w_log_d[i, t, g]
         
+        ### weighted density over Q-years for density dependence
         w_log_d[i, t, g] <- inprod(nu[1:Q, g], log_d[i, (t - Q):(t - 1), g]) / sum(nu[1:Q, g])
       }
     }
     
     for (t in St_year[i]:End_year[i]) {
+      ## g = 1, masu_salmon; g = 2, others; g = 3, total density
+      ## total density is a derived parameter
       log_d[i, t, 3] <- log(exp(log_d[i, t, 1]) + exp(log_d[i, t, 2]))
     }
   }
@@ -45,9 +51,11 @@ model {
   # Bayesian p-value --------------------------------------------------------
   
   for (n in 1:Nsample) {
+    ## squared-residual, data
     rs[n] <- N[n] - n_hat[n]
     sqr[n] <- pow(rs[n], 2)
     
+    ## squared residual, replicated
     y0[n] ~ dpois(n_hat[n])
     rs0[n] <- y0[n] - n_hat[n]
     sqr0[n] <- pow(rs0[n], 2)
@@ -71,15 +79,20 @@ model {
   ### population parameters
   for (i in 1:Nsite) {
     for (g in 1:Ng) {
+      ### process error
       tau_r_time[i, g] ~ dscaled.gamma(scale0, df0)
       sd_r_time[i, g] <- sqrt(1 / tau_r_time[i, g])
+      
+      ### observation error
       tau_obs[i, g] ~ dscaled.gamma(scale0, df0)
       sd_obs[i, g] <- sqrt(1 / tau_obs[i, g])
       
+      ### density dependence
       xi[i, 1:2, g] ~ dmnorm(mu_xi[ , g], TAU[ , , g])
     }
   }
   
+  ### initial population density
   for (i in 1:Nsite) {
     for (g in 1:Ng) {
       for(t in St_year[i]:(St_year[i] + Q - 1)) {
@@ -88,7 +101,7 @@ model {
     }
   }
   
-  ### regression parameterS
+  ### regression parameters
   for (i in 1:Nsite) {
     b[i] ~ dnorm(mu_b, tau_b)
   }
