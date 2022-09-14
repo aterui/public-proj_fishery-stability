@@ -170,3 +170,4 @@ g_obs <- ggplot(data = df_m,
   guides(fill = "none") +
   theme(axis.title.y = element_blank(),
         strip.placement = "outside")
+
