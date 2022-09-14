@@ -10,7 +10,7 @@ source(here::here("code/function_set.R"))
 
 ## fish data ####
 ## "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
-source("code/data_fmt_stock.R")
+suppressMessages(source("code/data_fmt_stock.R"))
 Order <- 3
 model <- "joint"
 
@@ -58,7 +58,8 @@ df_subset <- df_fish %>%
 df_t1 <- df_subset %>%
   group_by(site_id_numeric, group_numeric) %>%
   summarize(log_mu_d = log(mean(density)),
-            log_max_d = log(max(density))) %>%
+            log_max_d = log(max(density)),
+            log_range = log_max_d - log_mu_d) %>%
   ungroup()
 
 d_jags <- list(N = df_subset$abundance,
@@ -80,14 +81,7 @@ d_jags <- list(N = df_subset$abundance,
                Nsample_stock = nrow(df_fry),
                
                # order of auto-regressive process
-               Q = Order,
-
-               # max for initial densities
-               N_t1 = nrow(df_t1),
-               Log_d1 = df_t1$log_mu_d,
-               Log_max_d = df_t1$log_max_d,
-               Site_t1 = df_t1$site_id_numeric,
-               Group_t1 = df_t1$group_numeric)
+               Q = Order)
 
 ## run jags ####
 post <- run.jags(m$model,

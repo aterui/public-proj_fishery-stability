@@ -7,7 +7,9 @@ output:
   # reference_docx: word_format.docx
 csl: pnas.csl
 knit: (function(inputFile, encoding) {
-        rmarkdown::render(inputFile, encoding = encoding, output_dir = "document_output")
+        rmarkdown::render(inputFile,
+                          encoding = encoding, 
+                          output_dir = "document_output")
       })
 bibliography: reference.bib
 fontsize: 11pt

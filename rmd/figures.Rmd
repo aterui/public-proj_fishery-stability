@@ -3,7 +3,9 @@ output:
   pdf_document:
     latex_engine: xelatex
 knit: (function(inputFile, encoding) {
-        rmarkdown::render(inputFile, encoding = encoding, output_dir = "document_output")
+        rmarkdown::render(inputFile,
+                          encoding = encoding, 
+                          output_dir = "document_output")
       })
 header-includes:
   \pagenumbering{gobble}

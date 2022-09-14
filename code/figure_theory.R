@@ -51,23 +51,23 @@ g_theory <- df0 %>%
              x = stock,
              color = group_id,
              fill = group_id)) +
-  geom_point(data = filter(df0, status == "enhanced"),
-             size = 0.75,
-             color = hue_pal(h.start = 140, l = 85, c = 30)(1)) +
-  geom_point(data = filter(df0, status == "unenhanced"),
-             size = 0.75,
-             color = hue_pal(h.start = 250, l = 85, c = 50)(1)) +
-  geom_point(data = filter(df0, status == "all"),
-             size = 0.75,
-             color = hue_pal(h.start = 30, l = 85, c = 50)(1)) +
+  geom_point(data = . %>% filter(status == "enhanced"),
+             size = pt_size,
+             color = hue_pal(h.start = hs[2], l = lum, c = con)(1)) +
+  geom_point(data = . %>% filter(status == "unenhanced"),
+             size = pt_size,
+             color = hue_pal(h.start = hs[3], l = lum, c = con)(1)) +
+  geom_point(data = . %>% filter(status == "all"),
+             size = pt_size,
+             color = hue_pal(h.start = hs[1], l = lum, c = con)(1)) +
   geom_point(data = filter(df0, status == "dummy"),
              color = NA) +
   geom_smooth(size= 0.5,
               method = "loess") +
-  scale_color_hue(h = c(30, 250),
+  scale_color_hue(h = c(hs[1], hs[3]),
                   l = 70,
                   labels = c("Whole", "Enhanced", "Unenhanced")) +
-  scale_fill_hue(h = c(30, 250),
+  scale_fill_hue(h = c(hs[1], hs[3]),
                  l = 70) +
   labs(x = "Number of releases (individuals)",
        y = "Value") +

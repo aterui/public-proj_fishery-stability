@@ -63,7 +63,7 @@ model {
   tau0 <- 1 / 50
   tau100 <- 100
   scale0 <- 2.5
-  df0 <- 3
+  df0 <- 6
   v_scale0 <- rep(scale0, 2)
   
   ## local parameters ####
@@ -83,10 +83,8 @@ model {
   for (i in 1:Nsite) {
     for (g in 1:Ng) {
       for(t in St_year[i]:(St_year[i] + Q - 1)) {
-        log_d[i, t, g] ~ dt(log_d1[i, g], tau_t1[i, g], 5)
+        log_d[i, t, g] ~ dt(-2, 0.5, df0)
       }
-      
-      tau_t1[i, g] <- pow(log_max_d[i, g] - log_d1[i, g], -2)
     }
   }
   
@@ -121,12 +119,6 @@ data {
   ## stock data conversion
   for (n in 1:Nsample_stock) {
     stock[Site_stock[n], Year_stock[n]] <- Stock[n]
-  }
-  
-  ## initial population size
-  for (n in 1:N_t1) {
-    log_d1[Site_t1[n], Group_t1[n]] <- Log_d1[n]
-    log_max_d[Site_t1[n], Group_t1[n]] <- Log_max_d[n]
   }
   
 }

@@ -16,41 +16,30 @@ df_sp <- df_selected %>%
   group_by(river, site, site_id) %>% 
   summarize(n_species = n_distinct(taxon),
             n_species_unstock = n_distinct(taxon[.data$taxon != "Oncorhynchus_masou_masou"])) %>% 
-  ungroup() %>% 
-  mutate(scl_n_species = c(scale(n_species)),
-         scl_n_species_unstock = c(scale(n_species_unstock)))
+  ungroup()
 
 ## df for environmental covariates
 df_env <- read_csv(here::here("data_fmt/data_env_fmt.csv")) %>% 
   rename(wsd_area = area) %>% 
   mutate(site_id = paste0(river, site)) %>% 
-  filter(site_id %in% site_selected) %>% 
-  mutate(scl_wsd_area = c(scale(wsd_area)),
-         scl_ppt = c(scale(ppt)),
-         scl_temp = c(scale(temp)),
-         scl_forest = c(scale(frac_forest)))
+  filter(site_id %in% site_selected)
 
 ## df for ocean environments
 df_ocean <- read_csv(here::here("data_fmt/data_ocean_fmt.csv")) %>% 
-  filter(river %in% river_id) %>% 
-  mutate(scl_chr_a = c(scale(chr_a)),
-         scl_sst = c(scale(sst)))
+  filter(river %in% river_id)
 
 ## df for stock data
 source(here::here("code/data_fmt_stock.R"))
 
-## group name
-group <- c("all", "masu", "other")
 
 # ssm data ----------------------------------------------------------------
 
 df_ssm <- readRDS(file = here::here("data_fmt/data_joint3.rds")) %>% 
-  bind_rows() %>% 
   rename(median = '50%',
          high = '97.5%',
          low = '2.5%') %>% 
   filter(str_detect(param_name, "log_d")) %>% 
-  group_by(river, site, site_id, group) %>%
+  group_by(river, site, site_id, site_id_numeric, group) %>%
   summarize(mu = mean(exp(median)),
             sigma = sd(exp(median)),
             cv = sigma / mu) %>% 
