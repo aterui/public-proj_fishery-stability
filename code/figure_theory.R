@@ -43,7 +43,7 @@ df0 <- sim_result %>%
 
 # plot --------------------------------------------------------------------
 
-source(here::here("code/theme_set.R"))
+source(here::here("code/set_figure_theme.R"))
 theme_set(plt_theme)
 
 g_theory <- df0 %>% 

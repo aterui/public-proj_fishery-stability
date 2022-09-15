@@ -9,7 +9,7 @@ pacman::p_load(tidyverse,
 # data --------------------------------------------------------------------
 
 source(here::here("code/data_fmt_reg.R"))
-source(here::here("code/theme_set.R"))
+source(here::here("code/set_figure_theme.R"))
 
 
 # plot --------------------------------------------------------------------

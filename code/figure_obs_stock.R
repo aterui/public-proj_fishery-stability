@@ -112,7 +112,7 @@ df_fit <- lapply(c("cv", "species_richness"),
 
 # plot --------------------------------------------------------------------
 
-source(here::here("code/theme_set.R"))
+source(here::here("code/set_figure_theme.R"))
 theme_set(plt_theme)
 
 ## plot

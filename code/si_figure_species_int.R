@@ -3,7 +3,7 @@
 
 rm(list = ls())
 source(here::here("code/library.R"))
-source(here::here("code/function_set.R"))
+source(here::here("code/set_functions.R"))
 
 list_df0 <- readRDS(here::here("output/est_multi_ricker_sparse.rds"))
 df_trait <- readRDS(here::here("data_fmt/data_trait.rds"))
