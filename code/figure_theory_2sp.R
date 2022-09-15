@@ -3,7 +3,7 @@
 
 rm(list = ls())
 source("code/library.R")
-source(here::here("code/figure_set_theme.R"))
+source(here::here("code/theme_set.R"))
 
 # read data ---------------------------------------------------------------
 

@@ -18,7 +18,7 @@ df0 <- readRDS(file = here::here("data_fmt/data_joint3.rds")) %>%
          river = str_to_sentence(river))
 
 ## plot
-source(here::here("code/figure_set_theme.R"))
+source(here::here("code/theme_set.R"))
 theme_set(plt_theme)
 
 list_g_dyns <- foreach(i = seq_len(length(unique(df0$group)))) %do% {

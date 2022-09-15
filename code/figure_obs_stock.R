@@ -7,7 +7,7 @@ source(here::here("code/library.R"))
 # data --------------------------------------------------------------------
 
 ## raw data for cv, mean, sd
-suppressMessages(source(here::here("code/data_fmt_analysis.R")))
+suppressMessages(source(here::here("code/data_fmt_reg.R")))
 
 df_m <- df_ssm %>%
   filter(!(group != "all" & response == "cv")) %>%
@@ -112,7 +112,7 @@ df_fit <- lapply(c("cv", "species_richness"),
 
 # plot --------------------------------------------------------------------
 
-source(here::here("code/figure_set_theme.R"))
+source(here::here("code/theme_set.R"))
 theme_set(plt_theme)
 
 ## plot

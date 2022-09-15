@@ -7,7 +7,7 @@ source(here::here("code/library.R"))
 
 # data --------------------------------------------------------------------
 
-source("code/data_fmt_analysis.R")
+source("code/data_fmt_reg.R")
 
 df_m <- df_ssm %>%
   filter(response %in% c("mu", "sigma", "n_species"),

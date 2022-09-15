@@ -38,7 +38,7 @@ df_param <- df0 %>%
 
 ## plot
 
-source(here::here("code/figure_set_theme.R"))
+source(here::here("code/theme_set.R"))
 theme_set(plt_theme)
 
 list_g_theory <- foreach(i = seq_len(nrow(df_param))) %do% {
