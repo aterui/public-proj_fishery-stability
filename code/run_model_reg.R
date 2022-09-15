@@ -174,8 +174,8 @@ df_est <- as_tibble(mcmc_summary) %>%
 
 # export ------------------------------------------------------------------
 
-saveRDS(df_est, here::here(paste0("result/summary_reg.rds")))
-saveRDS(mcmc_sample, file = here::here("result/mcmc_reg.rds"))
+saveRDS(df_est, here::here(paste0("output/summary_reg.rds")))
+saveRDS(mcmc_sample, file = here::here("output/mcmc_reg.rds"))
 MCMCvis::MCMCtrace(mcmc_sample,
-                   filename = "result/mcmc_trace_reg")
+                   filename = "output/mcmc_trace_reg")
 

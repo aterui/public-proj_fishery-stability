@@ -7,7 +7,7 @@ source(here::here("code/figure_set_theme.R"))
 
 # read data ---------------------------------------------------------------
 
-df_sim <- readRDS(here::here("result/result_ricker_2sp.rds")) %>% 
+df_sim <- readRDS(here::here("output/result_ricker_2sp.rds")) %>% 
   filter(status == "all",
          phi == 1) %>% 
   mutate(cv = sd_density / mean_density,
@@ -144,7 +144,7 @@ list_g_c <- foreach(x = 1:length(v_alpha)) %do% {
   g_c <- g_d + g_ex + plot_annotation(tag_levels = "A")
   
   ggsave(g_c,
-         filename = here::here(paste0("figure/figure_2sp_model_", lbs[x], ".pdf")),
+         filename = here::here(paste0("output/figure_2sp_model_", lbs[x], ".pdf")),
          height = 8.5,
          width = 15)
     

@@ -5,7 +5,7 @@ rm(list = ls())
 source(here::here("code/library.R"))
 source(here::here("code/function_set.R"))
 
-list_df0 <- readRDS(here::here("result/est_multi_ricker_sparse.rds"))
+list_df0 <- readRDS(here::here("output/est_multi_ricker_sparse.rds"))
 df_trait <- readRDS(here::here("data_fmt/data_trait.rds"))
 df_trait_cat <- df_trait %>% 
   select(where(is.factor),
@@ -171,11 +171,11 @@ print(g_alpha)
 # export ------------------------------------------------------------------
 
 ggsave(g_alpha_site,
-       filename = here::here("figure/figure_alpha_site.pdf"),
+       filename = here::here("output/figure_alpha_site.pdf"),
        height = 10,
        width = 11)
 
 ggsave(g_alpha,
-       filename = here::here("figure/figure_alpha_dist.pdf"),
+       filename = here::here("output/figure_alpha_dist.pdf"),
        height = 5,
        width = 8)

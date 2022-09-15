@@ -9,7 +9,7 @@ pacman::p_load(tidyverse,
 # theoretical prediction --------------------------------------------------
 
 ## call `sim_result`
-load(here::here(file = "result/result_ricker.RData"))
+load(here::here(file = "output/result_ricker.RData"))
 
 df0 <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 

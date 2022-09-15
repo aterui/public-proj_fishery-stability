@@ -42,7 +42,7 @@ list_g_dyns <- foreach(i = seq_len(length(unique(df0$group)))) %do% {
     theme_bw()
   
   ggsave(g,
-         filename = here::here(paste0("figure/figure_obs_dyn_",
+         filename = here::here(paste0("output/figure_obs_dyn_",
                                       unique(df0$group)[i],
                                       ".pdf")),
          height = 10,

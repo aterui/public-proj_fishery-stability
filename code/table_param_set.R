@@ -7,7 +7,7 @@ pacman::p_load(tidyverse)
 
 # table for simulation parameters -----------------------------------------
 
-load(file = here::here("result/result_ricker.RData"))
+load(file = here::here("output/result_ricker.RData"))
 
 df_param <- sim_result %>% 
   dplyr::select(n_species,

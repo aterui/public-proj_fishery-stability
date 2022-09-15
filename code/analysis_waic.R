@@ -36,4 +36,4 @@ names(list_compare) <- list.files(here::here("result"),
   str_extract(., pattern = "(all|masu|other)")
 
 saveRDS(list_compare,
-        file = here::here("result/list_waic.rds"))
+        file = here::here("output/list_waic.rds"))

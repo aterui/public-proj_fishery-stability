@@ -28,7 +28,7 @@ g <- (g_theory + ggtitle("Theoretical prediction")) +
   plot_annotation(tag_levels = 'A')
 
 ggsave(g,
-       filename = here::here("figure/figure_theory_obs.pdf"),
+       filename = here::here("output/figure_theory_obs.pdf"),
        width = 10,
        height = 10)
 

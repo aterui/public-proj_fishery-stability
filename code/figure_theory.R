@@ -7,7 +7,7 @@ source(here::here("code/library.R"))
 # data --------------------------------------------------------------------
 
 ## call `sim_result`
-sim_result <- readRDS(file = here::here("result/result_ricker.rds"))
+sim_result <- readRDS(file = here::here("output/result_ricker.rds"))
 
 df0 <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 

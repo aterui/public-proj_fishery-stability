@@ -177,13 +177,13 @@ est <- mcmc_summary %>%
 saveRDS(est, here::here(paste0("data_fmt/data_", model, Order, ".rds")))
 
 saveRDS(post,
-        file = here::here(paste0("result/post_",
+        file = here::here(paste0("output/post_",
                                  model,
                                  Order,
                                  ".rds")))
 
 MCMCvis::MCMCtrace(post$mcmc,
                    params = para[-which(para %in% c("log_d_prime", "b", "loglik"))],
-                   filename = paste0("result/mcmc_trace_",
+                   filename = paste0("output/mcmc_trace_",
                                      model,
                                      Order))

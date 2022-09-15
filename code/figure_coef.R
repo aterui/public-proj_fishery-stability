@@ -75,6 +75,6 @@ g_coef <- df_mcmc %>%
   theme_ridges()
 
 ggsave(g_coef,
-       filename = here::here("figure/figure_coef.pdf"),
+       filename = here::here("output/figure_coef.pdf"),
        width = 8,
        height = 6)

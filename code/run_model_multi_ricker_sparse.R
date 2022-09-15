@@ -153,7 +153,7 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                     
                     ## trace plot output ####
                     MCMCvis::MCMCtrace(post$mcmc,
-                                       filename = paste0("result/mcmc_trace_multi_ricker_sparse_",
+                                       filename = paste0("output/mcmc_trace_multi_ricker_sparse_",
                                                          unique_site[i]))
                     
                     print(paste(i, "/", length(unique_site)))
@@ -164,4 +164,4 @@ df_est <- foreach(i = seq_len(length(unique_site)),
 # export ------------------------------------------------------------------
 
 df_waic <- distinct(df_est, site, waic_hat)
-saveRDS(list(df_est, df_waic), file = here::here("result/est_multi_ricker_sparse.rds"))
+saveRDS(list(df_est, df_waic), file = here::here("output/est_multi_ricker_sparse.rds"))
