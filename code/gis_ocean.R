@@ -20,7 +20,7 @@ wgs84_stack_chr_a <- list.files(path = here::here("data_raw/ocean"),
                                 full.names = T,
                                 pattern = "chlor_a") %>% 
   terra::rast() %>% 
-  terra::crop(extent(wgs84_sf_hkd_bf50))
+  terra::crop(raster::extent(wgs84_sf_hkd_bf50))
 
 albers_stack_chr_a <- terra::project(x = wgs84_stack_chr_a,
                                      y = wkt_jgd_albers,
