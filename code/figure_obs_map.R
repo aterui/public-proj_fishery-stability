@@ -11,7 +11,7 @@ pacman::p_load(tidyverse,
 
 # read data ---------------------------------------------------------------
 
-source(here::here("code/gis_crs_fmt.R"))
+source(here::here("code/set_crs.R"))
 source(here::here("code/data_fmt_fishdata.R"))
 
 ## hokkaido shape
