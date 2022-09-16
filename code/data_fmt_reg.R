@@ -25,7 +25,7 @@ df_env <- read_csv(here::here("data_fmt/data_env_fmt.csv")) %>%
   filter(site_id %in% site_selected)
 
 ## df for ocean environments
-df_ocean <- read_csv(here::here("data_fmt/data_ocean_fmt.csv")) %>% 
+df_ocean <- readRDS(here::here("data_fmt/data_ocean_fmt.rds")) %>% 
   filter(river %in% river_id)
 
 ## df for stock data
