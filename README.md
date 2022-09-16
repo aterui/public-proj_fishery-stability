@@ -1,7 +1,7 @@
 README
 ================
 Akira Terui
-Last updated 2022-09-15
+Last updated 2022-09-16
 
 ## Article information
 

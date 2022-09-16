@@ -3,19 +3,11 @@
 
 rm(list = ls())
 
-pacman::p_load(tidyverse,
-               foreach,
-               sf,
-               stars,
-               raster,
-               whitebox,
-               doParallel, 
-               doSNOW)
+source(here::here("code/library.R"))
+source(here::here("code/set_crs.R"))
+source(here::here("code/set_functions.R"))
 
 wbt_init()
-
-source("code/set_crs.R")
-source(here::here("code/set_functions.R"))
 
 
 # define function ---------------------------------------------------------
