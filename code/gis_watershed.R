@@ -10,26 +10,30 @@ source(here::here("code/set_functions.R"))
 wbt_init()
 
 
-# channel delineation -----------------------------------------------------
+# snap points -------------------------------------------------------------
 
-## specify temporary file location to avoid white space in file path
+### specify temporary file location to avoid white space in file path
 v_name <- tempdir() %>% 
   paste(c("upa.tif",
           "stream.tif",
           "channel.shp",
           "point.shp",
           "point_snap.shp",
+          "outlet.shp",
+          "outlet_snap.shp",
           "dir.tif",
-          "wsd.tif"),
+          "wsd.tif",
+          "cat.tif"),
         sep = "\\")
 
-## write flow accumulation layer to tempdir()
+### write flow accumulation layer to tempdir()
 sr_upa <- terra::rast(here::here("data_raw/gis/epsg4326_upa.tif"))
 terra::writeRaster(sr_upa,
                    filename = v_name[str_detect(v_name, "upa")],
                    overwrite = TRUE)
 
-## write point data to tempdir()
+## sampling sites
+### write point data to tempdir()
 sf_point <- read_csv("data_raw/gis/site-coordinate_hogosuimen_terui-org-2019.csv") %>% 
   drop_na(longitude) %>% 
   st_as_sf(coords = c("longitude", "latitude")) %>% 
@@ -43,15 +47,31 @@ sf_point %>%
   st_write(dsn = v_name[str_detect(v_name, "point\\.")],
            append = FALSE)
 
-## extract stream cells
+### extract stream cells
 wbt_extract_streams(flow_accum = v_name[str_detect(v_name, "upa")],
                     output = v_name[str_detect(v_name, "stream")],
                     threshold = 1)
 
-## snap points to streams
+### snap points to streams
 wbt_jenson_snap_pour_points(pour_pts = v_name[str_detect(v_name, "point\\.")],
                             streams = v_name[str_detect(v_name, "stream")],
                             output = v_name[str_detect(v_name, "point_snap")],
+                            snap_dist = 2)
+
+## outlet
+### write outlet data to tempdir()
+sf_outlet <- st_read(here::here("data_raw/gis/epsg4326_outlet.gpkg")) %>% 
+  dplyr::select(river = join_ws_na) %>% 
+  mutate(river = str_to_lower(river))
+
+sf_outlet %>% 
+  st_write(dsn = v_name[str_detect(v_name, "outlet\\.")],
+           append = FALSE)
+
+### snap points to streams
+wbt_jenson_snap_pour_points(pour_pts = v_name[str_detect(v_name, "outlet\\.")],
+                            streams = v_name[str_detect(v_name, "stream")],
+                            output = v_name[str_detect(v_name, "outlet_snap")],
                             snap_dist = 2)
 
 
@@ -73,46 +93,62 @@ wbt_unnest_basins(d8_pntr = v_name[str_detect(v_name, "dir")],
                   pour_pts = v_name[str_detect(v_name, "point_snap")],
                   output = v_name[str_detect(v_name, "wsd")])
 
+wbt_unnest_basins(d8_pntr = v_name[str_detect(v_name, "dir")],
+                  pour_pts = v_name[str_detect(v_name, "outlet_snap")],
+                  output = v_name[str_detect(v_name, "cat")])
+
 ## raster to polygon
 ### multiple polygons appears for several outlets
 ### pick the largest polygon from each outlet to avoid duplicates
 
-albers_sf_wsd0 <- list.files(path = tempdir(),
-                             pattern = "wsd",
-                             full.names = TRUE) %>% 
-  lapply(terra::rast) %>% 
-  lapply(stars::st_as_stars) %>% 
-  lapply(sf::st_as_sf,
-         merge = TRUE,
-         as_points = FALSE) %>%
-  bind_rows() %>% 
-  st_transform(crs = wkt_jgd_albers) %>% 
-  rowwise() %>% 
-  mutate(siteid = sum(c_across(cols = ends_with("tif")),
-                      na.rm = TRUE)) %>% 
-  dplyr::select(siteid) %>% 
-  ungroup() %>% 
-  mutate(area = units::set_units(st_area(.), "km^2")) %>% 
-  group_by(siteid) %>% 
-  slice(which.max(area)) %>% # remove duplicates by outlet
-  ungroup() %>% 
-  relocate(siteid, area) %>% 
-  arrange(siteid)
-
-albers_sf_wsd <- albers_sf_wsd0 %>% 
-  left_join(as_tibble(sf_point) %>% dplyr::select(-geometry),
-            by = "siteid") %>% 
-  relocate(siteid, river, site)
+albers_sf_wsd <- foreach(x = c("wsd", "cat")) %do% {
+  y0 <- list.files(path = tempdir(),
+                   pattern = x,
+                   full.names = TRUE) %>% 
+    lapply(terra::rast) %>% 
+    lapply(stars::st_as_stars) %>% 
+    lapply(sf::st_as_sf,
+           merge = TRUE,
+           as_points = FALSE) %>%
+    bind_rows() %>% 
+    st_transform(crs = wkt_jgd_albers) %>% 
+    rowwise() %>% 
+    mutate(siteid = sum(c_across(cols = ends_with("tif")),
+                        na.rm = TRUE)) %>% 
+    dplyr::select(siteid) %>% 
+    ungroup() %>% 
+    mutate(area = units::set_units(st_area(.), "km^2")) %>% 
+    group_by(siteid) %>% 
+    slice(which.max(area)) %>% # remove duplicates by outlet
+    ungroup() %>% 
+    relocate(siteid, area) %>% 
+    arrange(siteid)
+  
+  y <- y0 %>% 
+    left_join(as_tibble(sf_point) %>% dplyr::select(-geometry),
+              by = "siteid") %>% 
+    relocate(siteid, river, site)
+  
+  return(y)
+}
 
 
 # export ------------------------------------------------------------------
 
-## watershed
-saveRDS(albers_sf_wsd,
+## upstream watershed
+saveRDS(albers_sf_wsd[[1]],
         here::here("data_raw/gis/albers_wsd.rds"))
 
-st_write(albers_sf_wsd,
+st_write(albers_sf_wsd[[1]],
          here::here("data_raw/gis/albers_wsd.gpkg"),
+         append = FALSE)
+
+## outlet catchment
+saveRDS(albers_sf_wsd[[2]],
+        here::here("data_raw/gis/albers_wsd_outlet.rds"))
+
+st_write(albers_sf_wsd[[2]],
+         here::here("data_raw/gis/albers_wsd_outlet.gpkg"),
          append = FALSE)
 
 ## channel network
