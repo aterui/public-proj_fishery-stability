@@ -16,6 +16,7 @@ wbt_init()
 v_name <- tempdir() %>% 
   paste(c("upa.tif",
           "stream.tif",
+          "channel.shp",
           "point.shp",
           "point_snap.shp",
           "dir.tif",
@@ -32,6 +33,7 @@ terra::writeRaster(sr_upa,
 sf_point <- read_csv("data_raw/gis/site-coordinate_hogosuimen_terui-org-2019.csv") %>% 
   drop_na(longitude) %>% 
   st_as_sf(coords = c("longitude", "latitude")) %>% 
+  st_set_crs(4326) %>% 
   dplyr::select(-ID, -source) %>% 
   arrange(river, site) %>% 
   mutate(siteid = row_number()) %>% 
@@ -53,13 +55,18 @@ wbt_jenson_snap_pour_points(pour_pts = v_name[str_detect(v_name, "point\\.")],
                             snap_dist = 2)
 
 
-# watershed delineation ---------------------------------------------------
+# watershed & channel delineation -----------------------------------------
 
 ## flow direction, convert Arc to D8
 terra::rast(here::here("data_raw/gis/epsg4326_dir.tif")) %>% 
   arc2d8() %>% 
   terra::writeRaster(filename = v_name[str_detect(v_name, "dir")],
                      overwrite = TRUE)
+
+## stream raster to vector
+wbt_raster_streams_to_vector(streams = v_name[str_detect(v_name, "stream")],
+                             d8_pntr = v_name[str_detect(v_name, "dir")],
+                             output = v_name[str_detect(v_name, "channel")])
 
 ## watershed delineation
 wbt_unnest_basins(d8_pntr = v_name[str_detect(v_name, "dir")],
@@ -70,9 +77,9 @@ wbt_unnest_basins(d8_pntr = v_name[str_detect(v_name, "dir")],
 ### multiple polygons appears for several outlets
 ### pick the largest polygon from each outlet to avoid duplicates
 
-albers_sf_wsd <- list.files(path = tempdir(),
-                            pattern = "wsd",
-                            full.names = TRUE) %>% 
+albers_sf_wsd0 <- list.files(path = tempdir(),
+                             pattern = "wsd",
+                             full.names = TRUE) %>% 
   lapply(terra::rast) %>% 
   lapply(stars::st_as_stars) %>% 
   lapply(sf::st_as_sf,
@@ -81,20 +88,26 @@ albers_sf_wsd <- list.files(path = tempdir(),
   bind_rows() %>% 
   st_transform(crs = wkt_jgd_albers) %>% 
   rowwise() %>% 
-  mutate(wsdid = sum(c_across(cols = ends_with("tif")),
-                     na.rm = TRUE)) %>% 
-  select(wsdid) %>% 
+  mutate(siteid = sum(c_across(cols = ends_with("tif")),
+                      na.rm = TRUE)) %>% 
+  dplyr::select(siteid) %>% 
   ungroup() %>% 
   mutate(area = units::set_units(st_area(.), "km^2")) %>% 
-  group_by(wsdid) %>% 
+  group_by(siteid) %>% 
   slice(which.max(area)) %>% # remove duplicates by outlet
   ungroup() %>% 
-  relocate(wsdid, area) %>% 
-  arrange(wsdid)
+  relocate(siteid, area) %>% 
+  arrange(siteid)
+
+albers_sf_wsd <- albers_sf_wsd0 %>% 
+  left_join(as_tibble(sf_point) %>% dplyr::select(-geometry),
+            by = "siteid") %>% 
+  relocate(siteid, river, site)
 
 
 # export ------------------------------------------------------------------
 
+## watershed
 saveRDS(albers_sf_wsd,
         here::here("data_raw/gis/albers_wsd.rds"))
 
@@ -102,21 +115,39 @@ st_write(albers_sf_wsd,
          here::here("data_raw/gis/albers_wsd.gpkg"),
          append = FALSE)
 
+## channel network
+st_read(v_name[str_detect(v_name, "channel")]) %>% 
+  st_set_crs(4326) %>% 
+  saveRDS(here::here("data_raw/gis/epsg4326_channel.rds"))
+
+st_read(v_name[str_detect(v_name, "channel")]) %>% 
+  st_set_crs(4326) %>% 
+  st_write(here::here("data_raw/gis/epsg4326_channel.gpkg"),
+           append = FALSE)
+
+## snap point
+st_read(dsn = v_name[str_detect(v_name, "point_snap")]) %>% 
+  saveRDS(here::here("data_raw/gis/epsg4326_point_snap.rds"))
+
+st_read(dsn = v_name[str_detect(v_name, "point_snap")]) %>% 
+  st_write(here::here("data_raw/gis/epsg4326_point_snap.gpkg"),
+           append = FALSE)
+
 
 # check -------------------------------------------------------------------
-# 
+
 # sf_point <- st_read(v_name[str_detect(v_name, "point_snap")]) %>%
-#   st_set_crs(4326) %>% 
+#   st_set_crs(4326) %>%
 #   st_transform(wkt_jgd_albers)
 # 
 # library(tmap)
 # tmap_mode("view")
-#  
+# 
 # tm_shape(albers_sf_wsd) +
 #  tm_polygons(alpha = 0.3) +
 #  tm_shape(sf_point) +
 #  tm_dots()
-#    
+
 
 # remove ------------------------------------------------------------------
 
