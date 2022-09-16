@@ -11,4 +11,5 @@ pacman::p_load(tidyverse,
                here,
                cdyns,
                terra,
-               sf)
+               sf,
+               whitebox)
