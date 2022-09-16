@@ -1,15 +1,23 @@
-pacman::p_load(tidyverse,
+pacman::p_load(## gg
+               tidyverse,
                patchwork,
                ggside,
+               ## simulation
+               cdyns,
                foreach,
                doParallel,
                doSNOW,
-               scales,
+               ## bayes
                runjags,
                loo,
+               ## misc
                forecast,
+               scales,
                here,
-               cdyns,
+               ## gis
                terra,
+               raster,
+               exactextractr,
                sf,
+               stars,
                whitebox)
