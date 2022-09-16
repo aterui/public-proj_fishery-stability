@@ -1,12 +1,14 @@
 pacman::p_load(tidyverse,
                patchwork,
-               here,
-               cdyns,
+               ggside,
                foreach,
                doParallel,
                doSNOW,
                scales,
                runjags,
-               ggside,
+               loo,
                forecast,
-               loo)
+               here,
+               cdyns,
+               terra,
+               sf)
