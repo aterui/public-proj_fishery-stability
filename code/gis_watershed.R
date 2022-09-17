@@ -40,8 +40,8 @@ sf_point <- read_csv("data_raw/gis/site-coordinate_hogosuimen_terui-org-2019.csv
   st_set_crs(4326) %>% 
   dplyr::select(-ID, -source) %>% 
   arrange(river, site) %>% 
-  mutate(siteid = row_number()) %>% 
-  relocate(siteid)
+  mutate(site_id = row_number()) %>% 
+  relocate(site_id)
 
 sf_point %>% 
   st_write(dsn = v_name[str_detect(v_name, "point\\.")],
@@ -62,7 +62,10 @@ wbt_jenson_snap_pour_points(pour_pts = v_name[str_detect(v_name, "point\\.")],
 ### write outlet data to tempdir()
 sf_outlet <- st_read(here::here("data_raw/gis/epsg4326_outlet.gpkg")) %>% 
   dplyr::select(river = join_ws_na) %>% 
-  mutate(river = str_to_lower(river))
+  arrange(river) %>% 
+  mutate(river = str_to_lower(river),
+         site_id = row_number()) %>% 
+  relocate(site_id)
 
 sf_outlet %>% 
   st_write(dsn = v_name[str_detect(v_name, "outlet\\.")],
@@ -113,23 +116,34 @@ albers_sf_wsd <- foreach(x = c("wsd", "cat")) %do% {
     bind_rows() %>% 
     st_transform(crs = wkt_jgd_albers) %>% 
     rowwise() %>% 
-    mutate(siteid = sum(c_across(cols = ends_with("tif")),
-                        na.rm = TRUE)) %>% 
-    dplyr::select(siteid) %>% 
+    mutate(site_id = sum(c_across(cols = ends_with("tif")),
+                         na.rm = TRUE)) %>% 
+    dplyr::select(site_id) %>% 
     ungroup() %>% 
     mutate(area = units::set_units(st_area(.), "km^2")) %>% 
-    group_by(siteid) %>% 
+    group_by(site_id) %>% 
     slice(which.max(area)) %>% # remove duplicates by outlet
     ungroup() %>% 
-    relocate(siteid, area) %>% 
-    arrange(siteid)
+    relocate(site_id, area) %>% 
+    arrange(site_id)
   
-  y <- y0 %>% 
-    left_join(as_tibble(sf_point) %>% dplyr::select(-geometry),
-              by = "siteid") %>% 
-    relocate(siteid, river, site)
-  
-  return(y)
+  if(x == "wsd") {
+    
+    y0 %>% 
+      left_join(as_tibble(sf_point) %>% dplyr::select(-geometry),
+                by = "site_id") %>% 
+      relocate(site_id, river, site) %>% 
+      return()
+    
+  } else {
+    
+    y0 %>% 
+      left_join(as_tibble(sf_outlet) %>% dplyr::select(-geom),
+                by = "site_id") %>% 
+      relocate(site_id, river) %>% 
+      return()
+    
+  }
 }
 
 
