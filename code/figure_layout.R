@@ -2,8 +2,8 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls(all.names = TRUE))
-pacman::p_load(tidyverse,
-               patchwork)
+source(here::here("code/library.R"))
+
 
 # data --------------------------------------------------------------------
 

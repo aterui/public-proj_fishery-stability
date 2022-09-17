@@ -19,7 +19,7 @@ df_m <- df_ssm %>%
          response = fct_relevel(response, "cv", "species_richness"))
 
 ## regression data
-df_reg <- list.files(path = here::here("result"),
+df_reg <- list.files(path = here::here("output"),
                      full.names = TRUE,
                      pattern = "summary_reg") %>% 
   readRDS() %>% 
@@ -28,7 +28,7 @@ df_reg <- list.files(path = here::here("result"),
 ## join weighted stock
 df_m <- df_reg %>% 
   filter(str_detect(parameter, "ef_stock")) %>%
-  select(site_id_numeric,
+  dplyr::select(site_id_numeric,
          ef_stock = median) %>% 
   right_join(df_m,
              by = "site_id_numeric")
@@ -88,7 +88,7 @@ df_fit <- lapply(c("cv", "species_richness"),
                  FUN = function(i) {
                    m_beta <- df_mcmc %>%
                      filter(response == i) %>%
-                     select(where(is.numeric)) %>% 
+                     dplyr::select(where(is.numeric)) %>% 
                      data.matrix()
                    
                    y <- exp(model.matrix(~ef_stock) %*% m_beta) %>% 
