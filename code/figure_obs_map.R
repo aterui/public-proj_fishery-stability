@@ -18,38 +18,39 @@ albers_sf_channel <- readRDS(here::here("data_raw/gis/epsg4326_channel.rds")) %>
   st_transform(wkt_jgd_albers)
 
 ## watershed
-albers_sf_wsd <- readRDS(here::here("data_raw/gis/albers_wsd.rds")) %>% 
+albers_sf_wsd <- readRDS(here::here("data_raw/gis/albers_wsd_outlet.rds")) %>% 
   st_set_crs(wkt_jgd_albers)
 
 
 # example watershed -------------------------------------------------------
 
 albers_sf_channel_join <- st_join(albers_sf_channel,
-                                  albers_sf_wsd)
+                                  albers_sf_wsd) %>% 
+  drop_na(river)
 
-albers_sf_channel_example <- filter(albers_sf_channel, wsd_id == 488) #example
+## example watershed (okushibetsu)
+albers_sf_channel_oku <- filter(albers_sf_channel_join,
+                                river == "okushibetsu") #example
 
-## watershed
-
-albers_sf_wsd_example <- filter(albers_sf_wsd, wsd_id == 488) #example
+albers_sf_wsd_oku <- filter(albers_sf_wsd,
+                            river == "okushibetsu") #example
 
 ## site data
 site_selected <- distinct(df_fish, site_id) %>% 
   pull()
 
-albers_sf_point <- st_read(here::here("data_raw/gis/epsg4326_point_snap_prtwsd_edit.gpkg"),
-                           quiet = TRUE) %>% 
+albers_sf_point <- readRDS(here::here("data_raw/gis/epsg4326_point_snap.rds")) %>% 
   st_transform(wkt_jgd_albers) %>% 
   mutate(site_id = paste0(river, site)) %>% 
   filter(site_id %in% site_selected)
 
 
 # figure: map -------------------------------------------------------------
-  
+
 g_example <- ggplot() +
-  geom_sf(data = albers_sf_wsd_example,
+  geom_sf(data = albers_sf_wsd_oku,
           fill = grey(0.97)) +
-  geom_sf(data = albers_sf_channel_example,
+  geom_sf(data = albers_sf_channel_oku,
           color = grey(0.4)) +
   geom_sf(data = filter(albers_sf_point,
                         river == "okushibetsu"),
