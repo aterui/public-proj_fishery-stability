@@ -20,8 +20,8 @@ df_sp <- df_selected %>%
 
 ## df for environmental covariates
 df_env <- readRDS(here::here("data_fmt/data_env_fmt.rds")) %>% 
-  rename(wsd_area = area) %>% 
-  mutate(site_id = paste0(river, site)) %>% 
+  mutate(site_id = paste0(river, site),
+         wsd_area = as.numeric(area)) %>% 
   filter(site_id %in% site_selected)
 
 ## df for ocean environments
