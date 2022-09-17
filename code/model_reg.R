@@ -101,11 +101,11 @@ model {
       
       ## regression intercepts/slopes
       for (k in 1:6) {
-        a[k, g, p] ~ dnorm(0, tau0)
+        a[k, g, p] ~ dt(0, tau0, df0)
       }
       
       for (q in 1) {
-        b[q, g, p] ~ dnorm(0, tau0)
+        b[q, g, p] ~ dt(0, tau0, df0)
       }
     }
   }
