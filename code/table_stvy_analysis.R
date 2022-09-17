@@ -5,7 +5,7 @@ rm(list = ls())
 pacman::p_load(tidyverse,
                stargazer)
 
-load(here::here("result/result_stvy_analysis.RData"))
+load(here::here("output/result_stvy_analysis.RData"))
 
 
 # table -------------------------------------------------------------------

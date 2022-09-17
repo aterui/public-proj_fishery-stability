@@ -10,7 +10,7 @@ pacman::p_load(raster,
                stars,
                exactextractr)  
 
-source("code/gis_crs_fmt.R")
+source("code/set_crs.R")
 
 
 # read polygons and points ------------------------------------------------

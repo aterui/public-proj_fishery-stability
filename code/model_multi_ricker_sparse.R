@@ -2,9 +2,39 @@ model {
   
   tau0 <- 1 / 50
   scale0 <- 2.5
-  df0 <- 3
+  df0 <- 4
   a1 <- 2
   a2 <- 3
+  
+  # likelihood --------------------------------------------------------------
+  
+  ## observation
+  for (n in 1:Nsample) {
+    loglik[n] <- logdensity.pois(N[n], lambda[Year[n], Species[n]] * Area[n])
+    N[n] ~ dpois(lambda[Year[n], Species[n]] * Area[n])
+  }
+  
+  for (t in Nyr1:Nyr) {
+    for (i in 1:Nsp) {
+      lambda[t, i] <- d_obs[t, i]
+      log(d_obs[t, i]) <- log_d_obs[t, i]
+      log_d_obs[t, i] ~ dnorm(log_d[t, i], tau_obs[i])
+      log(d[t, i]) <- log_d[t, i]
+    }
+  }  
+  
+  ## state
+  for (t in (Nyr1 + Q):Nyr) {
+    for(i in 1:Nsp) {
+      log_d[t, i] ~ dnorm(log_mu_d[t, i], tau[i])
+      
+      log_mu_d[t, i] <- 
+        log_d[t - Q, i] + 
+        log_r[i] - 
+        inprod(alpha[i, ], d[t - Q, ]) +
+        inprod(xi[ , i], eta[t - Q, ])
+    }
+  }
   
   # prior -------------------------------------------------------------------
   
@@ -63,9 +93,6 @@ model {
   TAU[1:Nsp, 1:Nsp] <- inverse(OMEGA[ , ])
   
   for(i in 1:Nsp) {
-    #### process error precision
-    tau_r[i] <- TAU[i, i]
-    
     #### unique error for species-level time series
     tau[i] ~ dscaled.gamma(scale0, df0)
     sigma[i] <- sqrt(1 / tau[i])
@@ -73,37 +100,6 @@ model {
     for(j in 1:Nsp) {
       diag_omega[i, j] <- W[i, j] * pow(sigma[j], 2)
       rho[i, j] <- OMEGA[i, j] / sqrt(OMEGA[i, i] * OMEGA[j, j])
-    }
-  }
-  
-  
-  # likelihood --------------------------------------------------------------
-  
-  ## observation
-  for (n in 1:Nsample) {
-    loglik[n] <- logdensity.pois(N[n], lambda[Year[n], Species[n]] * Area[n])
-    N[n] ~ dpois(lambda[Year[n], Species[n]] * Area[n])
-  }
-  
-  for (t in Nyr1:Nyr) {
-    for (i in 1:Nsp) {
-      lambda[t, i] <- d_obs[t, i]
-      log(d_obs[t, i]) <- log_d_obs[t, i]
-      log_d_obs[t, i] ~ dnorm(log_d[t, i], tau_obs[i])
-      log(d[t, i]) <- log_d[t, i]
-    }
-  }  
-  
-  ## state
-  for (t in (Nyr1 + Q):Nyr) {
-    for(i in 1:Nsp) {
-      log_d[t, i] ~ dnorm(log_mu_d[t, i], tau_r[i])
-      
-      log_mu_d[t, i] <- 
-        log_d[t - Q, i] + 
-        log_r[i] - 
-        inprod(alpha[i, ], d[t - Q, ]) +
-        inprod(xi[ , i], eta[t - Q, ])
     }
   }
   

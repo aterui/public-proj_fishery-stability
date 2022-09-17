@@ -7,7 +7,7 @@ source(here::here("code/library.R"))
 # data --------------------------------------------------------------------
 
 ## call `sim_result`
-sim_result <- readRDS(file = here::here("result/result_ricker.rds"))
+sim_result <- readRDS(file = here::here("output/result_ricker.rds"))
 
 df0 <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 
@@ -43,7 +43,7 @@ df0 <- sim_result %>%
 
 # plot --------------------------------------------------------------------
 
-source(here::here("code/figure_set_theme.R"))
+source(here::here("code/set_figure_theme.R"))
 theme_set(plt_theme)
 
 g_theory <- df0 %>% 

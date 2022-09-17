@@ -8,7 +8,7 @@ pacman::p_load(tidyverse)
 # data --------------------------------------------------------------------
 
 ## load results of sensitivity analysis 
-load("result/result_ricker_for_stvy.RData")
+load("output/result_ricker_for_stvy.RData")
 
 ## unique parameter set
 df_param <- sim_stvy_result %>% 
@@ -65,4 +65,4 @@ fit_sense <- df_m %>%
                 phi,
               data = .))
 
-save(fit_sense, file = "result/result_stvy_analysis.RData")
+save(fit_sense, file = "output/result_stvy_analysis.RData")

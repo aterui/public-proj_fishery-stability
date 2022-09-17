@@ -97,4 +97,4 @@ stopCluster(cl)
 
 # return ------------------------------------------------------------------
 
-saveRDS(result, file = "result/result_ricker.rds")
+saveRDS(result, file = "output/result_ricker.rds")

@@ -7,7 +7,7 @@ source(here::here("code/library.R"))
 # data --------------------------------------------------------------------
 
 ## raw data for cv, mean, sd
-suppressMessages(source(here::here("code/data_fmt_analysis.R")))
+suppressMessages(source(here::here("code/data_fmt_reg.R")))
 
 df_m <- df_ssm %>%
   filter(!(group != "all" & response == "cv")) %>%
@@ -36,7 +36,7 @@ df_m <- df_reg %>%
 ef_stock <- seq(min(df_m$ef_stock), max(df_m$ef_stock), length = 100)
 
 ## slope
-df_mcmc <- readRDS(here::here("result/mcmc_reg.rds")) %>% 
+df_mcmc <- readRDS(here::here("output/mcmc_reg.rds")) %>% 
   MCMCvis::MCMCchains(param = "beta_raw") %>% 
   t() %>% 
   as_tibble(rownames = "param") %>% 
@@ -112,7 +112,7 @@ df_fit <- lapply(c("cv", "species_richness"),
 
 # plot --------------------------------------------------------------------
 
-source(here::here("code/figure_set_theme.R"))
+source(here::here("code/set_figure_theme.R"))
 theme_set(plt_theme)
 
 ## plot
@@ -170,3 +170,4 @@ g_obs <- ggplot(data = df_m,
   guides(fill = "none") +
   theme(axis.title.y = element_blank(),
         strip.placement = "outside")
+
