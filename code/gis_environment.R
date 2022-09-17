@@ -3,28 +3,19 @@
 
 rm(list = ls(all.names = T))
 
-pacman::p_load(raster,
-               rgdal,
-               tidyverse,
-               sf,
-               stars,
-               exactextractr)  
-
-source("code/set_crs.R")
+source(here::here("code/library.R"))
+source(here::here("code/set_crs.R"))
 
 
 # read polygons and points ------------------------------------------------
 
 ## watershed polygons
-albers_sf_wsd <- st_read(dsn = "data_raw/gis/epsg4326_upstr_watershed.gpkg") %>%
+albers_sf_wsd <- readRDS("data_raw/gis/albers_wsd.rds") %>%
   dplyr::select(river,
-                site) %>% 
-  st_transform(wkt_jgd_albers)
+                site)
 
 ## sampling sites
-wgs84_sf_site <- st_read(dsn = "data_raw/gis/epsg4326_point_snap_prtwsd_edit.gpkg") %>% 
-  dplyr::select(-ID,
-                -source)
+wgs84_sf_site <- readRDS("data_raw/gis/epsg4326_point_snap.rds")
 
 ## 50m buffer around sampling sites
 albers_sf_site_bf50 <- wgs84_sf_site %>% 
@@ -37,19 +28,13 @@ wgs84_sf_mask <- st_read("data_raw/gis/albers_hkd_shape.gpkg") %>%
   st_set_crs(st_crs(albers_sf_wsd)) %>% 
   st_transform(4326)
 
-wgs84_rs_temp <- raster("data_raw/gis/CHELSA_bio10_01.tif") %>% 
-  crop(extent(wgs84_sf_mask)) %>% 
-  mask(mask = wgs84_sf_mask)
-
-wgs84_rs_ppt <- raster("data_raw/gis/CHELSA_bio10_12.tif") %>% 
-  crop(extent(wgs84_sf_mask)) %>% 
-  mask(mask = wgs84_sf_mask)
-
-albers_stack_clim <- stack(wgs84_rs_temp,
-                           wgs84_rs_ppt) %>% 
-  projectRaster(crs = wkt_jgd_albers,
-                res = 1000,
-                method = "bilinear")
+albers_stack_clim <- list.files(here::here("data_raw/gis"),
+                                pattern = "CHELSA",
+                                full.names = TRUE) %>% 
+  terra::rast() %>% 
+  terra::crop(raster::extent(wgs84_sf_mask)) %>% 
+  terra::project(y = wkt_jgd_albers,
+                 method = "bilinear")
 
 names(albers_stack_clim) <- c("temp", "ppt")
 
@@ -65,21 +50,21 @@ df_clim <- exact_extract(albers_stack_clim,
 
 # land use ----------------------------------------------------------------
 
-wgs84_rs_lu <- raster("data_raw/gis/epsg4326_lu_hkd.tif")
-albers_rs_lu <- projectRaster(from = wgs84_rs_lu,
-                              crs = st_crs(albers_sf_wsd)$wkt,
-                              method = 'ngb',
-                              res = 100)
+albers_rs_lu <- terra::rast("data_raw/gis/epsg4326_lu_hkd.tif") %>% 
+  terra::project(y = st_crs(albers_sf_wsd)$wkt,
+                 method = 'near')
 
-albers_rs_forest <- calc(albers_rs_lu,
-                         fun = function(x) ifelse(dplyr::between(x, 111, 126), 1, 0))
-albers_rs_urban <- calc(albers_rs_lu,
-                        fun = function(x) ifelse(x == 50, 1, 0))
-albers_rs_agri <- calc(albers_rs_lu,
-                       fun = function(x) ifelse(x == 40, 1, 0))
-albers_rs_fua <- raster::stack(albers_rs_forest,
-                               albers_rs_urban,
-                               albers_rs_agri)
+albers_rs_forest <- terra::reduce(albers_rs_lu,
+                                  fun = function(x) ifelse(dplyr::between(x, 111, 126), 1, 0))
+albers_rs_urban <- terra::reduce(albers_rs_lu,
+                                 fun = function(x) ifelse(x == 50, 1, 0))
+albers_rs_agri <- terra::reduce(albers_rs_lu,
+                                fun = function(x) ifelse(x == 40, 1, 0))
+
+albers_rs_fua <- terra::rast(albers_rs_forest,
+                             albers_rs_urban,
+                             albers_rs_agri)
+
 names(albers_rs_fua) <- c("forest", "urban", "agri")
 
 df_lu <- exact_extract(albers_rs_fua,
