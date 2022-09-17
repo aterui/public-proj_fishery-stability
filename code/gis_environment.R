@@ -46,7 +46,7 @@ df_clim <- exact_extract(albers_stack_clim,
   rename(ppt = mean.ppt,
          temp = mean.temp) %>% 
   mutate(temp = 0.1 * temp)
-  
+
 
 # land use ----------------------------------------------------------------
 
@@ -54,16 +54,31 @@ albers_rs_lu <- terra::rast("data_raw/gis/epsg4326_lu_hkd.tif") %>%
   terra::project(y = st_crs(albers_sf_wsd)$wkt,
                  method = 'near')
 
-albers_rs_forest <- terra::reduce(albers_rs_lu,
-                                  fun = function(x) ifelse(dplyr::between(x, 111, 126), 1, 0))
-albers_rs_urban <- terra::reduce(albers_rs_lu,
-                                 fun = function(x) ifelse(x == 50, 1, 0))
-albers_rs_agri <- terra::reduce(albers_rs_lu,
-                                fun = function(x) ifelse(x == 40, 1, 0))
+## forest: 111-126
+albers_rs_forest <- terra::classify(albers_rs_lu,
+                                    rcl = rbind(c(111, 126, 1),
+                                                c(2, 500, 0)),
+                                    include.lowest = TRUE,
+                                    right = TRUE)
 
-albers_rs_fua <- terra::rast(albers_rs_forest,
-                             albers_rs_urban,
-                             albers_rs_agri)
+## urban: 50
+albers_rs_urban <- terra::classify(albers_rs_lu,
+                                   rcl = rbind(c(50, 50, 1),
+                                               c(2, 500, 0)),
+                                   include.lowest = TRUE,
+                                   right = TRUE)
+
+## agri: 40
+albers_rs_agri <- terra::classify(albers_rs_lu,
+                                  rcl = rbind(c(40, 40, 1),
+                                              c(2, 500, 0)),
+                                  include.lowest = TRUE,
+                                  right = TRUE)
+
+## multi-layer stake
+albers_rs_fua <- terra::rast(list(albers_rs_forest,
+                                  albers_rs_urban,
+                                  albers_rs_agri))
 
 names(albers_rs_fua) <- c("forest", "urban", "agri")
 
@@ -85,12 +100,12 @@ albers_sf_wsd <- albers_sf_wsd %>%
          area = units::set_units(area, km^2))
 
 st_write(albers_sf_wsd,
-         dsn = "data_raw/gis/albers_upstr_watershed_env.gpkg",
+         dsn = "data_raw/gis/albers_wsd_env.gpkg",
          append = FALSE)
 
-df_albers_sf_wsd <- albers_sf_wsd %>% 
+df_env <- albers_sf_wsd %>% 
   as_tibble() %>% 
-  dplyr::select(-geom)
+  dplyr::select(-geometry)
 
-write_csv(df_albers_sf_wsd,
-          file = "data_fmt/data_env_fmt.csv")
+saveRDS(df_env,
+        file = "data_fmt/data_env_fmt.rds")
