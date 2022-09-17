@@ -25,7 +25,8 @@ albers_sf_wsd <- readRDS(here::here("data_raw/gis/albers_wsd_outlet.rds")) %>%
 # example watershed -------------------------------------------------------
 
 albers_sf_channel_join <- st_join(albers_sf_channel,
-                                  albers_sf_wsd) %>% 
+                                  albers_sf_wsd,
+                                  join = st_within) %>% 
   drop_na(river)
 
 ## example watershed (okushibetsu)
@@ -67,6 +68,6 @@ g_hkd <- ggplot() +
   theme_bw()
 
 g_masu <- ggdraw() +
-  draw_image(here::here("image/masu_salmon.jpg")) +
+  draw_image(here::here("data_raw/image/masu_salmon.jpg")) +
   theme_void()
 
