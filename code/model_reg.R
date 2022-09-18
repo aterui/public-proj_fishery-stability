@@ -72,7 +72,7 @@ model {
   # prior -------------------------------------------------------------------
   
   scale0 <- 2.5
-  df0 <- 6
+  df0 <- 4
   tau0 <- 0.1
   
   ## overdispersion parameter for poisson
@@ -101,11 +101,11 @@ model {
       
       ## regression intercepts/slopes
       for (k in 1:6) {
-        a[k, g, p] ~ dt(0, tau0, df0)
+        a[k, g, p] ~ dnorm(0, tau0)
       }
       
       for (q in 1) {
-        b[q, g, p] ~ dt(0, tau0, df0)
+        b[q, g, p] ~ dnorm(0, tau0)
       }
     }
   }
