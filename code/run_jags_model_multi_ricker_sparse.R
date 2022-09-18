@@ -30,6 +30,7 @@ m <- read.jagsfile("code/model_multi_ricker_sparse.R")
 ## parameters ####
 para <- c("p0",
           "log_r",
+          "sigma_time",
           "sigma",
           "sigma_alpha1",
           "alpha",
@@ -61,7 +62,7 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                       summarize(freq = sum(p, na.rm = T),
                                 site_id = unique(site_id)) %>% 
                       filter(freq > 4) %>% 
-                      select(taxon, site_id) %>% 
+                      dplyr::select(taxon, site_id) %>% 
                       left_join(df_complete,
                                 by = c("taxon", "site_id")) %>% 
                       mutate(taxon_id = as.numeric(factor(.$taxon)))
