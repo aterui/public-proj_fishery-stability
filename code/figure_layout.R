@@ -9,7 +9,7 @@ source(here::here("code/library.R"))
 
 suppressMessages(source(here::here("code/figure_theory.R")))
 suppressMessages(source(here::here("code/figure_obs_stock.R")))
-suppressMessages(source(here::here("code/figure_map.R")))
+suppressMessages(source(here::here("code/figure_obs_map.R")))
 
 layout <- "
 ABC
