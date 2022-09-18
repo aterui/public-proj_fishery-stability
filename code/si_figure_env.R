@@ -2,8 +2,7 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-pacman::p_load(tidyverse,
-               patchwork)
+source(here::here("code/library.R"))
 
 
 # data --------------------------------------------------------------------
@@ -39,7 +38,7 @@ df_river <- df_stock_mu %>%
                         chr_a),
                names_to = "variable",
                values_to = "value") %>% 
-  dplyr::select(-c(starts_with("scl"), "sst")) %>% 
+  dplyr::select(-starts_with("scl")) %>% 
   mutate(var_label = case_when(variable == "mean_stock" ~ "Number~of~releases~(million~fish)",
                                variable == "chr_a" ~ "Chlorophyll~a~(mg~m^-3)"))
 
@@ -59,5 +58,4 @@ g_env <- df0 %>%
   facet_wrap(facets = ~var_label,
              scales = "free",
              labeller = label_parsed) +
-  labs(x= "Value",
-       y = "Count")
+  labs(y = "Count")

@@ -8,9 +8,9 @@ source(here::here("code/set_functions.R"))
 list_df0 <- readRDS(here::here("output/est_multi_ricker_sparse.rds"))
 df_trait <- readRDS(here::here("data_fmt/data_trait.rds"))
 df_trait_cat <- df_trait %>% 
-  select(where(is.factor),
-         max_total_length,
-         mouth_width)
+  dplyr::select(where(is.factor),
+                max_total_length,
+                mouth_width)
 
 df_est <- list_df0[[1]] %>% 
   mutate(taxon.y = spabb(taxon.y, sep = "_"),
@@ -40,11 +40,11 @@ df_fd <- m2v(m_fd) %>%
 df_alpha0 <- df_est %>% 
   filter(param_name == "alpha",
          x1 == x2) %>% 
-  select(site,
-         param_name,
-         alpha0 = median,
-         x1,
-         taxon.x)
+  dplyr::select(site,
+                param_name,
+                alpha0 = median,
+                x1,
+                taxon.x)
 
 ## join
 df_pd <- df_est %>% 
@@ -57,15 +57,15 @@ df_pd <- df_est %>%
   left_join(df_fd,
             by = c("taxon.x",
                    "taxon.y")) %>% 
-  select(site,
-         param_name,
-         median,
-         alpha0,
-         fd,
-         taxon.x,
-         taxon.y,
-         lbs.y,
-         lbs.x) %>%
+  dplyr::select(site,
+                param_name,
+                median,
+                alpha0,
+                fd,
+                taxon.x,
+                taxon.y,
+                lbs.y,
+                lbs.x) %>%
   mutate(alpha_prime = median / alpha0,
          value = ifelse(param_name == "alpha", alpha_prime, median),
          site_id = str_replace(site,
