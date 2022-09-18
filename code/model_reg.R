@@ -72,7 +72,7 @@ model {
   # prior -------------------------------------------------------------------
   
   scale0 <- 2.5
-  df0 <- 6
+  df0 <- 4
   tau0 <- 0.1
   
   ## overdispersion parameter for poisson

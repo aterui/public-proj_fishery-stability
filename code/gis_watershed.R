@@ -33,8 +33,10 @@ terra::writeRaster(sr_upa,
                    overwrite = TRUE)
 
 ## sampling sites
+## "epsg4326_point.gpkg" has been edited to correct for chihase, usubetsu, masuhoro
+## pre-edit coordinates in "site-coordinate_hogosuimen_terui-org-2019.csv"
 ### write point data to tempdir()
-sf_point <- read_csv("data_raw/gis/site-coordinate_hogosuimen_terui-org-2019.csv") %>% 
+sf_point <- st_read(here::here("data_raw/gis/epsg4326_point.gpkg")) %>% 
   drop_na(longitude) %>% 
   st_as_sf(coords = c("longitude", "latitude")) %>% 
   st_set_crs(4326) %>% 
@@ -130,7 +132,7 @@ albers_sf_wsd <- foreach(x = c("wsd", "cat")) %do% {
   if(x == "wsd") {
     
     y0 %>% 
-      left_join(as_tibble(sf_point) %>% dplyr::select(-geometry),
+      left_join(as_tibble(sf_point) %>% dplyr::select(-geom),
                 by = "site_id") %>% 
       relocate(site_id, river, site) %>% 
       return()
@@ -193,7 +195,7 @@ st_read(dsn = v_name[str_detect(v_name, "point_snap")]) %>%
 # library(tmap)
 # tmap_mode("view")
 # 
-# tm_shape(albers_sf_wsd) +
+# tm_shape(albers_sf_wsd[[1]]) +
 #  tm_polygons(alpha = 0.3) +
 #  tm_shape(sf_point) +
 #  tm_dots()

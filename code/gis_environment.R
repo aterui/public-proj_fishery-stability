@@ -3,28 +3,19 @@
 
 rm(list = ls(all.names = T))
 
-pacman::p_load(raster,
-               rgdal,
-               tidyverse,
-               sf,
-               stars,
-               exactextractr)  
-
-source("code/set_crs.R")
+source(here::here("code/library.R"))
+source(here::here("code/set_crs.R"))
 
 
 # read polygons and points ------------------------------------------------
 
 ## watershed polygons
-albers_sf_wsd <- st_read(dsn = "data_raw/gis/epsg4326_upstr_watershed.gpkg") %>%
+albers_sf_wsd <- readRDS("data_raw/gis/albers_wsd.rds") %>%
   dplyr::select(river,
-                site) %>% 
-  st_transform(wkt_jgd_albers)
+                site)
 
 ## sampling sites
-wgs84_sf_site <- st_read(dsn = "data_raw/gis/epsg4326_point_snap_prtwsd_edit.gpkg") %>% 
-  dplyr::select(-ID,
-                -source)
+wgs84_sf_site <- readRDS("data_raw/gis/epsg4326_point_snap.rds")
 
 ## 50m buffer around sampling sites
 albers_sf_site_bf50 <- wgs84_sf_site %>% 
@@ -37,19 +28,13 @@ wgs84_sf_mask <- st_read("data_raw/gis/albers_hkd_shape.gpkg") %>%
   st_set_crs(st_crs(albers_sf_wsd)) %>% 
   st_transform(4326)
 
-wgs84_rs_temp <- raster("data_raw/gis/CHELSA_bio10_01.tif") %>% 
-  crop(extent(wgs84_sf_mask)) %>% 
-  mask(mask = wgs84_sf_mask)
-
-wgs84_rs_ppt <- raster("data_raw/gis/CHELSA_bio10_12.tif") %>% 
-  crop(extent(wgs84_sf_mask)) %>% 
-  mask(mask = wgs84_sf_mask)
-
-albers_stack_clim <- stack(wgs84_rs_temp,
-                           wgs84_rs_ppt) %>% 
-  projectRaster(crs = wkt_jgd_albers,
-                res = 1000,
-                method = "bilinear")
+albers_stack_clim <- list.files(here::here("data_raw/gis"),
+                                pattern = "CHELSA",
+                                full.names = TRUE) %>% 
+  terra::rast() %>% 
+  terra::crop(raster::extent(wgs84_sf_mask)) %>% 
+  terra::project(y = wkt_jgd_albers,
+                 method = "bilinear")
 
 names(albers_stack_clim) <- c("temp", "ppt")
 
@@ -61,25 +46,34 @@ df_clim <- exact_extract(albers_stack_clim,
   rename(ppt = mean.ppt,
          temp = mean.temp) %>% 
   mutate(temp = 0.1 * temp)
-  
+
 
 # land use ----------------------------------------------------------------
 
-wgs84_rs_lu <- raster("data_raw/gis/epsg4326_lu_hkd.tif")
-albers_rs_lu <- projectRaster(from = wgs84_rs_lu,
-                              crs = st_crs(albers_sf_wsd)$wkt,
-                              method = 'ngb',
-                              res = 100)
+albers_rs_lu <- terra::rast("data_raw/gis/epsg4326_lu_hkd.tif") %>% 
+  terra::project(y = st_crs(albers_sf_wsd)$wkt,
+                 method = 'near')
 
-albers_rs_forest <- calc(albers_rs_lu,
-                         fun = function(x) ifelse(dplyr::between(x, 111, 126), 1, 0))
-albers_rs_urban <- calc(albers_rs_lu,
-                        fun = function(x) ifelse(x == 50, 1, 0))
-albers_rs_agri <- calc(albers_rs_lu,
-                       fun = function(x) ifelse(x == 40, 1, 0))
-albers_rs_fua <- raster::stack(albers_rs_forest,
-                               albers_rs_urban,
-                               albers_rs_agri)
+## forest: 111-126
+albers_rs_forest <- terra::classify(albers_rs_lu,
+                                    rcl = rbind(c(110.9, 126.1, 1),
+                                                c(2, 500, 0)))
+
+## urban: 50
+albers_rs_urban <- terra::classify(albers_rs_lu,
+                                   rcl = rbind(c(49.9, 50.1, 1),
+                                               c(2, 500, 0)))
+
+## agri: 40
+albers_rs_agri <- terra::classify(albers_rs_lu,
+                                  rcl = rbind(c(39.9, 40.1, 1),
+                                              c(2, 500, 0)))
+
+## multi-layer stake
+albers_rs_fua <- terra::rast(list(albers_rs_forest,
+                                  albers_rs_urban,
+                                  albers_rs_agri))
+
 names(albers_rs_fua) <- c("forest", "urban", "agri")
 
 df_lu <- exact_extract(albers_rs_fua,
@@ -100,12 +94,12 @@ albers_sf_wsd <- albers_sf_wsd %>%
          area = units::set_units(area, km^2))
 
 st_write(albers_sf_wsd,
-         dsn = "data_raw/gis/albers_upstr_watershed_env.gpkg",
+         dsn = "data_raw/gis/albers_wsd_env.gpkg",
          append = FALSE)
 
-df_albers_sf_wsd <- albers_sf_wsd %>% 
+df_env <- albers_sf_wsd %>% 
   as_tibble() %>% 
-  dplyr::select(-geom)
+  dplyr::select(-geometry)
 
-write_csv(df_albers_sf_wsd,
-          file = "data_fmt/data_env_fmt.csv")
+saveRDS(df_env,
+        file = "data_fmt/data_env_fmt.rds")

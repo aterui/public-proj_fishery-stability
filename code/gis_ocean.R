@@ -34,7 +34,7 @@ names(albers_stack_chr_a) <- paste0("chr_a_", 2002:2019)
 ## mask layer: river outlet
 albers_sf_outlet_bf30 <- list.files(path = here::here("data_raw/gis"),
                                     full.names = T,
-                                    pattern = "outlet") %>% 
+                                    pattern = "epsg4326_outlet") %>% 
   st_read() %>% 
   st_transform(crs = wkt_jgd_albers) %>% 
   mutate(river = str_to_lower(join_ws_na)) %>% 

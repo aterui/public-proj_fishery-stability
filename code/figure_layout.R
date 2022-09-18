@@ -2,14 +2,14 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls(all.names = TRUE))
-pacman::p_load(tidyverse,
-               patchwork)
+source(here::here("code/library.R"))
+
 
 # data --------------------------------------------------------------------
 
 suppressMessages(source(here::here("code/figure_theory.R")))
 suppressMessages(source(here::here("code/figure_obs_stock.R")))
-suppressMessages(source(here::here("code/figure_map.R")))
+suppressMessages(source(here::here("code/figure_obs_map.R")))
 
 layout <- "
 ABC

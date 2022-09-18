@@ -1,25 +1,25 @@
 pacman::p_load(## gg
-               tidyverse,
-               patchwork,
-               ggside,
-               ggspatial,
-               cowplot,
-               ## simulation
-               cdyns,
-               foreach,
-               doParallel,
-               doSNOW,
-               ## bayes
-               runjags,
-               loo,
-               ## misc
-               forecast,
-               scales,
-               here,
-               ## gis
-               terra,
-               raster,
-               exactextractr,
-               sf,
-               stars,
-               whitebox)
+  tidyverse,
+  patchwork,
+  ggside,
+  ggspatial,
+  cowplot,
+  ## simulation
+  cdyns,
+  foreach,
+  doParallel,
+  doSNOW,
+  ## bayes
+  runjags,
+  loo,
+  ## misc
+  forecast,
+  scales,
+  here,
+  ## gis
+  terra,
+  raster,
+  exactextractr,
+  sf,
+  stars,
+  whitebox)

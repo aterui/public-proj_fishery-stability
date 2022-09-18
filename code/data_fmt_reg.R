@@ -1,8 +1,8 @@
 
 # setup -------------------------------------------------------------------
 
-pacman::p_load(tidyverse)
-
+#rm(list = ls())
+source(here::here("code/library.R"))
 
 # data --------------------------------------------------------------------
 
@@ -19,9 +19,9 @@ df_sp <- df_selected %>%
   ungroup()
 
 ## df for environmental covariates
-df_env <- read_csv(here::here("data_fmt/data_env_fmt.csv")) %>% 
-  rename(wsd_area = area) %>% 
-  mutate(site_id = paste0(river, site)) %>% 
+df_env <- readRDS(here::here("data_fmt/data_env_fmt.rds")) %>% 
+  mutate(site_id = paste0(river, site),
+         wsd_area = as.numeric(area)) %>% 
   filter(site_id %in% site_selected)
 
 ## df for ocean environments
