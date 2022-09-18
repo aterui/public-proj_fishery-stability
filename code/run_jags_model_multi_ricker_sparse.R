@@ -165,4 +165,5 @@ df_est <- foreach(i = seq_len(length(unique_site)),
 # export ------------------------------------------------------------------
 
 df_waic <- distinct(df_est, site, waic_hat)
-saveRDS(list(df_est, df_waic), file = here::here("output/est_multi_ricker_sparse.rds"))
+saveRDS(list(df_est, df_waic),
+        file = here::here("output/summary_multi_ricker_sparse.rds"))
