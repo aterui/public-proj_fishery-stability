@@ -101,7 +101,7 @@ df_trait_w <- df_trait_l %>%
                 .fns = as.factor),
          across(.cols = unique(df_fs_sp$trait),
                 .fns = function(x) x / standard_length)) %>% 
-  select(-standard_length, -total_weight)
+  dplyr::select(-standard_length, -total_weight)
 
 saveRDS(df_trait_w,
         here::here("data_fmt/data_trait.rds"))
@@ -113,7 +113,7 @@ saveRDS(df_trait_w,
 
 ## reformat data for FD
 df_trait_value <- df_trait_w %>% 
-  select(-taxon) %>% 
+  dplyr::select(-taxon) %>% 
   data.frame()
 
 rownames(df_trait_value) <- df_trait_w$taxon
