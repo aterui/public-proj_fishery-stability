@@ -193,7 +193,7 @@ st_read(dsn = v_name[str_detect(v_name, "point_snap")]) %>%
 # library(tmap)
 # tmap_mode("view")
 # 
-# tm_shape(albers_sf_wsd) +
+# tm_shape(albers_sf_wsd[[1]]) +
 #  tm_polygons(alpha = 0.3) +
 #  tm_shape(sf_point) +
 #  tm_dots()

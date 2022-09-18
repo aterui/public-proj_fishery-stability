@@ -56,24 +56,18 @@ albers_rs_lu <- terra::rast("data_raw/gis/epsg4326_lu_hkd.tif") %>%
 
 ## forest: 111-126
 albers_rs_forest <- terra::classify(albers_rs_lu,
-                                    rcl = rbind(c(111, 126, 1),
-                                                c(2, 500, 0)),
-                                    include.lowest = TRUE,
-                                    right = TRUE)
+                                    rcl = rbind(c(110.9, 126.1, 1),
+                                                c(2, 500, 0)))
 
 ## urban: 50
 albers_rs_urban <- terra::classify(albers_rs_lu,
-                                   rcl = rbind(c(50, 50, 1),
-                                               c(2, 500, 0)),
-                                   include.lowest = TRUE,
-                                   right = TRUE)
+                                   rcl = rbind(c(49.9, 50.1, 1),
+                                               c(2, 500, 0)))
 
 ## agri: 40
 albers_rs_agri <- terra::classify(albers_rs_lu,
-                                  rcl = rbind(c(40, 40, 1),
-                                              c(2, 500, 0)),
-                                  include.lowest = TRUE,
-                                  right = TRUE)
+                                  rcl = rbind(c(39.9, 40.1, 1),
+                                              c(2, 500, 0)))
 
 ## multi-layer stake
 albers_rs_fua <- terra::rast(list(albers_rs_forest,
