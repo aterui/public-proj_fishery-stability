@@ -1,11 +1,5 @@
 model {
   
-  tau0 <- 1 / 50
-  scale0 <- 2.5
-  df0 <- 4
-  a1 <- 2
-  a2 <- 3
-  
   # likelihood --------------------------------------------------------------
   
   ## observation
@@ -37,6 +31,12 @@ model {
   }
   
   # prior -------------------------------------------------------------------
+  
+  tau0 <- 1 / 50
+  scale0 <- 2.5
+  df0 <- 6
+  a1 <- 2
+  a2 <- 3
   
   ## low-level parameters ####
   for (i in 1:Nsp) {
@@ -96,6 +96,7 @@ model {
     #### unique error for species-level time series
     tau[i] ~ dscaled.gamma(scale0, df0)
     sigma[i] <- sqrt(1 / tau[i])
+    sigma_time[i] <- sqrt(OMEGA[i, i])
     
     for(j in 1:Nsp) {
       diag_omega[i, j] <- W[i, j] * pow(sigma[j], 2)
