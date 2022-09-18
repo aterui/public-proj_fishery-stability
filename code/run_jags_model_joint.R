@@ -150,7 +150,7 @@ est <- mcmc_summary %>%
          group_numeric = ifelse(n_year_id == 2, year_id_numeric, group_numeric),
          site_id_numeric = ifelse(n_site_id == 2, NA, site_id_numeric),
          year_id_numeric = ifelse(n_year_id == 2, NA, year_id_numeric)) %>% 
-  select(-n_site_id, -n_year_id) %>% 
+  dplyr::select(-n_site_id, -n_year_id) %>% 
   mutate(year = year_id_numeric + 1998,
          group = case_when(group_numeric == 1 ~ "masu_salmon",
                            group_numeric == 2 ~ "other",
