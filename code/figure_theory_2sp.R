@@ -12,7 +12,7 @@ df_sim <- readRDS(here::here("output/result_ricker_2sp.rds")) %>%
          phi == 1) %>% 
   mutate(cv = sd_density / mean_density,
          sd_type = case_when(sd_env == 0 ~ "Deterministic",
-                             sd_env == 0.5 ~ "Stochastic"),
+                             sd_env == 0.75 ~ "Stochastic"),
          alpha_label = case_when(alpha == 0.1 ~ sprintf('"Weak competition"~(alpha=="%.1f")',
                                                         alpha),
                                  alpha == 0.5 ~ sprintf('"Strong competition"~(alpha=="%.1f")',

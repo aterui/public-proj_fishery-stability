@@ -61,14 +61,14 @@ g_theory <- df0 %>%
              size = pt_size,
              color = hue_pal(h.start = hs[1], l = lum, c = con)(1)) +
   geom_point(data = filter(df0, status == "dummy"),
-             color = NA) +
+             color = grey(0, alpha = 0)) +
   geom_smooth(size= 0.5,
               method = "loess") +
   scale_color_hue(h = c(hs[1], hs[3]),
-                  l = 70,
+                  l = 60,
                   labels = c("Whole", "Enhanced", "Unenhanced")) +
   scale_fill_hue(h = c(hs[1], hs[3]),
-                 l = 70) +
+                 l = 85) +
   labs(x = "Number of releases (individuals)",
        y = "Value") +
   facet_wrap(facets = ~ response_name,

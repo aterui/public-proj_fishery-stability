@@ -180,6 +180,5 @@ g_obs <- ggplot(data = df_m,
        linetype = "Posterior prob.") +
   guides(fill = "none") +
   theme(axis.title.y = element_blank(),
-        strip.placement = "outside") +
-  scale_y_continuous(trans = "log10")
+        strip.placement = "outside")
 
