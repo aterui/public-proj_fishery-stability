@@ -16,7 +16,13 @@ df_m <- df_ssm %>%
          response = ifelse(response == "n_species",
                            "species_richness",
                            response),
-         response = fct_relevel(response, "cv", "species_richness"))
+         response = fct_relevel(response, "cv", "species_richness"),
+         dummy = 0) %>% 
+  bind_rows(tibble(dummy = 1,
+                   group = factor("all", levels(.$group)),
+                   response = factor("sigma", levels(.$response)),
+                   value = max(.$value[.$response == "mu"]),
+                   site_id_numeric = 1))
 
 ## regression data
 df_reg <- list.files(path = here::here("output"),
@@ -33,7 +39,9 @@ df_m <- df_reg %>%
   right_join(df_m,
              by = "site_id_numeric")
 
-ef_stock <- seq(min(df_m$ef_stock), max(df_m$ef_stock), length = 100)
+ef_stock <- seq(min(df_m$ef_stock),
+                max(df_m$ef_stock),
+                length = 100)
 
 ## slope
 df_mcmc <- readRDS(here::here("output/mcmc_reg.rds")) %>% 
@@ -135,9 +143,12 @@ g_obs <- ggplot(data = df_m,
   geom_point(data = . %>% filter(group == "other"),
              color = hue_pal(h.start = hs[3], l = lum, c = con)(1),
              size = pt_size) +
-  geom_point(data = . %>% filter(group == "all"),
+  geom_point(data = . %>% filter(group == "all", dummy == 0),
              color = hue_pal(h.start = hs[1], l = lum, c = con)(1),
              size = pt_size) +
+  geom_point(data = . %>% filter(group == "all",
+                                 dummy == 1),
+             color = grey(0, alpha = 0)) +
   geom_ribbon(aes(x = x,
                   ymin = low,
                   ymax = high,
@@ -152,10 +163,10 @@ g_obs <- ggplot(data = df_m,
                 linetype = lty),
             data = df_y) +
   scale_color_hue(h = c(hs[1], hs[3]),
-                  l = 70,
+                  l = 60,
                   labels = c("Whole", "Enhanced", "Unenhanced")) +
   scale_fill_hue(h = c(hs[1], hs[3]),
-                 l = 70,
+                 l = 85,
                  labels = c("Whole", "Enhanced", "Unenhanced")) +
   scale_linetype_manual(values = c(`a` = "solid",
                                    `b` = "dashed",
@@ -169,5 +180,6 @@ g_obs <- ggplot(data = df_m,
        linetype = "Posterior prob.") +
   guides(fill = "none") +
   theme(axis.title.y = element_blank(),
-        strip.placement = "outside")
+        strip.placement = "outside") +
+  scale_y_continuous(trans = "log10")
 
