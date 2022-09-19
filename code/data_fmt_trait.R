@@ -13,7 +13,7 @@ source(here::here("code/set_functions.R"))
 ## spawning substrate - vegetation = 1; mineral substrate = 2; various = 3
 
 ### fish shape, species-level average
-df_fs_sp <- read_csv(here::here("data_fmt/data_fish_shapes.csv")) %>% 
+df_fs_sp <- read_csv(here::here("data_raw/data_fish_shapes.csv")) %>% 
   rename_with(.fn = str_to_lower) %>% 
   group_by(tree_name) %>% 
   summarize(across(.fns = function(x) mean(x, na.rm = T),
@@ -23,7 +23,7 @@ df_fs_sp <- read_csv(here::here("data_fmt/data_fish_shapes.csv")) %>%
                values_to = "value")
 
 ### fish shape, genus-level average
-df_fs_genus <- read_csv(here::here("data_fmt/data_fish_shapes.csv")) %>% 
+df_fs_genus <- read_csv(here::here("data_raw/data_fish_shapes.csv")) %>% 
   rename_with(.fn = str_to_lower) %>% 
   separate(tree_name,
            into = c("genus", "species"),
