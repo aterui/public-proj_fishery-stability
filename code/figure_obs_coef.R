@@ -9,44 +9,29 @@ pacman::p_load(foreach,
 
 # data --------------------------------------------------------------------
 
-variable <- c("richness", "cv", "mu", "sigma")
-group <- c("all", "masu", "other")
-
-## loop for response variables
-df_mcmc <- foreach(i = seq_len(length(variable)),
-                     .combine = bind_rows) %do% {
-  
-  file_name <- list.files(path = here::here("result"), full.names = TRUE) %>%
-    as_tibble() %>%
-    filter(str_detect(value, "mcmc")) %>%
-    filter(str_detect(value, variable[i])) %>%
-    pull()
-  
-  ## loop for fish group
-  df_mcmc_beta <- foreach(j = seq_len(length(file_name)),
-          .combine = bind_rows) %do% {
-    
-    load(file = file_name[j])
-    mcmc_beta <- MCMCvis::MCMCchains(mcmc_sample) %>%
-      as_tibble() %>%
-      select(b2 = `b[2]`) %>%
-      mutate(response = variable[i],
-             group = group[j])
-    
-  }
-  
-  return(df_mcmc_beta)  
-}
-
-df_mcmc <- df_mcmc %>%
-  filter(!(group != "all" & response == "cv")) %>%
-  mutate(group = case_when(group == "all" ~ "Whole",
-                           group == "masu" ~ "Enhanced",
-                           group == "other" ~ "Unenhanced"),
-         response = case_when(response == "richness" ~ "Species richness",
-                              response == "cv" ~ "CV",
-                              response == "mu" ~ "Mean",
-                              response == "sigma" ~ "SD")) %>%
+## mcmc samples from the regression model
+df_mcmc <- list.files(path = here::here("output"),
+                      full.names = TRUE,
+                      pattern = "mcmc_reg") %>%
+  readRDS() %>% 
+  MCMCvis::MCMCchains() %>% # combine 4 chains
+  as_tibble() %>% 
+  dplyr::select(starts_with("a[2,")) %>% # a[2,.,.], standardized coef for release
+  pivot_longer(cols = starts_with("a[2,"),
+               names_to = "param") %>% 
+  mutate(param_numeric = str_remove_all(param, "a\\[|\\]")) %>% 
+  separate(param_numeric,
+           into = c("k", "g", "p"),
+           sep = ",",
+           convert = T) %>% 
+  mutate(group = case_when(g == 1 ~ "Whole",
+                           g == 2 ~ "Enhanced", #masu salmon
+                           g == 3 ~ "Unenhanced"), #other
+         response = case_when(p == 1 ~ "SD",
+                              p == 2 ~ "Mean",
+                              p == 3 ~ "Species richness",
+                              p == 4 ~ "CV")) %>% 
+  filter(!(group != "Whole" & response %in% c("Species richness", "CV"))) %>% 
   mutate(group = factor(group,
                         levels = c("Whole",
                                    "Enhanced",
@@ -55,23 +40,43 @@ df_mcmc <- df_mcmc %>%
                            levels = c("SD",
                                       "Mean",
                                       "Species richness",
-                                      "CV")))
+                                      "CV"))) %>% 
+  dplyr::select(group, response, value)
+
+df_q <- df_mcmc %>% 
+  group_by(group, response) %>% 
+  summarize(median = median(value),
+            upper = quantile(value, 0.975),
+            lower = quantile(value, 0.025))
 
 # plot --------------------------------------------------------------------
 
+source(here::here("code/set_figure_theme.R"))
+
 g_coef <- df_mcmc %>% 
-  ggplot(aes(x = b2,
+  ggplot(aes(x = value,
              y = response,
              color = group,
              fill = group)) +
   geom_vline(xintercept = 0,
              color = grey(0.5),
              linetype = "dashed") +
-  geom_density_ridges(alpha = 0.5) +
+  geom_density_ridges(alpha = 0.5,
+                      scale = 1) +
+  geom_point(data = df_q,
+             pch = 2,
+             aes(x = median,
+                 y = response)) +
   labs(y = "Response",
-       x = "Release effect",
+       x = "Standardized release effect",
        fill = "Species group",
        color = "Species group") +
+  scale_color_hue(h = c(hs[1], hs[3]),
+                  l = 50,
+                  labels = c("Whole", "Enhanced", "Unenhanced")) +
+  scale_fill_hue(h = c(hs[1], hs[3]),
+                 l = 95,
+                 labels = c("Whole", "Enhanced", "Unenhanced")) +
   theme_ridges()
 
 ggsave(g_coef,
