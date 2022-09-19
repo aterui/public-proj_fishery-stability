@@ -2,6 +2,7 @@ pacman::p_load(## gg
   tidyverse,
   patchwork,
   ggside,
+  ggridges,
   ggspatial,
   cowplot,
   ## simulation
