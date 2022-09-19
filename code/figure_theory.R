@@ -15,7 +15,7 @@ df0 <- sim_result %>%
                names_to = "response",
                values_to = "value") %>% 
   filter(r1 == 0.5,
-         sd_env == 0.5,
+         sd_env == 0.75,
          alpha == 0.1,
          phi == 0.5,
          k == 100,
