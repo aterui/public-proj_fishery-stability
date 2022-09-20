@@ -18,7 +18,7 @@ df_param <- expand.grid(n_timestep = 1000,
                         r1 = seq(0.5, 3.5, by = 1),
                         r_min = 0.5,
                         r_max = 2.5,
-                        sd_env = c(0.5, 0.75),
+                        sd_env = 0.75,
                         phi = c(0.5, 1),
                         int_type = "random",
                         alpha = c(0.1, 0.5),
@@ -35,6 +35,7 @@ stock <- seq(0, 500, length = n_rep)
 pb <- txtProgressBar(max = nrow(df_param), style = 3)
 fun_progress <- function(n) setTxtProgressBar(pb, n)
 opts <- list(progress = fun_progress)
+set.seed(123)
 
 result <- foreach(x = iter(df_param, by = 'row'),
                   .combine = "bind_rows",
