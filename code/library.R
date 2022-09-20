@@ -18,6 +18,7 @@ pacman::p_load(## gg
   scales,
   here,
   corrplot,
+  msir,
   ## gis
   terra,
   raster,
