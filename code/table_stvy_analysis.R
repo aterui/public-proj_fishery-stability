@@ -2,13 +2,12 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-pacman::p_load(tidyverse,
-               stargazer)
-
-load(here::here("output/result_stvy_analysis.RData"))
+source("code/library.R")
 
 
 # table -------------------------------------------------------------------
+
+fit_sense <- readRDS(here::here("output/result_stvy_analysis.rds"))
 
 table_stvy <- list(NULL)
 text_match <- c("_all", "_enhanced", "_unenhanced")
