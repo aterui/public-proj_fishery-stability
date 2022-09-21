@@ -180,7 +180,7 @@ As with the two-species model, we ran `r n_sim` time steps of `r max(sim_result$
 
 ### Statistical analysis
 
-Our goal is to compare temporal community dynamics across sites. However, the data are not comparable because of observation errors (e.g., different observers) and missing observations. To confront this challenge, we developed a Bayesian state-space model for three species groups separately: (i) whole community, the summed abundance of all species, (ii) enhanced species, the abundance of masu salmon, (iii) unenhanced species, the summed abundance of all species except masu salmon. A Bayesian state-space model is best suited for our analysis because it can account for observation errors while imputing missing values given the long-term trend at each site [@clarkPopulationTimeSeries2004; @keryBayesianPopulationAnalysis2012]. The model is composed of observation and state models, as described below.
+**Community dynamics comparison.** Our goal is to compare temporal community dynamics across sites. However, the data are not comparable because of observation errors (e.g., different observers) and missing observations. To confront this challenge, we developed a Bayesian state-space model for three species groups separately: (i) whole community, the summed abundance of all species, (ii) enhanced species, the abundance of masu salmon, (iii) unenhanced species, the summed abundance of all species except masu salmon. A Bayesian state-space model is best suited for our analysis because it can account for observation errors while imputing missing values given the long-term trend at each site [@clarkPopulationTimeSeries2004; @keryBayesianPopulationAnalysis2012]. The model is composed of observation and state models, as described below.
 
 In the observation model, we model observation processes. Fish abundance of either whole community, enhanced species (masu salmon), or unenhanced species at site $s$ in year $t$, $N_{s,t}$, was assumed to follow a Poisson distribution:
 
@@ -243,7 +243,9 @@ $\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$
 ```
 $\delta_{0}$ is the global intercept and $\delta_k (k > 0)$ are the regression coefficients. The watershed-level predictors $z_{k,w}$ include the yearly release of masu salmon (fry + juvenile + smolt; averaged for1999-2019) and ocean productivity (chlorophyll *a* concentration; averaged for 2002-2019). Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture. All predictors were standardized (mean = 0, SD = 1) before the analysis.
 
-We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned weakly informative priors to parameters (**Table S6**). Three Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. Total MCMC interations ranged from `r min(df_mcmc_ssm$n_total_mcmc)` to `r max(df_mcmc_ssm$n_total_mcmc)` for the state-space models and was `r unique(df_mcmc_reg$n_total_mcmc)` for the regression models. The first `r unique(c(df_mcmc_ssm$n_burn, df_mcmc_reg$n_burn))` iterations were discarded as burn-in, and MCMC samples were saved every `r unique(df_mcmc_ssm$n_thin)` (state-space) and `r unique(df_mcmc_reg$n_thin)` iterations (regression) to reduce autocorrelation. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached \< 1.1 [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.1.0 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Table S7-S10**.
+**Species interaction.** XXX
+
+**Model fitting.** We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned weakly informative priors to parameters (**Table S6**). Three Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. Total MCMC interations ranged from `r min(df_mcmc_ssm$n_total_mcmc)` to `r max(df_mcmc_ssm$n_total_mcmc)` for the state-space models and was `r unique(df_mcmc_reg$n_total_mcmc)` for the regression models. The first `r unique(c(df_mcmc_ssm$n_burn, df_mcmc_reg$n_burn))` iterations were discarded as burn-in, and MCMC samples were saved every `r unique(df_mcmc_ssm$n_thin)` (state-space) and `r unique(df_mcmc_reg$n_thin)` iterations (regression) to reduce autocorrelation. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached \< 1.1 [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.1.0 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Table S7-S10**.
 
 \newpage
 
@@ -278,7 +280,7 @@ Parameter values used in the main and sensitivity analysis. Five hundred paramet
 
 # Table S1
 source(here::here("code/table_param_set.R"))
-kable(df_param, format = "markdown")
+knitr::kable(df_param, format = "markdown")
 
 ```
 
@@ -334,9 +336,8 @@ Fish species found in the study watersheds.
 # Table S5
 source(here::here("code/table_species_list.R"))
 
-kable(df_sp_list,
-      format = "markdown")
-
+knitr::kable(df_sp_list,
+             format = "markdown")
 ```
 
 \newpage
@@ -350,8 +351,8 @@ Prior distributions used in the Bayesian models.
 # Table S6
 source(here::here("code/table_prior.R"))
 
-kable(df_prior,
-      format = "markdown")
+knitr::kable(df_prior,
+             format = "markdown")
 
 ```
 
@@ -366,9 +367,9 @@ Median estimates of the Bayesian state-space model. Numbers in parenthesis indic
 # Table S7
 source(here::here("code/table_ssm.R"))
 
-kable(df_ssm,
-      align = c(rep("l", 3), "c"),
-      format = "markdown")
+knitr::kable(df_ssm,
+             align = c(rep("l", 3), "c"),
+             format = "markdown")
 
 ```
 
@@ -419,7 +420,7 @@ for(i in seq_len(length(df_est))) {
 
 # Figure S1-6
 ## load figures
-source(here::here("code/figure_si_theory.R"))
+source(here::here("code/si_figure_theory.R"))
 
 j <- 0
 figure_sim_chunk <- knit_chunk <- NULL
@@ -457,7 +458,7 @@ for(i in seq_len(nrow(df_param))) {
 
 # Figure S7-9
 ## load figures
-source(here::here("code/figure_si_obs_dyns.R"))
+source(here::here("code/si_figure_obs_dyns.R"))
 j <- 6
 
 c_text <- c("whole community",
@@ -493,7 +494,7 @@ for(i in seq_len(length(list_g_dyns))) {
 
 ```{r figure_s10, fig.width=11, fig.height=8}
 
-source(here::here("code/figure_si_env.R"))
+source(here::here("code/si_figure_env.R"))
 
 print(g_env)
 ```
@@ -506,7 +507,7 @@ Distribution of environmental variables in the protected watershed. Note that th
 
 ```{r figure_s11, fig.width=11, fig.height=11}
 
-source(here::here("code/figure_si_cor.R"))
+source(here::here("code/si_figure_cor.R"))
 ```
 
 Correlation plot among environmental variables in the protected watersheds. Numbers indicate Spearman's rank correlations.
