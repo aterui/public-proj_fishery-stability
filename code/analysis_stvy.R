@@ -2,13 +2,13 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-pacman::p_load(tidyverse)
+source("code/library.R")
 
 
 # data --------------------------------------------------------------------
 
 ## load results of sensitivity analysis 
-load("output/result_ricker_for_stvy.RData")
+sim_stvy_result <- readRDS("output/result_ricker_for_stvy.rds")
 
 ## unique parameter set
 df_param <- sim_stvy_result %>% 
@@ -20,7 +20,7 @@ df_psi <- sim_stvy_result %>%
   left_join(df_param,
             by = c("r1"),
             suffix = c("", ".y")) %>%
-  select(-ends_with(".y")) %>% 
+  dplyr::select(-ends_with(".y")) %>% 
   pivot_wider(names_from = status,
               values_from = c(mean_density,
                               sd_density)) %>% 
@@ -65,4 +65,4 @@ fit_sense <- df_m %>%
                 phi,
               data = .))
 
-save(fit_sense, file = "output/result_stvy_analysis.RData")
+saveRDS(fit_sense, file = "output/result_stvy_analysis.rds")
