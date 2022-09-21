@@ -7,7 +7,7 @@ pacman::p_load(tidyverse)
 
 # table for simulation parameters -----------------------------------------
 
-load(file = here::here("output/result_ricker.RData"))
+sim_result <- readRDS(file = here::here("output/result_ricker.rds"))
 
 df_param <- sim_result %>% 
   dplyr::select(n_species,
@@ -42,7 +42,7 @@ df_param <- sim_result %>%
                             Parameter == "k" ~ "Unif(100, 1000)",
                             Parameter == "r1" ~ "Unif(0.5, 2.5)",
                             Parameter == "r_max" ~ "Unif(0.5, 2.5)",
-                            Parameter == "sd_env" ~ "Unif(0.05, 0.5)",
+                            Parameter == "sd_env" ~ "Unif(0.05, 1.5)",
                             Parameter == "phi" ~ "Unif(0.5, 1)",
                             Parameter == "alpha" ~ "Unif(0.05, 0.5)"),
     Parameter = case_when(Parameter == "n_species" ~ "$S$",

@@ -1,6 +1,10 @@
 library(tidyverse)
 
 
+# round digits ------------------------------------------------------------
+
+op <- function(x, d = 2) sprintf(paste0("%1.", d, "f"), x) 
+
 # safe conversion from matrix to vector -----------------------------------
 
 m2v <- function(x) {
