@@ -11,17 +11,17 @@ knit: (function(inputFile, encoding) {
                           output_dir = "document_output")
       })
 header-includes:
-  \pagenumbering{gobble}
-  \usepackage{amsmath}
+  - \pagenumbering{gobble}
+  - \usepackage{amsmath}
 bibliography: reference.bib
-csl: pnas.csl
+csl: https://www.zotero.org/styles/pnas
 ---
 
 ```{r setup, include=FALSE}
 
-# setup
-pacman::p_load(knitr,
-               tidyverse)
+# setup ####
+source(here::here("code/library.R"))
+source(here::here("code/set_functions.R"))
 
 knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE,
@@ -29,94 +29,77 @@ knitr::opts_chunk$set(echo = FALSE,
 
 options(knitr.kable.NA = '')
 
-op <- function(x, d = 2) sprintf(paste0("%1.", d, "f"), x) 
 
 # theory ####
-load(here::here("result/result_ricker.RData"))
+cols <- c(
+  "n_species",
+  "k",
+  "r_type",
+  "r1",
+  "r_min",
+  "r_max",
+  "sd_env",
+  "phi",
+  "int_type",
+  "alpha",
+  "model",
+  "seed")
 
-n_sim <- sim_result %>% 
-  mutate(n_sim = n_warmup + n_burnin + n_timestep) %>% 
-  pull(n_sim) %>% 
-  unique()
-
-param_set <- sim_result %>% 
-  distinct(n_species,
-           k,
-           r_type,
-           r1,
-           r_min,
-           r_max,
-           sd_env,
-           phi,
-           int_type,
-           alpha,
-           model,
-           seed)
+sim_result <- list(readRDS(here::here("output/result_ricker_2sp.rds")),
+                   readRDS(here::here("output/result_ricker.rds"))) %>% 
+  lapply(FUN = function(x) {
+      n_sim <- x %>% 
+        mutate(n_sim = n_warmup + n_burnin + n_timestep) %>% 
+        pull(n_sim) %>% 
+        unique()
+      
+      param_set <- x %>% 
+        dplyr::select(which(colnames(x) %in% cols)) %>% 
+        distinct()
+      
+      attr(param_set, "n_sim") <- n_sim
+      return(param_set)
+  })
 
 # empirical data ####
 
 ## raw data
 source(here::here("code/data_fmt_fishdata.R"))
-source(here::here("code/data_fmt_analysis.R"))
+source(here::here("code/data_fmt_reg.R"))
 
 df_area <- d0 %>% 
   group_by(site_id, year) %>% 
   summarize(area = unique(area))
 
-filename <- list.files(path = here::here("result"), full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(string = .$value, pattern = "reg")) %>% 
-  filter(!str_detect(string = .$value, pattern = "reg_rich")) %>% 
-  pull()
-
-df_beta <- lapply(filename, function(x) {
-  read_csv(here::here(x)) %>% 
-    filter(parameter == "b[2]")
-})
-names(df_beta) <- str_extract(filename, "all|masu|other")  
-
 ## ssm estimate
-df_bp <- list.files(path = here::here("data_fmt"), full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(string = .$value, pattern = "ssm")) %>% 
-  pull() %>% 
-  lapply(function(x) {
-    read_csv(x) %>% 
-      filter(param == "bp_value") %>% 
-      select(mean) %>% 
-      mutate(group = str_extract(x, "all|masu|other"))
-  }) %>% 
-  bind_rows()
+df_bp <- list.files(path = here::here("data_fmt"),
+                    full.names = T,
+                    pattern = "joint") %>% 
+  readRDS() %>% 
+  filter(param == "bp_value") %>% 
+  dplyr::select(mean)
 
 ## mcmc sample size
-df_mcmc_ssm <- list.files(path = here::here("data_fmt"), full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(string = .$value, pattern = "ssm")) %>% 
-  pull() %>% 
-  lapply(function(x) {
-    read_csv(x) %>% 
-      select(n_total_mcmc,
-             n_sample,
-             n_thin,
-             n_burn) %>% 
-      distinct()
-  }) %>% 
-  bind_rows()
+df_mcmc_ssm <- list.files(path = here::here("data_fmt"),
+                    full.names = T,
+                    pattern = "joint") %>% 
+  readRDS() %>% 
+  ungroup() %>% 
+  dplyr::select(n_total_mcmc,
+                n_sample,
+                n_thin,
+                n_burn) %>% 
+  distinct()
 
-df_mcmc_reg <- list.files(path = here::here("result"), full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(string = .$value, pattern = "reg_")) %>% 
-  filter(!str_detect(string = .$value, pattern = "rich")) %>% 
-  pull() %>% 
-  lapply(function(x) {
-    read_csv(x) %>% 
-      select(n_total_mcmc,
-             n_sample,
-             n_thin,
-             n_burn) %>% 
-      distinct()
-  }) %>% 
-  bind_rows()
+df_mcmc_reg <- list.files(path = here::here("output"),
+                          full.names = T,
+                          pattern = "summary_reg") %>% 
+  readRDS() %>% 
+  dplyr::select(n_total_mcmc,
+                n_sample,
+                n_thin,
+                n_burn) %>% 
+  distinct()
 
 ## release data
 source(here::here("code/data_fmt_stock.R"))
@@ -137,18 +120,20 @@ df_stock_stage <- df_stock %>%
 
 ## Theory
 
+### Model
+
 We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012]. In the basic formula without intentional release, the population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
 
 ```{=tex}
 \begin{align}
-N_{i,t+1} = N_{i,t}~exp\left[r_i \left(1-\frac{N_{i,t} + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
+N_{i,t+1} = N_{i,t}~\exp\left[r_i \left(1-\frac{N_{i,t} + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]\exp(\epsilon_{i,t})
 \end{align}
 ```
 where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on $i$, $K_i$ the carrying capacity, and $\epsilon_{i,t}$ the species response to stochastic environmental fluctuations that obey an normal distribution $Normal(0, \sigma_{\epsilon}^2)$. We modified this formula to include the effects of intentional release (species 1) on reproduction and competition as follows:
 
 ```{=tex}
 \begin{align}
-N_{i,t+1} = (N_{i,t}+\phi_i R_t)~exp \left[r_i \left\{1-\frac{N_{i,t}+\alpha_{i1} (N_{1,t} + R_t) + \sum_{j=2}^S \alpha_{ij}N_{j,t}}{K_i} \right\} \right]exp(\epsilon_{i,t})
+N_{i,t+1} = (N_{i,t}+\phi_i R_t)~\exp \left[r_i \left\{1-\frac{N_{i,t}+\alpha_{i1} (N_{1,t} + R_t) + \sum_{j=2}^S \alpha_{ij}N_{j,t}}{K_i} \right\} \right]\exp(\epsilon_{i,t})
 \end{align}
 ```
 $R_t$ is the number of released individuals, and the parameter $\phi_i$ controls the relative fitness of captive-bred individuals:
@@ -168,14 +153,20 @@ $f_R~(\ge 0)$ is the density-independent survival of captive-bred individuals re
 
 ```{=tex}
 \begin{align}
-N_{i,t+1} = (N_{i,t}+\phi_i R_t)~exp \left[r_i \left(1-\frac{N_{i,t}+\alpha_{i1}R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]exp(\epsilon_{i,t})
+N_{i,t+1} = (N_{i,t}+\phi_i R_t)~exp \left[r_i \left(1-\frac{N_{i,t}+\alpha_{i1}R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]\exp(\epsilon_{i,t})
 \end{align}
 ```
 In this model, intrinsic growth rates of unenhanced species $r_{i,i \ne 1}$ and interspecific competition $\alpha_{ij}$ are random draws from a uniform ($r_{i,i \ne 1} \sim Unif(0.5,r_{max})$) and an exponential distribution ($\alpha_{ij} \sim Exp(1/\bar{\alpha})$), respectively. We assumed constant values of intraspecific competition ($\alpha_{ii}=1$), carrying capacity $(K_i = K)$ and the number of releases $(R_t=R)$.
 
-Prior to the main simulation, we performed an extensive sensitivity analysis to identify parameters that strongly influence the relationship between community dynamics and intentional release (see **Supplementary text**). We identified five influential parameters (**Table S2-S4**), of which different values were considered in the main simulation as follows: intrinsic growth of enhanced species ($r_1 =$ `r unique(param_set$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(param_set$alpha)`), carrying capacity ($K=$ `r unique(param_set$k)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(param_set$phi)`). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(param_set$n_species)`), maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(param_set$r_max)`), and environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(param_set$sd_env)`). This simulation setup resulted in `r nrow(param_set)` sets of parameter combinations that cover a range of ecological scenarios.
+### Model analysis
 
-Under each parameter combination, we ran `r n_sim` time steps of `r max(sim_result$n_rep)` independent communities (i.e., simulation replicates). The number of released individuals $R$ was drawn randomly from a uniform distribution for each simulation replicate as $R \sim Unif(0,500)$. We initialized the community with populations of each species drawn from a Poisson distribution with a mean of five. We repeated the seeding procedure every 10 time steps over the first `r unique(sim_result$n_warmup)` time steps to allow species to establish populations and reach equilibrium without intentional release (initialization period). After the initialization period, we released $R$ individuals of the enhanced species every time step over the next `r unique(sim_result$n_burnin)` time steps to reach new equilibrium with selective intentional release (burn-in period). We continued the simulation run with intentional release and saved the last `r unique(sim_result$n_timestep)` time steps. We obtained the following summary statistics of the whole community $\sum_i^SN_j$: the coefficient of variation (CV), the number of species persist (defied as $N_i > 0.01$ at $t=1600$), the temporal mean ($\mu$), and the SD ($\sigma$). The temporal mean and SD were also calculated for the enhanced species ($N_1$) and unenhanced species ($\sum_{i,i \ne 1}^S N_i$) separately. We summarized values of simulation parameters in **Table S1**.
+First, we analyzed a two-species community to gain insights into the model behavior and to guide the N-species analysis. Specifically, we examined the release effect with $20$ parameter values of intrinsic population growth rate $r_i$ ($0.5$ to $3.5$ with an equal interval) and carrying capacity $K$ ($50$ to $500$ with an equal interval), resulting in $400$ parameter combinations. In an ordinary Ricker model, the chosen range of $r_i$ can generate stable equilibrium, damped oscillations, limit cycle, and chaos (XXX). For simplicity, we assumed $r_1 = r_2$. We crossed this parameter setup with environmental stochasticity ($\sigma = \{0, 0.75\}$) and competition strength ($\alpha = \{0.1, 0.5\}$) and generated $1600$ simulation scenarios ($400 \times 2 \times 2$).
+
+Under each simulation scenario, we ran `r n_sim` time steps of `r max(sim_result$n_rep)` with $100$ values of release level $R$ ($0$ to $500$ with an equal interval). We initialized the community with populations of each species drawn from a Poisson distribution with a mean of $50$. We let species grow with no release for the first `r unique(sim_result$n_warmup)` time steps to allow them reach equilibrium without intentional release (initialization period). After the initialization period, we released $R$ individuals of the enhanced species every time step over the next `r unique(sim_result$n_burnin)` time steps to reach new equilibrium with selective intentional release (burn-in period). We continued the simulation run with intentional release and saved the last `r unique(sim_result$n_timestep)` time steps, which were used to obtain the following summary statistics of the whole community $\sum_i^SN_j$: the coefficient of variation (CV), the temporal mean ($\mu$), and the SD ($\sigma$).
+
+We subsequently analyzed a whole community model with $10$ species using important parameter combinations identified in the two-species model: intrinsic growth of enhanced species ($r_1 =$ `r unique(param_set$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(param_set$alpha)`), carrying capacity ($K=$ `r unique(param_set$k)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(param_set$phi)`). We confirmed that these parameters are influential in the ten-species community model via sensitivity analysis (**Table S2-S4**). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(param_set$n_species)`), maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(param_set$r_max)`), and environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(param_set$sd_env)`). This simulation setup resulted in `r nrow(param_set)` sets of parameter combinations.
+
+As with the two-species model, we ran `r n_sim` time steps of `r max(sim_result$n_rep)` with $100$ values of release level $R$ ($0$ to $500$ with a constant interval) for each simulation scenario. Initial seed inidividuals of each species were drawn from a Poisson distribution with a mean of five. In this simulation, we repeated the seeding procedure every 10 time steps over the first `r unique(sim_result$n_warmup)` time steps to account for possible complex dynamics within a ten-species community (initialization period). The rest of simulation procedures is identical to the two-species model. We summarized values of simulation parameters in **Table S1**.
 
 ## Empirical analysis
 
