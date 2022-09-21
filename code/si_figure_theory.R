@@ -1,15 +1,14 @@
 
 # setup -------------------------------------------------------------------
 
-rm(list = ls(all.names = TRUE))
-pacman::p_load(tidyverse,
-               foreach)
+rm(list = ls())
+source("code/library.R")
 
 
 # theoretical prediction --------------------------------------------------
 
 ## call `sim_result`
-load(here::here(file = "output/result_ricker.RData"))
+sim_result <- readRDS("output/result_ricker.rds")
 
 df0 <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 
