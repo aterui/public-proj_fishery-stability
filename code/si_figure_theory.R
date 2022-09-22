@@ -2,13 +2,13 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-source("code/library.R")
+source(here::here("code/library.R"))
 
 
 # theoretical prediction --------------------------------------------------
 
 ## call `sim_result`
-sim_result <- readRDS("output/result_ricker.rds")
+sim_result <- readRDS(here::here("output/result_ricker.rds"))
 
 df0 <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 
