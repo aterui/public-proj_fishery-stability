@@ -2,73 +2,51 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-pacman::p_load(tidyverse)
-op <- function(x, d = 2) sprintf(paste0("%1.", d, "f"), x) 
+lapply(paste0("code/", c("library.R", "set_functions.R")),
+       FUN = function(x) source(here::here(x)))
 
 
 # data for tables ---------------------------------------------------------
 
-filename <- list.files(path = here::here("result"),
-                       full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(string = .$value, pattern = "reg")) %>% 
-  filter(!str_detect(string = .$value, pattern = "reg_rich")) %>% 
-  pull()
-
-name <- str_extract(filename, pattern = "all|masu|other")
-
-df_est <- lapply(filename, function(x) {
+df_reg <- readRDS(here::here("output/summary_reg.rds"))
+group <- unique(df_reg$group) %>% 
+  na.omit() %>% 
+  c()
   
-  if (str_detect(x, pattern = "masu|other")) {
-    df0 <- read_csv(x) %>% 
-      filter(response != "cv")
-  } else {
-    df0 <- read_csv(x)
-  }
+r_level <- c("Species richness",
+             "CV",
+             "Mean $\\mu$",
+             "SD $\\sigma$")
+
+list_reg <- lapply(group, FUN = function(x) {
   
-  df_m <- df0 %>% 
-    filter(!(str_detect(string = .$parameter,
-                        pattern = "sigma|b_raw"))) %>% 
-    dplyr::select(response,
-                  parameter,
-                  median,
-                  sd,
-                  prob_positive) %>% 
-    mutate(prob_negative = 1 - prob_positive,
-           Parameter = case_when(parameter == "a[1]" ~ "$\\gamma_1$",
-                                 parameter == "a[2]" ~ "$\\gamma_2$",
-                                 parameter == "a[3]" ~ "$\\gamma_3$",
-                                 parameter == "a[4]" ~ "$\\gamma_4$",
-                                 parameter == "b[1]" ~ "$\\delta_0$",
-                                 parameter == "b[2]" ~ "$\\delta_1$",
-                                 parameter == "b[3]" ~ "$\\delta_2$"),
-           Effect = case_when(parameter == "a[1]" ~ "Watershed area",
-                              parameter == "a[2]" ~ "Air temperature",
-                              parameter == "a[3]" ~ "Precipitation",
-                              parameter == "a[4]" ~ "Forest fraction",
-                              parameter == "a[5]" ~ "Forest fraction",
-                              parameter == "b[1]" ~ "Intercept",
-                              parameter == "b[2]" ~ "Intentional release",
-                              parameter == "b[3]" ~ "Ocean productivity"),
-           Response = ifelse(parameter == "b[1]", response, NA),
-           Response = case_when(Response == "richness" ~ "Species richness",
-                                Response == "cv" ~ "CV",
-                                Response == "mu" ~ "Mean $\\mu$",
-                                Response == "sigma" ~ "SD $\\sigma$")) %>% 
-    relocate(Response,
-             Parameter,
-             Effect) %>% 
-    dplyr::select(-parameter, -response) %>% 
+  df_reg %>% 
+    filter(param_name %in% c("a", "b"),
+           group == x) %>% 
+    mutate(variable = case_when(id1 == 1 & param_name == "a" ~ "Intercept",
+                                id1 == 2 & param_name == "a" ~ "Effective release",
+                                id1 == 3 & param_name == "a" ~ "Watershed area",
+                                id1 == 4 & param_name == "a" ~ "Air temperature",
+                                id1 == 5 & param_name == "a" ~ "Precipitation",
+                                id1 == 6 & param_name == "a" ~ "Forest fraction",
+                                id1 == 1 & param_name == "b" ~ "Ocean productivity"),
+           response = case_when(response == "species_richness" ~ "Species richness",
+                                response == "cv" ~ "CV",
+                                response == "mu" ~ "Mean $\\mu$",
+                                response == "sigma" ~ "SD $\\sigma$"),
+           response = factor(response, r_level),
+           pr_ne = 1 - pr_po) %>%
     mutate(across(.cols = where(is.numeric),
                   .fns = function(x) paste0("$", op(x), "$"))) %>% 
-    rename(Estimate = median,
-           SE = sd,
-           "Pr(> 0)" = prob_positive,
-           "Pr(< 0)" = prob_negative)
+    arrange(response) %>% 
+    dplyr::select(Group = group,
+                  Response = response,
+                  Variable = variable,
+                  Estimate = median,
+                  SE= sd, 
+                  "Pr(> 0)" = pr_po, 
+                  "Pr(< 0)" = pr_ne)
   
-  return(df_m)
 })
 
-names(df_est) <- name
-
-
+names(list_reg) <- group
