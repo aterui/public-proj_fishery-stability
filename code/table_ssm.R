@@ -2,8 +2,8 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-paste0("code/", c("library.R", "set_functions.R")) %>% 
-  lapply(FUN = function(x) source(here::here(x)))
+lapply(paste0("code/", c("library.R", "set_functions.R")),
+       FUN = function(x) source(here::here(x)))
 
 
 # data --------------------------------------------------------------------
