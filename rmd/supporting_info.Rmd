@@ -166,7 +166,7 @@ First, we analyzed a two-species community to gain insights into the model behav
 
 Under each simulation scenario, we ran `r attr(list_param[[1]], "n_sim")` time steps of community dynamics for $100$ values of release level $R$ ($0$ to $500$ with an equal interval). We initialized populations of each species drawn from a Poisson distribution with a mean of $50$ and let species grow with no release for the first `r unique(list_sim[[1]]$n_warmup)` time steps. After the initialization period, we released $R$ individuals of the enhanced species every time step over the next `r unique(list_sim[[1]]$n_burnin)` time steps to reach new equilibrium with selective intentional release (burn-in period). We continued the simulation run with intentional release and saved the last `r unique(list_sim[[1]]$n_timestep)` time steps, which were used to obtain the following summary statistics of the whole community $\sum_i^SN_j$: the coefficient of variation (CV), the temporal mean ($\mu$), and the SD ($\sigma$).
 
-We subsequently analyzed a whole community model with $10$ species using important parameter combinations identified in the two-species simulation: intrinsic growth of enhanced species ($r_1 =$ `r unique(list_param[[1]]$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(list_param[[1]]$alpha)`), carrying capacity ($K=$ `r unique(list_param[[1]]$k)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(list_param[[1]]$phi)`). We confirmed that these parameters are influential in the ten-species community model via sensitivity analysis (**Table S2-S4**). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(list_param[[1]]$n_species)`), maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(list_param[[1]]$r_max)`), and environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(list_param[[1]]$sd_env)`). This simulation setup resulted in `r nrow(list_param[[1]])` sets of parameter combinations.
+We subsequently analyzed a whole community model with $10$ species using important parameter combinations identified in the two-species simulation: intrinsic growth of enhanced species ($r_1 =$ `r unique(list_param[[2]]$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(list_param[[2]]$alpha)`), carrying capacity ($K=$ `r unique(list_param[[2]]$k)`), and relative fitness of captive-bred individuals ($f_R=$ `r unique(list_param[[2]]$phi)`). We confirmed that these parameters are influential in the ten-species community model via sensitivity analysis (**Table S2-S4**). Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(list_param[[2]]$n_species)`), maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(list_param[[2]]$r_max)`), and environmental stochasticity ($\sigma_{\epsilon}=$ `r unique(list_param[[2]]$sd_env)`). This simulation setup resulted in `r nrow(list_param[[2]])` sets of parameter combinations.
 
 As with the two-species model, we ran `r attr(list_param[[2]], "n_sim")` time steps of `r max(list_sim[[2]]$n_rep)` with $100$ values of release level $R$ ($0$ to $500$ with a constant interval) for each simulation scenario. Initial seed inidividuals of each species were drawn from a Poisson distribution with a mean of five. In this simulation, we repeated the seeding procedure every 10 time steps over the first `r unique(list_sim[[2]]$n_warmup)` time steps to account for possible complex dynamics within a ten-species community (initialization period). The rest of simulation procedures is identical to the two-species model. We summarized values of simulation parameters in **Table S1**.
 
@@ -385,22 +385,22 @@ source(here::here("code/table_reg.R"))
 j <- 7
 
 ## conditional text
-c_text <- case_when(name == "all" ~ "whole community",
-                    name == "masu" ~ "masu salmon",
-                    name == "other" ~ "unenhanced species")
+c_text <- case_when(group == "all" ~ "whole community",
+                    group == "masu_salmon" ~ "masu salmon",
+                    group == "other" ~ "unenhanced species")
 
 ## common text
 table_legend <- "Median estimates and standard errors (SEs) of regression coefficients are shown. Pr(> 0) and Pr(< 0) represent the proportion of positive and negative estimates in MCMC samples, respectively (i.e., posterior probability)."
 
 table_reg_chunk <- knit_chunk <- NULL
 
-for(i in seq_len(length(df_est))) {
+for(i in seq_len(length(list_reg))) {
   
   knit_chunk <- paste0("## Table S", i + j, " Parameter estimates for the regression model (", c_text[i], ") \n",
                        table_legend,
                        "\n```{r table_s", i + j,"}
                        \n\n
-                       kable(df_est[[",i,"]],
+                       kable(list_reg[[",i,"]],
                              align = c(rep('l', 3), rep('c', 4)),
                              format = 'markdown')
                        \n\n
