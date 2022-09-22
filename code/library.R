@@ -20,6 +20,7 @@ pacman::p_load(## gg
   corrplot,
   msir,
   stargazer,
+  knitr,
   ## gis
   terra,
   raster,
