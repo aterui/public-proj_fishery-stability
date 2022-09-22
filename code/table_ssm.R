@@ -3,7 +3,7 @@
 
 rm(list = ls())
 paste0("code/", c("library.R", "set_functions.R")) %>% 
-  lapply(source)
+  lapply(FUN = function(x) source(here::here(x)))
 
 
 # data --------------------------------------------------------------------
