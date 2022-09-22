@@ -2,58 +2,48 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-pacman::p_load(tidyverse)
-op <- function(x, d = 2) sprintf(paste0("%1.", d, "f"), x) 
+paste0("code/", c("library.R", "set_functions.R")) %>% 
+  lapply(source)
 
 
 # data --------------------------------------------------------------------
 
+p_level <- c("$\\mu_{\\beta}$",
+             "$\\sigma_{\\beta}$",
+             "$\\mu_{\\xi1}$",
+             "$\\mu_{\\xi2}$",
+             "$\\nu_{0}$")
+
 df_ssm <- list.files(path = here::here("data_fmt"),
                      full.names = T,
                      pattern = "joint") %>% 
-  readRDS()
-# %>% 
-#   filter(param %in% c("mu_b",
-#                       "log_global_r",
-#                       "sd_r_space",
-#                       "sd_b")) %>% 
-#   select(param, `50%`, `2.5%`, `97.5%`) %>% 
-#       mutate(group = str_extract(x, "all|masu|other"),
-#              param = factor(param, levels = c("log_global_r",
-#                                               "mu_b",
-#                                               "sd_r_space",
-#                                               "sd_b")),
-#              Parameter = case_when(param == "log_global_r" ~ "$\\mu_{r}$",
-#                                    param == "mu_b" ~ "$\\mu_{\\beta}$",
-#                                    param == "sd_r_space" ~ "$\\sigma_{r}$",
-#                                    param == "sd_b" ~ "$\\sigma_{\\beta}$"),
-#              Interpretation = case_when(param == "log_global_r" ~ "Rate of community change",
-#                                         param == "mu_b" ~ "Effect of spring release",
-#                                         param == "sd_r_space" ~ "SD of the rate of community change",
-#                                         param == "sd_b" ~ "SD of the effect of spring release"),
-#              `Species group` = case_when(group == "all" & param == "log_global_r" ~ "Whole",
-#                                          group == "masu" & param == "log_global_r" ~ "Enhanced",
-#                                          group == "other" & param == "log_global_r" ~ "Unenhanced")) %>% 
-#       arrange(param)
-#     
-#     if(str_detect(x, "other")) {
-#       df0 <- df0 %>% 
-#         filter(!(param %in% c("mu_b", "sd_b")))
-#     }
-#     
-#     df0 <- df0 %>%
-#       mutate(across(.cols = where(is.numeric),
-#                     .fns = op)) %>% 
-#       mutate(Estimate = paste0("$",
-#                                `50%`,
-#                                "~(", `2.5%`, ",~", `97.5%`, ")",
-#                                "$")) %>% 
-#       select(`Species group`,
-#              Parameter,
-#              Interpretation,
-#              Estimate) %>% 
-#     
-#     return(df0)
-#     
-#   }) %>% 
-#   bind_rows()
+  readRDS() %>%
+  ungroup() %>% 
+  filter(param_name %in% c("nu0",
+                           "mu_xi",
+                           "mu_b",
+                           "sd_b")) %>% 
+  dplyr::select(param_name,
+                param,
+                group,
+                median = `50%`,
+                lower = `2.5%`,
+                upper = `97.5%`) %>% 
+  mutate(group = replace_na(group, "masu_salmon"),
+         group= case_when(group == "masu_salmon" ~ "Enhanced (masu salmon)",
+                          group == "other" ~ "Unenhanced"),
+         parameter = case_when(param_name == "nu0" ~ "$\\nu_{0}$",
+                               str_detect(param, "mu_xi\\[1,.\\]") ~ "$\\mu_{\\xi1}$",
+                               str_detect(param, "mu_xi\\[2,.\\]") ~ "$\\mu_{\\xi2}$",
+                               param_name == "mu_b" ~ "$\\mu_{\\beta}$",
+                               param_name == "sd_b" ~ "$\\sigma_{\\beta}$"),
+         parameter = factor(parameter,
+                            levels = p_level),
+         estimate = paste0(op(median),
+                           " [", op(lower),
+                           " to ",
+                           op(upper), "]")) %>%
+  dplyr::select(group, parameter, estimate) %>% 
+  arrange(group, parameter) %>% 
+  mutate(group = replace(group, duplicated(group), values = NA)) %>% 
+  rename_with(.fn = str_to_sentence)
