@@ -224,22 +224,23 @@ We used linear regression to quantify the impact of intentional release on commu
 \left\{
 \begin{aligned}
 y_s &\sim \text{Poisson}(\lambda_{y,s} \exp(\varepsilon_{\lambda,s})) &&\text{for species richness}\\
-\ln \pmb{y_s} &\sim \text{MN}(\pmb{\mu_{y,s}}, \pmb{\Omega_y}) &&\text{for mean and SD}
+\ln \pmb{y_s} &\sim \text{MN}(\pmb{\theta_{y,s}}, \pmb{\Omega_y}) &&\text{for mean and SD}
 \end{aligned}
 \right.
  (\#eq:reg)
 \end{align}
 ```
-In the poisson model for species richness, $\exp(\varepsilon_{\lambda,s})$ is the error term accounting for overdispersion ($\varepsilon_{\lambda,s} \sim \text{Normal}(0, \sigma_{\lambda}^2)$). In the multi-variate normal model, $\pmb{y_s}$ represents a vector of mean and SD at site $s$, which is modeled as a random variable drawn from a multi-variate normal distribution with a variance-covariance matrix $\pmb{\Omega_y}$. The expected means $\lambda_{y,s}$ and $\pmb{\mu_s}$ were related to linear predictors as follows:
+In the poisson model for species richness, $\exp(\varepsilon_{\lambda,s})$ is the error term accounting for overdispersion ($\varepsilon_{\lambda,s} \sim \text{Normal}(0, \sigma_{\lambda}^2)$). In the multi-variate normal model, $\pmb{y_s}$ represents a vector of mean and SD at site $s$, which is modeled as a random variable drawn from a multi-variate normal distribution with a variance-covariance matrix $\pmb{\Omega_y}$. The expected means $\lambda_{y,s}$ and $\pmb{\theta_s}$ were related to linear predictors as follows:
 
 ```{=tex}
 \begin{align}
 \left\{
 \begin{aligned}
 \ln \lambda_{y,s} &= \gamma_{0,w(s)} + \gamma_1 R'_{s} + \sum_k \gamma_kx_{k,s} &&\text{for species richness}\\
-\mu_{y,s} &= \gamma_{0,w(s)} + \gamma_1 R'_{s} + \sum_k \gamma_k x_{k,s} &&\text{for mean and SD}
+\theta_{y,s} &= \gamma_{0,w(s)} + \gamma_1 R'_{s} + \sum_k \gamma_k x_{k,s} &&\text{for mean and SD}
 \end{aligned}
 \right.
+(\#eq:model)
 \end{align}
 ```
 $\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$ nested within watershed $w$) and $\gamma_k (k > 0)$ are the regression coefficients of effective release of masu salmon $R'_s$ and other site-level predictors $x_k$. $R'_s$ is the product of the average yearly release at watershed $w$ ($R_w$; fry + juvenile + smolt, averaged for 1999 -- 2019) and the site-specific weight factor $\eta_{w,s'}$ ($s'=1,...,S_w + 1$, where $S_w$ is the number of sites within watershed $w$):
@@ -263,7 +264,23 @@ In Equation \@ref(eq:effr), $\eta_{w,s'}$ represents the effective proportion of
 \end{split}
 \end{align}
 ```
-$\delta_{0}$ is the global intercept and $\delta_1$ is the regression coefficient of ocean productivity $z_{w}$ (chlorophyll *a* concentration; averaged for 2002 -- 2019). Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture. All predictors were standardized (mean = 0, SD = 1) before the analysis.
+$\delta_{0}$ is the global intercept and $\delta_1$ is the regression coefficient of ocean productivity $z_{w}$ (chlorophyll *a* concentration; averaged for 2002 -- 2019). Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture.
+
+As for the effects of environmental variables on the CV, we did not explicitly develop a regression model. Instead, we derived their effects from the multi-variate normal model of mean and SD since the CV is a additive function of mean and SD in a log scale:
+
+```{=tex}
+\begin{align}
+\text{E}(\ln CV_s) = \text{E}(\ln y_s^{(\sigma)}) - \text{E}(\ln y_s^{(\mu)})
+\end{align}
+```
+Considering that $\text{E}(\ln y_s^{(\sigma)}) = \theta_{y,s}^{(\sigma)}$ and $\text{E}(\ln y_s^{(\mu)}) = \theta_{y,s}^{(\mu)}$,
+
+```{=tex}
+\begin{align}
+\text{E}(\ln CV_s) = (\gamma_{0,w(s)}^{(\sigma)} - \gamma_{0,w(s)}^{(\mu)}) + (\gamma_{1}^{(\sigma)} - \gamma_{1}^{(\mu)})R'_s + \sum_k (\gamma_{k}^{(\sigma)} - \gamma_{k}^{(\mu)})x_{k,s}
+\end{align}
+```
+All predictors were standardized (mean = 0, SD = 1) before the analysis.
 
 **Species interaction.** XXX
 
