@@ -6,11 +6,6 @@ source(here::here("code/library.R"))
 source(here::here("code/set_functions.R"))
 
 list_df0 <- readRDS(here::here("output/summary_multi_ricker_sparse.rds"))
-df_trait <- readRDS(here::here("data_fmt/data_trait.rds"))
-df_trait_cat <- df_trait %>% 
-  dplyr::select(where(is.factor),
-                max_total_length,
-                mouth_width)
 
 df_est <- list_df0[[1]] %>% 
   mutate(taxon.y = spabb(taxon.y, sep = "_"),
@@ -27,14 +22,8 @@ df_est <- list_df0[[1]] %>%
                         no = paste0('italic("', taxon.x, '")'))
   )
 
-# join functional distance ------------------------------------------------
 
-## read functional distance matrix
-m_fd <- readRDS(here::here("data_fmt/data_fd.rds"))
-df_fd <- m2v(m_fd) %>% 
-  rename(fd = value) %>% 
-  mutate(taxon.x = spabb(row, sep = "_"),
-         taxon.y = spabb(col, sep = "_"))
+# join functional distance ------------------------------------------------
 
 ## intra-specific competition
 df_alpha0 <- df_est %>% 
@@ -54,14 +43,10 @@ df_pd <- df_est %>%
                    "param_name",
                    "x1",
                    "taxon.x")) %>% 
-  left_join(df_fd,
-            by = c("taxon.x",
-                   "taxon.y")) %>% 
   dplyr::select(site,
                 param_name,
                 median,
                 alpha0,
-                fd,
                 taxon.x,
                 taxon.y,
                 lbs.y,
@@ -74,13 +59,7 @@ df_pd <- df_est %>%
          site_id = str_to_sentence(site_id)) %>% 
   filter(alpha_prime != 1)
 
-## ordered taxon by site
-site_order <- df_pd %>%
-  group_by(site_id) %>%
-  summarize(alpha_site = median(value)) %>%
-  arrange(desc(alpha_site)) %>%
-  pull(site_id)
-
+## df for plot
 df_plot <- df_pd %>%
   group_by(taxon.y, site) %>%
   summarize(alpha50 = median(value)) %>%
@@ -89,40 +68,10 @@ df_plot <- df_pd %>%
   mutate(order = row_number()) %>%
   right_join(df_pd,
              by = c("taxon.y",
-                    "site"))# %>%
-#mutate(site_id = factor(site_id, levels = site_order))
+                    "site"))
 
 
 # figure ------------------------------------------------------------------
-
-## by site ####
-g_alpha_site <- df_plot %>%
-  filter(alpha_prime != 1) %>% 
-  ggplot(aes(y = factor(lbs.x, levels = rev(sort(unique(lbs.x)))),
-             x = lbs.y,
-             fill = value,
-             label = sprintf("%.2f", value))) +
-  geom_tile() +
-  geom_text(size = 3) +
-  facet_wrap(facets = ~site_id,
-             scales = "free",
-             nrow = 3,
-             ncol = 3) +
-  theme_classic() +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        axis.text.x = element_text(face = "italic",
-                                   angle = 75,
-                                   vjust = 0.5,
-                                   hjust = 0.5)) +
-  scale_x_discrete(labels = label_parse()) +
-  scale_y_discrete(labels = label_parse()) +
-  MetBrewer::scale_fill_met_c("Hiroshige", direction = -1) +
-  labs(y = expression("Taxon"~italic("i")),
-       x = expression("Taxon"~italic("j")),
-       fill = expression(alpha[ij]))
-
-print(g_alpha_site)
 
 ## by taxa ####
 taxon_ordered <- df_plot %>%
@@ -167,6 +116,35 @@ g_alpha <- df_plot %>%
         axis.line = element_line(color = "gray"))
 
 print(g_alpha)
+
+## by site ####
+g_alpha_site <- df_plot %>%
+  filter(alpha_prime != 1) %>% 
+  ggplot(aes(y = factor(lbs.x, levels = rev(sort(unique(lbs.x)))),
+             x = lbs.y,
+             fill = value,
+             label = sprintf("%.2f", value))) +
+  geom_tile() +
+  geom_text(size = 3) +
+  facet_wrap(facets = ~site_id,
+             scales = "free",
+             nrow = 3,
+             ncol = 3) +
+  theme_classic() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        axis.text.x = element_text(face = "italic",
+                                   angle = 75,
+                                   vjust = 0.5,
+                                   hjust = 0.5)) +
+  scale_x_discrete(labels = label_parse()) +
+  scale_y_discrete(labels = label_parse()) +
+  MetBrewer::scale_fill_met_c("Hiroshige", direction = -1) +
+  labs(y = expression("Taxon"~italic("i")),
+       x = expression("Taxon"~italic("j")),
+       fill = expression(alpha[ij]))
+
+print(g_alpha_site)
 
 
 # export ------------------------------------------------------------------
