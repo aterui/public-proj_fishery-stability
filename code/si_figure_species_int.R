@@ -156,6 +156,7 @@ g_alpha <- df_plot %>%
   guides(color = "none",
          fill = "none") +
   scale_y_discrete(labels = label_parse()) +
+  scale_x_continuous(breaks = seq(0, max(df_plot$value), by = 0.25)) +
   MetBrewer::scale_fill_met_d("Hiroshige", direction = -1) +
   ggridges::theme_ridges() +
   theme(panel.grid = element_blank(),
