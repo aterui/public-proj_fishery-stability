@@ -57,11 +57,10 @@ model {
     }
   }  
   
-  p0[1] ~ dbeta(1.6, 0.4)
+  p0[1] ~ dbeta(1, 1)
   p0[2] ~ dbeta(1, 1)  
   q0 <- 100
-  q1 ~ dscaled.gamma(1, df0)
-  sigma_alpha1 <- sqrt(1 / q1)
+  q1 <- 1
   
   ## factor analysis for epsilon ###
   

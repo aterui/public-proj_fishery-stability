@@ -32,7 +32,6 @@ para <- c("p0",
           "log_r",
           "sigma_time",
           "sigma",
-          "sigma_alpha1",
           "alpha",
           "rho",
           "loglik")
