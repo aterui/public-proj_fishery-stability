@@ -25,14 +25,26 @@ df_psi <- sim_stvy_result %>%
               values_from = c(mean_density,
                               sd_density)) %>% 
   group_by(group_id) %>% 
-  summarize(slope_mean_enhanced = cor(mean_density_enhanced, stock, method = "spearman"),
-            slope_mean_unenhanced = cor(mean_density_unenhanced, stock, method = "spearman"),
-            slope_mean_all = cor(mean_density_all, stock, method = "spearman"),
-            slope_sd_enhanced = cor(sd_density_enhanced, stock, method = "spearman"),
-            slope_sd_unenhanced = cor(sd_density_unenhanced, stock, method = "spearman"),
-            slope_sd_all = cor(sd_density_all, stock, method = "spearman")) %>% 
-  mutate(across(.fns = as.numeric)) %>% 
-  ungroup()
+  summarize(slope_mean_enhanced = cor(mean_density_enhanced,
+                                      stock,
+                                      method = "spearman"),
+            slope_mean_unenhanced = cor(mean_density_unenhanced,
+                                        stock,
+                                        method = "spearman"),
+            slope_mean_all = cor(mean_density_all, 
+                                 stock,
+                                 method = "spearman"),
+            slope_sd_enhanced = cor(sd_density_enhanced,
+                                    stock,
+                                    method = "spearman"),
+            slope_sd_unenhanced = cor(sd_density_unenhanced,
+                                      stock, 
+                                      method = "spearman"),
+            slope_sd_all = cor(sd_density_all, 
+                               stock, 
+                               method = "spearman")) %>% 
+   mutate(across(.fns = replace_na, replace = 0)) %>% 
+   ungroup()
 
 ## combine
 df_m <- df_psi %>% 
