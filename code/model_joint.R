@@ -109,7 +109,7 @@ model {
   ## hyper parameters ####
   for (g in 1:Ng) {
     mu_xi[1, g] ~ dnorm(0, tau0)
-    mu_xi[2, g] ~ dnorm(1, tau0)
+    mu_xi[2, g] ~ dnorm(0, tau0)
     
     TAU[1:2, 1:2, g] ~ dscaled.wishart(v_scale0[], 2)
     OMEGA[1:2, 1:2, g] <- inverse(TAU[ , , g])

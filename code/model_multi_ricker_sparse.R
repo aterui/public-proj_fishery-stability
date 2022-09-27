@@ -34,13 +34,13 @@ model {
   
   tau0 <- 1 / 50
   scale0 <- 2.5
-  df0 <- 4
+  df0 <- 6
   a1 <- 2
   a2 <- 3
   
   ## low-level parameters ####
   for (i in 1:Nsp) {
-    log_d[Nyr1, i] ~ dnorm(0, tau0)
+    log_d[Nyr1, i] ~ dt(-2, 0.5, df0)
     log_r[i] ~ dnorm(0, tau0)
     
     tau_obs[i] ~ dscaled.gamma(scale0, df0)
