@@ -56,7 +56,7 @@ para <- c("a",
 m <- runjags::read.jagsfile("code/model_reg.R")
 
 ## mcmc setup ####
-n_ad <- 1000
+n_ad <- 100
 n_iter <- 1.0E+4
 n_thin <- max(3, ceiling(n_iter / 500))
 n_burn <- ceiling(max(10, n_iter/2))
@@ -124,7 +124,7 @@ while(max(mcmc_summary$Rhat, na.rm = T) >= 1.1) {
 }
 
 mcmc_sample <- post$mcmc
-n_total_mcmc <- (post$sample / n_sample) * n_iter + post$burnin
+n_total_mcmc <- (post$sample / n_sample) * n_iter + burnin
 
 ### Pr(theta > 0)
 pr_po <- MCMCvis::MCMCpstr(post$mcmc,
