@@ -56,8 +56,8 @@ df_prior <- tibble(Model = c("State space", rep(NA, 6),
                              "Multiplicative gamma prior",
                              "Half-t(-2, 2, 6)",
                              
-                             "Half-t(0, 2.5, 6)",
-                             "Half-t(0, 2.5, 6)",
                              "Normal(0, 10)",
-                             "Half-t(0, 2.5, 6)"),
+                             "Normal(0, 10)",
+                             "Dirichlet(1,...,$S_w$)",
+                             "Scaled Inv-Wishart(\\pmb{\\phi})"),
                    )
