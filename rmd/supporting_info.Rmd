@@ -446,7 +446,7 @@ for(i in seq_len(nrow(df_param))) {
                        "$r_1$ = `r df_param$r1[",i,"]`, ",
                        "$K$ = `r df_param$k[",i,"]`) \n",
                        
-                       "\n```{r figure_s", i + j,", fig.width = 9.5, fig.height = 8}
+                       "\n```{r figure_s", i + j,", fig.width = 9.5, fig.height = 7}
                        \n\n
                        list_g_theory[[",i,"]]
                        \n\n
@@ -475,9 +475,11 @@ for(i in seq_len(nrow(df_param))) {
 source(here::here("code/si_figure_obs_dyns.R"))
 j <- 8
 
-c_text <- c("whole community",
-            "masu salmon",
-            "unenhanced species")
+c_text <- tibble(Group) %>% 
+  mutate(text = case_when(Group == "all" ~ "whole community",
+                          Group == "masu_salmon" ~ "masu salmon",
+                          Group == "other" ~ "unenhanced species")) %>% 
+  pull(text)
 
 figure_dyns_chunk <- knit_chunk <- NULL
 
