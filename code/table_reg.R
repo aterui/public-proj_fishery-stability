@@ -12,7 +12,7 @@ df_reg <- readRDS(here::here("output/summary_reg.rds"))
 group <- unique(df_reg$group) %>% 
   na.omit() %>% 
   c()
-  
+
 r_level <- c("Species richness",
              "CV",
              "Mean $\\mu$",
@@ -39,13 +39,12 @@ list_reg <- lapply(group, FUN = function(x) {
     mutate(across(.cols = where(is.numeric),
                   .fns = function(x) paste0("$", op(x), "$"))) %>% 
     arrange(response) %>% 
-    dplyr::select(Group = group,
-                  Response = response,
-                  Variable = variable,
-                  Estimate = median,
-                  SE= sd, 
-                  "Pr(> 0)" = pr_po, 
-                  "Pr(< 0)" = pr_ne)
+    transmute(Response = replace(response, duplicated(response), NA),
+              Variable = variable,
+              Estimate = median,
+              SE= sd, 
+              "Pr(> 0)" = pr_po, 
+              "Pr(< 0)" = pr_ne)
   
 })
 
