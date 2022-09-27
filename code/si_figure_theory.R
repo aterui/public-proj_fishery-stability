@@ -46,10 +46,14 @@ list_g_theory <- foreach(i = seq_len(nrow(df_param))) %do% {
   df_set <- df0 %>% 
     filter(r1 == df_param$r1[i],
            k == df_param$k[i]) %>% 
-    mutate(alpha_label = case_when(alpha == 0.1 ~ "bar(alpha)==0.1",
-                                   alpha == 0.5 ~ "bar(alpha)==0.5"),
-           phi_label = case_when(phi == 0.5 ~ "f[R]==0.5",
-                                 phi == 1 ~ "f[R]==1.0"))
+    mutate(alpha_label = case_when(alpha == min(df0$alpha) ~ sprintf('bar(alpha)=="%.1f")',
+                                                                     alpha),
+                                   alpha == max(df0$alpha) ~ sprintf('bar(alpha)=="%.1f")',
+                                                                     alpha)),
+           phi_label = case_when(phi == min(df0$phi) ~ sprintf('f[R]=="%1f"', phi),
+                                 phi == max(df0$phi) ~ sprintf('f[R]=="%1f"', phi)
+                                 )
+           )
   
   g <- df_set %>% 
     ggplot(aes(y = value,
