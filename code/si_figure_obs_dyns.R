@@ -17,6 +17,9 @@ df0 <- readRDS(file = here::here("output/summary_ssm_ar3.rds")) %>%
   mutate(est_density = exp(median),
          river = str_to_sentence(river))
 
+Group <- unique(df0$group) %>% 
+  sort()
+
 ## plot
 source(here::here("code/set_figure_theme.R"))
 theme_set(plt_theme)
@@ -24,7 +27,7 @@ theme_set(plt_theme)
 list_g_dyns <- foreach(i = seq_len(length(unique(df0$group)))) %do% {
   
   g <- df0 %>% 
-    filter(group == unique(df0$group)[i]) %>% 
+    filter(group == Group[i]) %>% 
     ggplot() + 
     geom_line(aes(x = year_id_numeric + 1998,
                   y = est_density,
@@ -39,7 +42,8 @@ list_g_dyns <- foreach(i = seq_len(length(unique(df0$group)))) %do% {
     ylab(expression("Density (ind."~m^-2*")")) +
     xlab("Year") +
     labs(color = "Site") +
-    theme_bw()
+    theme_bw() +
+    theme(strip.background = element_blank())
   
   ggsave(g,
          filename = here::here(paste0("output/figure_obs_dyn_",
