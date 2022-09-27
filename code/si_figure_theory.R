@@ -46,13 +46,12 @@ list_g_theory <- foreach(i = seq_len(nrow(df_param))) %do% {
   df_set <- df0 %>% 
     filter(r1 == df_param$r1[i],
            k == df_param$k[i]) %>% 
-    mutate(alpha_label = case_when(alpha == min(df0$alpha) ~ sprintf('bar(alpha)=="%.1f")',
+    mutate(alpha_label = case_when(alpha == min(df0$alpha) ~ sprintf('bar(alpha)=="%.2f"',
                                                                      alpha),
-                                   alpha == max(df0$alpha) ~ sprintf('bar(alpha)=="%.1f")',
+                                   alpha == max(df0$alpha) ~ sprintf('bar(alpha)=="%.2f"',
                                                                      alpha)),
-           phi_label = case_when(phi == min(df0$phi) ~ sprintf('f[R]=="%1f"', phi),
-                                 phi == max(df0$phi) ~ sprintf('f[R]=="%1f"', phi)
-                                 )
+           phi_label = case_when(phi == min(df0$phi) ~ sprintf('f[R]=="%.1f"', phi),
+                                 phi == max(df0$phi) ~ sprintf('f[R]=="%.1f"', phi))
            )
   
   g <- df_set %>% 
@@ -60,7 +59,7 @@ list_g_theory <- foreach(i = seq_len(nrow(df_param))) %do% {
                x = stock,
                color = group_id,
                fill = group_id)) +
-    geom_smooth(size= 0.1,
+    geom_smooth(size= 1,
                 method = "loess") +
     scale_color_hue(labels = c("Whole", "Enhanced", "Unenhanced")) +
     labs(x = "Number of releases (individuals)",
@@ -68,10 +67,12 @@ list_g_theory <- foreach(i = seq_len(nrow(df_param))) %do% {
     facet_grid(cols = vars(alpha_label, phi_label),
                rows = vars(response_name),
                scales = "free_y",
-               labeller = label_parsed) +
+               labeller = label_parsed, 
+               switch = "y") +
     guides(color = guide_legend(override.aes = list(fill = NA)),
            fill = "none") +
-    theme(axis.title.y = element_blank())
+    theme(axis.title.y = element_blank(),
+          strip.placement = "outside")
   
   return(g)
 }
