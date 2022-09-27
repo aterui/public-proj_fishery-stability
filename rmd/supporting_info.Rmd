@@ -329,7 +329,7 @@ where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0,
 
 ## Table S1 Simulation parameter
 
-Parameter values used in the main and sensitivity analysis. Five hundred parameter values were drawn randomly from uniform distributions in the sensitivity analysis.
+Parameter values used in the whole community simulation.
 
 ```{r table_s1}
 
@@ -374,7 +374,7 @@ knitr::kable(df_prior,
 
 ## Table S4 Parameter estimates of the Bayesian state-space model
 
-Median estimates of the Bayesian state-space model. Numbers in parenthesis indicate 95% credible intervals. Site-specific parameters were excluded due to a large number of parameters.
+Median estimates of the Bayesian state-space model. Site-specific parameters were excluded due to a large number of parameters.
 
 ```{r table_s7}
 
@@ -382,7 +382,7 @@ Median estimates of the Bayesian state-space model. Numbers in parenthesis indic
 source(here::here("code/table_ssm.R"))
 
 knitr::kable(df_ssm,
-             align = c(rep("l", 3), "c"),
+             align = c(rep("l", 2), rep("c", 2)),
              format = "markdown")
 
 ```
@@ -446,7 +446,7 @@ for(i in seq_len(nrow(df_param))) {
                        "$r_1$ = `r df_param$r1[",i,"]`, ",
                        "$K$ = `r df_param$k[",i,"]`) \n",
                        
-                       "\n```{r figure_s", i + j,", fig.width = 9.5, fig.height = 7}
+                       "\n```{r figure_s", i + j,", fig.width = 10, fig.height = 7}
                        \n\n
                        list_g_theory[[",i,"]]
                        \n\n
