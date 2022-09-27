@@ -55,13 +55,6 @@ df_subset <- df_fish %>%
          group_numeric = as.numeric(group)) %>% 
   filter(group != "all")
 
-df_t1 <- df_subset %>%
-  group_by(site_id_numeric, group_numeric) %>%
-  summarize(log_mu_d = log(mean(density)),
-            log_max_d = log(max(density)),
-            log_range = log_max_d - log_mu_d) %>%
-  ungroup()
-
 d_jags <- list(N = df_subset$abundance,
                Group = df_subset$group_numeric,
                Site = df_subset$site_id_numeric,
