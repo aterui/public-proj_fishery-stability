@@ -105,6 +105,27 @@ df_mcmc_reg <- list.files(path = here::here("output"),
                 n_burn) %>% 
   distinct()
 
+df_mcmc_ssm <- list.files(path = here::here("data_fmt"),
+                    full.names = T,
+                    pattern = "joint") %>% 
+  readRDS() %>% 
+  ungroup() %>% 
+  dplyr::select(n_total_mcmc,
+                n_sample,
+                n_thin,
+                n_burn) %>% 
+  distinct()
+
+df_mcmc_ricker <- list.files(path = here::here("output"),
+                             full.names = T,
+                             pattern = "summary_multi_ricker") %>% 
+  readRDS() %>% 
+  dplyr::select(n_total_mcmc,
+                n_sample,
+                n_thin,
+                n_burn) %>% 
+  distinct()
+
 ## release data
 source(here::here("code/data_fmt_stock.R"))
 
@@ -133,7 +154,7 @@ We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012]. In th
 N_{i,t+1} = N_{i,t}~\exp\left[r_i \left(1-\frac{\sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]\exp(\varepsilon_{i,t})
 \end{align}
 ```
-where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on $i$, $K_i$ the carrying capacity, and $\varepsilon_{i,t}$ the species response to stochastic environmental fluctuations that obey an normal distribution $\text{Normal}(0, \sigma_{\varepsilon}^2)$. We modified this formula to include the effects of intentional release (species 1) on reproduction and competition as follows:
+where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on $i$, $K_i$ the carrying capacity, and $\varepsilon_{i,t}$ the species response to stochastic environmental fluctuations that obey a normal distribution $\text{Normal}(0, \sigma_{\varepsilon}^2)$. We modified this formula to include the effects of intentional release (species 1) on reproduction and competition as follows:
 
 ```{=tex}
 \begin{align}
@@ -201,20 +222,20 @@ where $\lambda_{s,t}$ is the expected fish density (individual m^-2^) and $A_{s,
 \lambda_{s,t} = n_{s,t}\exp(\varepsilon_{s,t}^{\text{obs}}) + \psi \beta_s~Fry_{w(s),t}
 \end{align}
 ```
-$n_{s,t}$ is the "true" fish density excluding fish released in the spring, $Fry_{w(s),t}$ the number of salmon fry released (unit: million fish) in spring in watershed $w$ within which site $s$ is located, and $\beta_s$ the site-specific effect of released salmon fry on the observed fish density. The parameter $\beta_s$ was drawn from a normal distribution with the hyper-mean $\mu_{\beta}$ and hyper-variance $\sigma_{\beta}^2$. The parameter $\varepsilon_{s,t}^{\text{obs}}$ is the error term that follows a normal distribution $\text{Normal}(0, \sigma_{\text{obs},s}^2)$. The inclusion of this term allows the model to account for site- and year-specific observation errors, which can be caused by ecological and/or artificial factors. When modeling the unenhanced species group, $\psi$ equals zero (otherwise $\psi = 1$) so the model excludes the term $\beta_s~Fry_{w(s),t}$.
+$n_{s,t}$ is the "true" fish density excluding fish released in the spring, $Fry_{w(s),t}$ the number of salmon fry released (unit: million fish) in spring in watershed $w$ within which site $s$ is located, and $\beta_s$ the site-specific effect of released salmon fry on the observed fish density. The parameter $\beta_s$ was drawn from a normal distribution with the hyper-mean $\theta_{\beta}$ and hyper-variance $\sigma_{\beta}^2$. The parameter $\varepsilon_{s,t}^{\text{obs}}$ is the error term that follows a normal distribution $\text{Normal}(0, \sigma_{\text{obs},s}^2)$. The inclusion of this term allows the model to account for site- and year-specific observation errors, which can be caused by ecological and/or artificial factors. When modeling the unenhanced species group, $\psi$ equals zero (otherwise $\psi = 1$) so the model excludes the term $\beta_s~Fry_{w(s),t}$.
 
-In the state model, we model temporal dynamics of fish density $n_{s,t,g}$ as follows:
+In the state model, we model temporal dynamics of fish density $n_{s,t}$ as follows:
 
 ```{=tex}
 \begin{align}
 \begin{split}
-&\ln n_{s,t} = \nu_{1,s} + \nu_{2,s} \ln n'_{s,t-1} + \varepsilon_{s,t}^{\text{state}}\\
+&\ln n_{s,t} = \xi_{1,s} + \xi_{2,s} \ln n'_{s,t-1} + \varepsilon_{s,t}^{\text{state}}\\
 &\ln n'_{s,t-1} = \frac{\sum_{q=1}^Q (\tau^{q} \ln n_{s,t-q})}{\sum_{q=1}^Q \tau^{q}}
 \end{split}
 (\#eq:state)
 \end{align}
 ```
-where $\nu_{1,s}$ is the site-specific growth rate at site $s$, $\nu_{2,s}$ the parameter characterizing density-dependence, and $\varepsilon_{s,t}^{\text{state}}$ the process error that follows a normal distribution as $\varepsilon_{s,t}^{\text{state}} \sim \text{Normal}(0, \sigma_{\text{state},s}^2)$. The parameters $\nu_{1,s}$ and $\nu_{2,s}$ were drawn from a multi-variate normal distribution as $\pmb{\nu} \sim \text{MVN}(\pmb{\theta_{\nu}}, \pmb{\Omega_{\nu}})$, where $\pmb{\nu}$ is the matrix of $\nu_{1,s}$ and $\nu_{2,s}$. Equation \@ref(eq:state) is structurally equivalent to a $Q$-order autoregressive (AR) model; however, our model has only one AR parameter $\tau$ (range: 0 -- 1) unlike ordinary AR models that require $Q$ AR parameters. This reduction of parameter numbers is possible because we express the AR parameters as a geometric-series $\tau^q$. Thus, the parameter $\tau$ controls how fast the density influence attenuates towards the past. In this study, we set $Q=3$ given the life span of the study species (typically 1 -- 3 years). We used median estimates of fish density $n_{s,t}$ to calculate the temporal CV, mean ($\mu$), and SD ($\sigma$) for each site. For a whole community, we summed the densities of enhanced and unenhanced species. We summarized the reconstructed community dynamics in **Figures S7 -- S9**.
+where $\xi_{1,s}$ is the site-specific growth rate at site $s$, $\xi_{2,s}$ the parameter characterizing density-dependence, and $\varepsilon_{s,t}^{\text{state}}$ the process error that follows a normal distribution as $\varepsilon_{s,t}^{\text{state}} \sim \text{Normal}(0, \sigma_{\text{state},s}^2)$. The parameters $\xi_{1,s}$ and $\xi_{2,s}$ were drawn from a multi-variate normal distribution as $\pmb{\xi} \sim \text{MVN}(\pmb{\theta_{\xi}}, \pmb{\Omega_{\xi}})$, where $\pmb{\xi}$ is the matrix of $\xi_{1,s}$ and $\xi_{2,s}$. Equation \@ref(eq:state) is structurally equivalent to a $Q$-order autoregressive (AR) model; however, our model has only one AR parameter $\tau$ (range: 0 -- 1) unlike ordinary AR models that require $Q$ AR parameters. This reduction of parameter numbers is possible because we express the AR parameters as a geometric-series $\tau^q$. Thus, the parameter $\tau$ controls how fast the density influence attenuates towards the past. In this study, we set $Q=3$ given the life span of the study species (typically 1 -- 3 years). We used median estimates of fish density $n_{s,t}$ to calculate the temporal CV, mean ($\mu$), and SD ($\sigma$) for each site. For a whole community, we summed the densities of enhanced and unenhanced species. We summarized the reconstructed community dynamics in **Figures S7 -- S9**.
 
 We assessed the predictive performance of our model using the Bayesian p-value [@keryIntroductionWinBUGSEcologists2010], a value of which takes a range of 0 --1 and indicates over- (\~0.00), under- (\~1.00), or suitable-fitting (\~0.50) to the data. A Bayesian p-value for our state-space models was `r op(min(df_bp$mean))`, indicating that our model specification is appropriate.
 
@@ -244,7 +265,7 @@ In the poisson model for species richness, $\exp(\varepsilon_{\lambda,s})$ is th
 (\#eq:model)
 \end{align}
 ```
-$\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$ nested within watershed $w$) and $\gamma_k (k > 0)$ is the $k^\text{th}$ regression coefficient [effective release of masu salmon $R'_s$ ($k = 1$) and other site-level predictors $x_k$ ($k \ge 2$)]. $R'_s$ is the product of the average yearly release at watershed $w$ ($R_w$; fry + juvenile + smolt, averaged for 1999 -- 2019) and the site-specific weight factor $\eta_{w,s'}$ ($s'=1,...,S_w + 1$, where $S_w$ is the number of sites within watershed $w$):
+$\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$ nested within watershed $w$) and $\gamma_k (k = 1,2,...)$ is the $k^\text{th}$ regression coefficient [effective release of masu salmon $R'_s$ ($k = 1$) and other site-level predictors $x_k$ ($k \ge 2$)]. $R'_s$ is the product of the average yearly release at watershed $w$ ($R_w$; fry + juvenile + smolt, averaged for 1999 -- 2019) and the site-specific weight factor $\eta_{w,s'}$ ($s'=1,...,S_w + 1$, where $S_w$ is the number of sites within watershed $w$):
 
 ```{=tex}
 \begin{align}
@@ -260,12 +281,12 @@ In Equation \@ref(eq:effr), $\eta_{w,s'}$ represents the effective proportion of
 ```{=tex}
 \begin{align}
 \begin{split}
-\gamma_{0,w} &\sim \text{Normal}(\mu_{\gamma,w},\sigma_{\gamma}^2)\\
-\mu_{\gamma,w} &= \delta_0 + \delta_1 z_{w}
+\gamma_{0,w} &\sim \text{Normal}(\theta_{\gamma,w},\sigma_{\gamma}^2)\\
+\theta_{\gamma,w} &= \gamma'_0 + \gamma'_1 x'_{w}
 \end{split}
 \end{align}
 ```
-$\delta_{0}$ is the global intercept and $\delta_1$ is the regression coefficient of ocean productivity $z_{w}$ (chlorophyll *a* concentration; averaged for 2002 -- 2019). Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture.
+$\gamma'_{0}$ is the global intercept and $\gamma'_1$ is the regression coefficient of ocean productivity $\gamma'_{w}$ (chlorophyll *a* concentration; averaged for 2002 -- 2019). Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture.
 
 Since the CV is a additive function of mean $\mu$ and SD $\sigma$ in a log scale, we can derive the effects of environmental factors on the CV from Equation \@ref(eq:model):
 
@@ -295,7 +316,7 @@ N_{i,t} \sim \text{Poisson}(\lambda_{i,t} A_{t})\\
 \end{split}
 \end{align}
 ```
-In the state model, we described a multi-species Ricker model for fish density $n_{i,t}$:
+where $\varepsilon_{i,t}^{\text{obs}} \sim \text{Normal}(0, \sigma_{\text{obs},i})$. In the state model, we described a multi-species Ricker model for fish density $n_{i,t}$:
 
 ```{=tex}
 \begin{align}
@@ -308,13 +329,13 @@ Equation \@ref(eq:ricker-ssm) is equivalent to Equation \@ref(eq:ricker) except 
 ```{=tex}
 \begin{align}
 \begin{split}
-\alpha'_{ij} \sim \text{half-Normal}(0, \sigma^2_{\alpha, ij})\\
+\alpha'_{ij} \sim \text{Half-normal}(0, \sigma^2_{\alpha, ij})\\
 \sigma_{\alpha,ij}^2 = z_{ij}c_1 + (1-z_{ij})c_0
 \end{split}
 (\#eq:sparse)
 \end{align}
 ```
-In Equation \@ref(eq:sparse), the latent variable $z_{ij}$ is drawn from a Bernoulli distribution and controls the prior for $\alpha'_{ij}$. We used $c_1 = 1$ and $c_0 = 0.01$ so that $\alpha'_{ij}$ is freely estimated when $z_{ij}=1$ ($\sigma^2_{\alpha} = 1$). Otherwise, the probability density of $\alpha'_{ij}$ would be concentrated around zero ($\sigma^2_{\alpha} = 0.01$), effectively omitting the parameter from the model [@mutshindaWhatDrivesCommunity2009]. We assigned different "inclusion" probabilities to diagonal (intraspecific competition) and off-diagonal elements (interspecific competition) as $z_{ii} \sim \text{Bernoulli}(p_{\alpha}^{\text{intra}})$ and $z_{ij,i \ne j} \sim \text{Bernoulli}(p_{\alpha}^{\text{inter}})$.
+In Equation \@ref(eq:sparse), the latent variable $z_{ij}$ is drawn from a Bernoulli distribution and controls the prior for $\alpha'_{ij}$. We used $c_1 = 1$ and $c_0 = 0.01$ so that $\alpha'_{ij}$ is freely estimated when $z_{ij}$ equals one ($\sigma^2_{\alpha} = 1$). Otherwise, the probability density of $\alpha'_{ij}$ would be concentrated around zero ($\sigma^2_{\alpha} = 0.01$), effectively omitting the parameter from the model [@mutshindaWhatDrivesCommunity2009]. We assigned different "inclusion" probabilities to diagonal (intraspecific competition) and off-diagonal elements (interspecific competition) as $z_{ii} \sim \text{Bernoulli}(p_{\alpha}^{\text{intra}})$ and $z_{ij,i \ne j} \sim \text{Bernoulli}(p_{\alpha}^{\text{inter}})$.
 
 We assumed that environmental noise $\varepsilon_{i,t}^{\text{state}}$ is correlated among species by introducing the variance-covariance matrix $\pmb{\Omega_{\varepsilon}}$. The matrix $\pmb{\Omega_{\varepsilon}}$ was modeled with the aid of latent factors $\zeta_{t,d}$ and factor loadings $\delta_{d,i}$:
 
@@ -324,6 +345,8 @@ We assumed that environmental noise $\varepsilon_{i,t}^{\text{state}}$ is correl
 \end{align}
 ```
 where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0, \sigma_{\epsilon,i}^2)$, and $I_{ij}$ is the identity matrix ($I_{ii}=1$ and $I_{ij, i \ne j} = 0$). With this formulation, the matrix $\pmb{\Omega_{\varepsilon}}$ can be described as $\pmb{\Omega_{\varepsilon}}=\pmb{\Delta}^T\pmb{\Delta} + \text{diag}(\sigma_{\epsilon,i}^2)$, where $\pmb{\Delta}$ is the matrix of factor loadings $\delta_{d,i}$. This model structure has a merit of reduced number of parameters while capturing the correlated nature of environmental noises [@ovaskainenHowAreSpecies2017]. We set $D=2$ when the number of species in a community is greater than four, otherwise $D=1$. We reported the estimates of $\alpha_{ij}$ so the values are comparable to those used in the theoretical analysis.
+
+**Priors.** Vague priors were assigned to most parameters: $\text{Normal(0, 10)}$ for regression coefficients ($\gamma$ and $\gamma'$) and means ($\theta_{\beta}$ and $\pmb{\theta_{\xi}}$), $\text{Half-student's}~t(0, 2.5, 6)$ for SDs ($\sigma_{\beta}$, $\sigma_{\text{obs},s}$, $\sigma_{\text{state},s}$, $\sigma_{\text{obs},i}$, $\sigma_{\text{state},i}$ $\sigma_{\lambda}$, $\sigma_{\gamma}$, and $\sigma_{\epsilon,i}$), $\text{scaled-Inv-Wishart}(\pmb{\phi})$ ($\pmb{\phi}$ is a vector of prior scales $\pmb{\phi}=\{2.5,...,2.5\}$) with the degrees of freedom = 2 for variance-covariance matrices ($\pmb{\Omega_{\xi}}$, $\pmb{\Omega_y}$, and $\pmb{\Omega_{\varepsilon}}$), and $\text{Normal}(0, 1)$ for latent factors ($\zeta_{t,d}$). We used multiplicative gamma priors with parameters $\nu = 3$, $a_1=2$, and $a_2=3$ (see Durante [@duranteNoteMultiplicativeGamma2017] for interpretation) for latent factors ($\delta_{d,i}$) following Ovaskainen *et al.* [@ovaskainenHowAreSpecies2017]. We assigned a weakly informative priors to initial fish densities $\text{ln}~n_{i,t}$ ($t = 1, 2, 3$) using $\text{Student's}~t(-2, 2, 6)$ to enhance model convergence.
 
 **Model fitting.** We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned weakly informative priors to parameters (**Table S6**). Four Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. The total MCMC iteration was XXX. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached \< 1.1 [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.2.1 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Table S7 -- S10**.
 
@@ -349,9 +372,9 @@ knitr::kable(df_param, format = "markdown")
 
 Fish species found in the study watersheds.
 
-```{r table_s5}
+```{r table_s2}
 
-# Table S5
+# Table S2
 source(here::here("code/table_species_list.R"))
 
 knitr::kable(df_sp_list,
@@ -364,7 +387,7 @@ knitr::kable(df_sp_list,
 
 Prior distributions used in the Bayesian models.
 
-```{r table_s6}
+```{r table_s3}
 
 # Table S6
 source(here::here("code/table_prior.R"))
