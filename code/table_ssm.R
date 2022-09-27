@@ -39,11 +39,14 @@ df_ssm <- list.files(path = here::here("output"),
                                param_name == "sd_b" ~ "$\\sigma_{\\beta}$"),
          parameter = factor(parameter,
                             levels = p_level),
-         estimate = paste0(op(median),
-                           " [", op(lower),
-                           " to ",
-                           op(upper), "]")) %>%
-  dplyr::select(group, parameter, estimate) %>% 
+         estimate = paste0("$",
+                           op(median),
+                           "$"),
+         "95% CI" = paste0("$",
+                          op(lower), "~\\text{to}~", op(upper),
+                          "$")) %>%
+  dplyr::select(group, parameter, estimate, "95% CI") %>% 
   arrange(group, parameter) %>% 
   mutate(group = replace(group, duplicated(group), values = NA)) %>% 
-  rename_with(.fn = str_to_sentence)
+  rename_with(.cols = -"95% CI",
+              .fn = str_to_sentence)
