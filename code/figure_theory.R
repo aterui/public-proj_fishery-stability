@@ -14,7 +14,7 @@ df0 <- sim_result %>%
   pivot_longer(cols = mean_density:cv,
                names_to = "response",
                values_to = "value") %>% 
-  filter(r1 == min(sim_result$r1),
+  filter(r1 == 1.5,
          sd_env == max(sim_result$sd_env), # sd_env = 0.75
          alpha == min(sim_result$alpha), # alpha = 0.25
          phi == min(sim_result$phi), # phi = 0.5
