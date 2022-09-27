@@ -14,9 +14,9 @@ p_level <- c("$\\mu_{\\beta}$",
              "$\\mu_{\\xi2}$",
              "$\\nu_{0}$")
 
-df_ssm <- list.files(path = here::here("data_fmt"),
+df_ssm <- list.files(path = here::here("output"),
                      full.names = T,
-                     pattern = "joint") %>% 
+                     pattern = "summary_ssm_ar") %>% 
   readRDS() %>%
   ungroup() %>% 
   filter(param_name %in% c("nu0",

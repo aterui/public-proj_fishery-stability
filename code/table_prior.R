@@ -7,8 +7,9 @@ pacman::p_load(tidyverse)
 
 # table for simulation parameters -----------------------------------------
 
-df_prior <- tibble(Model = c("State space", rep(NA, 6),
-                             "Regression", rep(NA, 3)),
+df_prior <- tibble(Model = c(rep("State space (AR model)", 8),
+                             rep("Species (species interaction)", 11),
+                             rep("Regression", 4)),
                    Parameter = c(
                      "$\\theta_{\\beta}$",
                      "$\\theta_{\\xi_1}$",
@@ -17,7 +18,7 @@ df_prior <- tibble(Model = c("State space", rep(NA, 6),
                      "$\\sigma_{\\text{obs},s}$",
                      "$\\sigma_{\\text{state},s}$",
                      "$\\Omega_{\\xi}$",
-                     "$ln~n_{s,1-3}$",
+                     "$\\ln~n_{s,1-3}$",
                      
                      "$\\sigma_{\\text{obs},i}$",
                      "$\\sigma_{\\text{state},i}$",
@@ -29,7 +30,7 @@ df_prior <- tibble(Model = c("State space", rep(NA, 6),
                      "$p_{\\alpha}^{inter}$",
                      "$\\zeta_{t,d}$",
                      "$\\delta_{d,i}$",
-                     "$ln~n_{i,1}$",
+                     "$\\ln~n_{i,1}$",
                      
                      "$\\gamma$",
                      "$\\gamma'$",
@@ -49,7 +50,7 @@ df_prior <- tibble(Model = c("State space", rep(NA, 6),
                              "Half-t(0, 2.5, 6)",
                              "Half-t(0, 2.5, 6)",
                              "Half-t(0, 2.5, 6)",
-                             "Scaled Inv-Wishart(\\pmb{\\phi})",
+                             "Scaled Inv-Wishart($\\pmb{\\phi}$)",
                              "Beta(1, 1)",
                              "Beta(1, 1)",
                              "Normal(0, 1)",
@@ -59,5 +60,6 @@ df_prior <- tibble(Model = c("State space", rep(NA, 6),
                              "Normal(0, 10)",
                              "Normal(0, 10)",
                              "Dirichlet(1,...,$S_w$)",
-                             "Scaled Inv-Wishart(\\pmb{\\phi})"),
-                   )
+                             "Scaled Inv-Wishart($\\pmb{\\phi}$)"),
+                   ) %>% 
+  mutate(Model = replace(Model, duplicated(Model), NA))
