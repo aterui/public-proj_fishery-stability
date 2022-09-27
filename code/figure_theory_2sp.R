@@ -11,12 +11,12 @@ df_sim <- readRDS(here::here("output/result_ricker_2sp.rds")) %>%
   filter(status == "all",
          phi == 1) %>% 
   mutate(cv = sd_density / mean_density,
-         sd_type = case_when(sd_env == 0 ~ "Deterministic",
-                             sd_env == 0.75 ~ "Stochastic"),
-         alpha_label = case_when(alpha == 0.1 ~ sprintf('"Weak competition"~(alpha=="%.1f")',
-                                                        alpha),
-                                 alpha == 0.5 ~ sprintf('"Strong competition"~(alpha=="%.1f")',
-                                                        alpha))) %>% 
+         sd_type = case_when(sd_env == min(.$sd_env) ~ "Deterministic",
+                             sd_env == max(.$sd_env) ~ "Stochastic"),
+         alpha_label = case_when(alpha == min(.$alpha) ~ sprintf('"Weak competition"~(alpha=="%.1f")',
+                                                                 alpha),
+                                 alpha == max(.$alpha) ~ sprintf('"Strong competition"~(alpha=="%.1f")',
+                                                                 alpha))) %>% 
   pivot_longer(cols = c(mean_density,
                         sd_density,
                         cv),
@@ -31,9 +31,9 @@ df_sim <- readRDS(here::here("output/result_ricker_2sp.rds")) %>%
 
 ## example time-series
 df_para <- expand.grid(r = seq(0.5, 3.5, by = 1),
-                       alpha = c(0.1, 0.5),
+                       alpha = range(df_sim$alpha),
                        stock = seq(0, 500, by = 250),
-                       sd_env = c(0, 0.5),
+                       sd_env = range(df_sim$sd_env),
                        k = c(100, 400))
 
 df_g <- foreach(i = seq_len(nrow(df_para)),
@@ -65,12 +65,12 @@ df_g <- foreach(i = seq_len(nrow(df_para)),
                 }
 
 df_g <- df_g%>% 
-  mutate(sd_type = case_when(sd_env == 0 ~ "Deterministic",
-                             sd_env == 0.5 ~ "Stochastic"),
-         alpha_label = case_when(alpha == 0.1 ~ sprintf('"Weak competition"~(alpha=="%.1f")',
-                                                        alpha),
-                                 alpha == 0.5 ~ sprintf('"Strong competition"~(alpha=="%.1f")',
-                                                        alpha)),
+  mutate(sd_type = case_when(sd_env == min(df_sim$sd_env) ~ "Deterministic",
+                             sd_env == max(df_sim$sd_env) ~ "Stochastic"),
+         alpha_label = case_when(alpha == min(df_sim$alpha) ~ sprintf('"Weak competition"~(alpha=="%.1f")',
+                                                                      alpha),
+                                 alpha == max(df_sim$sd_env) ~ sprintf('"Strong competition"~(alpha=="%.1f")',
+                                                                       alpha)),
          r_label = case_when(r %in% seq(0.5, 3.5, by = 1) ~ sprintf('r=="%.1f"', r))) 
 
 
@@ -80,7 +80,7 @@ v_alpha <- sort(unique(df_sim$alpha))
 lbs <- c("weak", "strong")
 
 list_g_c <- foreach(x = 1:length(v_alpha)) %do% {
-
+  
   ## column by stochasticity plot
   g_d <- df_sim  %>%
     filter(alpha == v_alpha[x]) %>% 
@@ -147,6 +147,6 @@ list_g_c <- foreach(x = 1:length(v_alpha)) %do% {
          filename = here::here(paste0("output/figure_2sp_model_", lbs[x], ".pdf")),
          height = 8.5,
          width = 15)
-    
+  
   return(g_c)  
 }
