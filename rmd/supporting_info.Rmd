@@ -84,47 +84,22 @@ df_bp <- list.files(path = here::here("data_fmt"),
   dplyr::select(mean)
 
 ## mcmc sample size
-df_mcmc_ssm <- list.files(path = here::here("data_fmt"),
+
+df_mcmc <- lapply(c("summary_joint", "summary_reg", "summary_multi_ricker"),
+       function(x) {
+         list.files(path = here::here("output"),
                     full.names = T,
-                    pattern = "joint") %>% 
-  readRDS() %>% 
-  ungroup() %>% 
-  dplyr::select(n_total_mcmc,
-                n_sample,
-                n_thin,
-                n_burn) %>% 
-  distinct()
-
-df_mcmc_reg <- list.files(path = here::here("output"),
-                          full.names = T,
-                          pattern = "summary_reg") %>% 
-  readRDS() %>% 
-  dplyr::select(n_total_mcmc,
-                n_sample,
-                n_thin,
-                n_burn) %>% 
-  distinct()
-
-df_mcmc_ssm <- list.files(path = here::here("data_fmt"),
-                    full.names = T,
-                    pattern = "joint") %>% 
-  readRDS() %>% 
-  ungroup() %>% 
-  dplyr::select(n_total_mcmc,
-                n_sample,
-                n_thin,
-                n_burn) %>% 
-  distinct()
-
-df_mcmc_ricker <- list.files(path = here::here("output"),
-                             full.names = T,
-                             pattern = "summary_multi_ricker") %>% 
-  readRDS() %>% 
-  dplyr::select(n_total_mcmc,
-                n_sample,
-                n_thin,
-                n_burn) %>% 
-  distinct()
+                    pattern = x) %>% 
+           readRDS() %>% 
+           ungroup() %>% 
+           dplyr::select(n_total_mcmc,
+                         n_sample,
+                         n_thin,
+                         n_burn) %>% 
+           distinct() %>% 
+           mutate(model = str_extract(x, "joint|reg|ricker"))
+       }) %>% 
+  bind_rows()
 
 ## release data
 source(here::here("code/data_fmt_stock.R"))
