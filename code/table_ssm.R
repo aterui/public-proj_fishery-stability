@@ -8,11 +8,11 @@ lapply(paste0("code/", c("library.R", "set_functions.R")),
 
 # data --------------------------------------------------------------------
 
-p_level <- c("$\\mu_{\\beta}$",
+p_level <- c("$\\theta_{\\beta}$",
              "$\\sigma_{\\beta}$",
-             "$\\mu_{\\xi1}$",
-             "$\\mu_{\\xi2}$",
-             "$\\nu_{0}$")
+             "$\\theta_{\\xi1}$",
+             "$\\theta_{\\xi2}$",
+             "$\\tau$")
 
 df_ssm <- list.files(path = here::here("output"),
                      full.names = T,
@@ -32,10 +32,10 @@ df_ssm <- list.files(path = here::here("output"),
   mutate(group = replace_na(group, "masu_salmon"),
          group= case_when(group == "masu_salmon" ~ "Enhanced (masu salmon)",
                           group == "other" ~ "Unenhanced"),
-         parameter = case_when(param_name == "nu0" ~ "$\\nu_{0}$",
-                               str_detect(param, "mu_xi\\[1,.\\]") ~ "$\\mu_{\\xi1}$",
-                               str_detect(param, "mu_xi\\[2,.\\]") ~ "$\\mu_{\\xi2}$",
-                               param_name == "mu_b" ~ "$\\mu_{\\beta}$",
+         parameter = case_when(param_name == "nu0" ~ "$\\tau$",
+                               str_detect(param, "mu_xi\\[1,.\\]") ~ "$\\theta_{\\xi1}$",
+                               str_detect(param, "mu_xi\\[2,.\\]") ~ "$\\theta_{\\xi2}$",
+                               param_name == "mu_b" ~ "$\\theta_{\\beta}$",
                                param_name == "sd_b" ~ "$\\sigma_{\\beta}$"),
          parameter = factor(parameter,
                             levels = p_level),

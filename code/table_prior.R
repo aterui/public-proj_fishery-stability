@@ -8,7 +8,7 @@ pacman::p_load(tidyverse)
 # table for simulation parameters -----------------------------------------
 
 df_prior <- tibble(Model = c(rep("State space (AR model)", 8),
-                             rep("Species (species interaction)", 11),
+                             rep("State space (species interaction)", 11),
                              rep("Regression", 4)),
                    Parameter = c(
                      "$\\theta_{\\beta}$",
@@ -26,8 +26,8 @@ df_prior <- tibble(Model = c(rep("State space (AR model)", 8),
                      "$\\sigma_{\\gamma}$",
                      "$\\sigma_{\\epsilon,i}$",
                      "$\\Omega_{\\varepsilon}$",
-                     "$p_{\\alpha}^{intra}$",
-                     "$p_{\\alpha}^{inter}$",
+                     "$p_{\\alpha}^{\\text{intra}}$",
+                     "$p_{\\alpha}^{\\text{inter}}$",
                      "$\\zeta_{t,d}$",
                      "$\\delta_{d,i}$",
                      "$\\ln~n_{i,1}$",
@@ -42,7 +42,7 @@ df_prior <- tibble(Model = c(rep("State space (AR model)", 8),
                              "Half-t(0, 2.5, 6)",
                              "Half-t(0, 2.5, 6)",
                              "Half-t(0, 2.5, 6)",
-                             "Scaled Inv-Wishart(\\pmb{\\phi})",
+                             "Scaled Inv-Wishart($\\pmb{\\phi}$)",
                              "Half-t(0, 2.5, 6)",
                              
                              "Half-t(0, 2.5, 6)",
