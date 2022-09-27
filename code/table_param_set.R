@@ -19,9 +19,9 @@ df_param <- sim_result %>%
                 alpha) %>% 
   pivot_longer(cols = everything(),
                names_to = "Parameter",
-               values_to = "Main") %>% 
+               values_to = "Value") %>% 
   group_by(Parameter) %>% 
-  summarize(Main = list(unique(Main))) %>% 
+  summarize(Value = list(unique(Value))) %>% 
   ungroup() %>% 
   mutate(
     id = case_when(Parameter == "n_species" ~ "a",
@@ -38,13 +38,6 @@ df_param <- sim_result %>%
                                Parameter == "sd_env" ~ "Environmental variability",
                                Parameter == "phi" ~ "Relative fitness of captive-bred individuals",
                                Parameter == "alpha" ~ "Average strength of interspecific competition"),
-    Sensitivity = case_when(Parameter == "n_species" ~ "Unif(5, 20)",
-                            Parameter == "k" ~ "Unif(100, 1000)",
-                            Parameter == "r1" ~ "Unif(0.5, 3.5)",
-                            Parameter == "r_max" ~ "Unif(0.5, 3.5)",
-                            Parameter == "sd_env" ~ "Unif(0.05, 1.5)",
-                            Parameter == "phi" ~ "Unif(0.5, 1)",
-                            Parameter == "alpha" ~ "Unif(0.05, 0.5)"),
     Parameter = case_when(Parameter == "n_species" ~ "$S$",
                           Parameter == "k" ~ "$K$",
                           Parameter == "r1" ~ "$r_1$",
