@@ -119,7 +119,7 @@ while(max(mcmc_summary$Rhat, na.rm = T) >= 1.1) {
 
 
 ## format output ####
-n_total_mcmc <- (post$sample / n_sample) * n_iter + post$burnin
+n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
 
 df_site <- df_fish %>% 
   distinct(site_id_numeric,

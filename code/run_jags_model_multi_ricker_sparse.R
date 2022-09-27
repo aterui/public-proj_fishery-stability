@@ -33,8 +33,7 @@ para <- c("p0",
           "sigma_time",
           "sigma",
           "alpha",
-          "rho",
-          "loglik")
+          "rho")
 
 # jags --------------------------------------------------------------------
 
@@ -112,14 +111,6 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                       print(max(mcmc_summary$Rhat, na.rm = T))
                     }
                     
-                    ## waic ####                    
-                    loglik <- sapply(1:nrow(df_subset), function(i)
-                      unlist(post$mcmc[, paste0("loglik[", i, "]")]))
-                    
-                    waic_hat <- loo::waic(loglik)
-                    waic_bar <- waic_hat$estimates["waic", "Estimate"]
-                    waic_se <- waic_hat$estimates["waic", "SE"]
-                    
                     ## reformat mcmc_summary ####
                     n_total_mcmc <- (post$sample / n_sample) * n_iter + n_burn
                     
@@ -137,9 +128,7 @@ df_est <- foreach(i = seq_len(length(unique_site)),
                              n_sample = post$sample,
                              n_thin = n_thin,
                              n_burn = n_burn,
-                             n_chain = n_chain,
-                             waic_hat = waic_bar,
-                             waic_se = waic_se) %>% 
+                             n_chain = n_chain) %>% 
                       separate(col = x,
                                into = c("x1", "x2"),
                                sep = ",",
@@ -163,6 +152,5 @@ df_est <- foreach(i = seq_len(length(unique_site)),
 
 # export ------------------------------------------------------------------
 
-df_waic <- distinct(df_est, site, waic_hat)
-saveRDS(list(df_est, df_waic),
+saveRDS(df_est,
         file = here::here("output/summary_multi_ricker_sparse.rds"))
