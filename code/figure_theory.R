@@ -14,11 +14,11 @@ df0 <- sim_result %>%
   pivot_longer(cols = mean_density:cv,
                names_to = "response",
                values_to = "value") %>% 
-  filter(r1 == 0.5,
-         sd_env == 0.75,
-         alpha == 0.1,
-         phi == 0.5,
-         k == 100,
+  filter(r1 == min(sim_result$r1),
+         sd_env == max(sim_result$sd_env), # sd_env = 0.75
+         alpha == min(sim_result$alpha), # alpha = 0.25
+         phi == min(sim_result$phi), # phi = 0.5
+         k == min(sim_result$k), # k= 100
          response %in% c("n_sp_last", "cv", "mean_density", "sd_density")) %>% 
   filter(!(response == "cv" & status != "all")) %>%
   filter(!(response == "n_sp_last" & status != "all")) %>%
@@ -98,8 +98,8 @@ g_theory <- df0 %>%
   # geom_point(data = df0 %>% filter(status == "all"),
   #            size = pt_size,
   #            color = hue_pal(h.start = hs[1], l = lum, c = con)(1)) +
-  # geom_smooth(size= 0.5,
-  #             method = "loess") +
+  geom_smooth(size= 0.5,
+              method = "loess") +
   scale_color_hue(h = c(hs[1], hs[3]),
                   l = 60,
                   labels = c("Whole", "Enhanced", "Unenhanced")) +
