@@ -34,7 +34,7 @@ source(here::here("code/data_fmt_stock.R"))
 
 # ssm data ----------------------------------------------------------------
 
-df_ssm <- readRDS(file = here::here("data_fmt/data_joint3.rds")) %>% 
+df_ssm <- readRDS(file = here::here("output/summary_ssm_ar3.rds")) %>% 
   rename(median = '50%',
          high = '97.5%',
          low = '2.5%') %>% 

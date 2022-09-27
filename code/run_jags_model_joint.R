@@ -12,7 +12,7 @@ source(here::here("code/set_functions.R"))
 ## "data_fmt_stock.R" calls `df_fish` through "data_fmt_fishdata.R"
 suppressMessages(source("code/data_fmt_stock.R"))
 Order <- 3
-model <- "joint"
+model <- "ssm_ar"
 
 ## mcmc setup ####
 n_ad <- 100
@@ -167,7 +167,7 @@ est <- mcmc_summary %>%
 
 # export ------------------------------------------------------------------
 
-saveRDS(est, here::here(paste0("data_fmt/data_", model, Order, ".rds")))
+saveRDS(est, here::here(paste0("output/summary_", model, Order, ".rds")))
 
 saveRDS(post,
         file = here::here(paste0("output/post_",

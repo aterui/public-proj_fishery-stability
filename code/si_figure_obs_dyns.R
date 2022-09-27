@@ -8,7 +8,7 @@ pacman::p_load(tidyverse,
 # time series data --------------------------------------------------------
 
 ## read data
-df0 <- readRDS(file = here::here("data_fmt/data_joint3.rds")) %>% 
+df0 <- readRDS(file = here::here("output/summary_ssm_ar3.rds")) %>% 
   bind_rows() %>% 
   rename(median = '50%',
          high = '97.5%',
