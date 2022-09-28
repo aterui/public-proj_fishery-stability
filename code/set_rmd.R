@@ -8,7 +8,8 @@ source(here::here("code/set_functions.R"))
 
 knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE,
-                      warning = FALSE)
+                      warning = FALSE,
+                      eval.after = "fig.cap") # to embed codes in fig.cap
 
 options(knitr.kable.NA = '')
 
