@@ -31,6 +31,7 @@ m <- read.jagsfile("code/model_multi_ricker_sparse.R")
 para <- c("p0",
           "log_r",
           "sigma_time",
+          "sigma_obs",
           "sigma",
           "alpha",
           "rho")

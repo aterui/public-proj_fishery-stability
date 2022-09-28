@@ -145,7 +145,7 @@ df_est <- as_tibble(mcmc_summary) %>%
          n_total_mcmc = n_total_mcmc,
          n_sample = n_sample,
          n_thin = n_thin,
-         n_burn = post$burnin) %>% 
+         n_burn = n_burn) %>% 
   separate(param_id,
            into = c("id1", "id2", "id3"),
            convert = T,
