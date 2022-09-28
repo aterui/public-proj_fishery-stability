@@ -13,39 +13,18 @@ p_level <- c("$\\theta_{\\beta}$",
              "$\\theta_{\\xi2}$",
              "$\\tau$")
 
-df_ssm <- list.files(path = here::here("output"),
-                     full.names = T,
-                     pattern = "summary_ssm_ar") %>% 
+df_ricker <- list.files(path = here::here("output"),
+                        full.names = T,
+                        pattern = "summary_multi_ricker") %>% 
   readRDS() %>%
-  ungroup() %>% 
-  filter(param_name %in% c("nu0",
-                           "mu_xi",
-                           "mu_b",
-                           "sd_b")) %>% 
-  dplyr::select(param_name,
-                param,
-                group,
-                median = `50%`,
-                lower = `2.5%`,
-                upper = `97.5%`) %>% 
-  mutate(group = replace_na(group, "masu_salmon"),
-         group= case_when(group == "masu_salmon" ~ "Enhanced (masu salmon)",
-                          group == "other" ~ "Unenhanced"),
-         parameter = case_when(param_name == "nu0" ~ "$\\tau$",
-                               str_detect(param, "mu_xi\\[1,.\\]") ~ "$\\theta_{\\xi1}$",
-                               str_detect(param, "mu_xi\\[2,.\\]") ~ "$\\theta_{\\xi2}$",
-                               param_name == "mu_b" ~ "$\\theta_{\\beta}$",
-                               param_name == "sd_b" ~ "$\\sigma_{\\beta}$"),
-         parameter = factor(parameter,
-                            levels = p_level),
-         estimate = paste0("$",
-                           op(median),
-                           "$"),
-         "95% CI" = paste0("$",
-                           op(lower), "~\\text{to}~", op(upper),
-                           "$")) %>%
-  dplyr::select(group, parameter, estimate, "95% CI") %>% 
-  arrange(group, parameter) %>% 
-  mutate(group = replace(group, duplicated(group), values = NA)) %>% 
-  rename_with(.cols = -"95% CI",
-              .fn = str_to_sentence)
+  filter(param_name %in% c("p0")) %>% 
+  arrange(param) %>% 
+  transmute(Parameter = case_when(param == "p0[1]" ~ "$p_{\\alpha}^{\\text{Intra}}$",
+                                  param == "p0[2]" ~ "$p_{\\alpha}^{\\text{Inter}}$"),
+            Site = str_to_sentence(site),
+            Estimate = paste0("$", op(median), "$"),
+            "95% CI" = paste0("$", 
+                              op(lower), "~\\text{to}~", op(upper),
+                              "$")) %>% 
+  mutate(Parameter = replace(Parameter, duplicated(Parameter), NA))
+  

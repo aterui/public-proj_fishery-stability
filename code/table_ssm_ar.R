@@ -13,9 +13,9 @@ p_level <- c("$\\theta_{\\beta}$",
              "$\\theta_{\\xi2}$",
              "$\\tau$")
 
-df_ssm <- list.files(path = here::here("output"),
-                     full.names = T,
-                     pattern = "summary_ssm_ar") %>% 
+df_ssm_ar <- list.files(path = here::here("output"),
+                        full.names = T,
+                        pattern = "summary_ssm_ar") %>% 
   readRDS() %>%
   ungroup() %>% 
   filter(param_name %in% c("nu0",
@@ -42,8 +42,8 @@ df_ssm <- list.files(path = here::here("output"),
                            op(median),
                            "$"),
          "95% CI" = paste0("$",
-                          op(lower), "~\\text{to}~", op(upper),
-                          "$")) %>%
+                           op(lower), "~\\text{to}~", op(upper),
+                           "$")) %>%
   dplyr::select(group, parameter, estimate, "95% CI") %>% 
   arrange(group, parameter) %>% 
   mutate(group = replace(group, duplicated(group), values = NA)) %>% 
