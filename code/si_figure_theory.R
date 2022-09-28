@@ -15,10 +15,10 @@ df0 <- sim_result %>%
   pivot_longer(cols = mean_density:cv,
                names_to = "response",
                values_to = "value") %>% 
-  filter(response %in% c("n_sp_persist", "cv", "mean_density", "sd_density")) %>% 
+  filter(response %in% c("n_sp_last", "cv", "mean_density", "sd_density")) %>% 
   filter(!(response == "cv" & status != "all")) %>%
-  filter(!(response == "n_sp_persist" & status != "all")) %>%
-  mutate(response_name = case_when(response == "n_sp_persist" ~ "Number~of~species~persist",
+  filter(!(response == "n_sp_last" & status != "all")) %>%
+  mutate(response_name = case_when(response == "n_sp_last" ~ "Number~of~species~persist",
                                    response == "cv" ~ "CV~sigma/mu",
                                    response == "mean_density" ~ "Mean~mu~(ind.)",
                                    response == "sd_density" ~ "SD~sigma~(ind.)"),

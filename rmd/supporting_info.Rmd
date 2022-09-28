@@ -18,10 +18,6 @@ header-includes:
   - \pagenumbering{gobble}
   - \usepackage{amsmath,fancyhdr, caption}
   - \captionsetup{width=1.3\linewidth, labelfont={bf}}
-  - \pagestyle{fancy}
-  - \fancyhead[L]{}
-  - \fancyhead[C]{}
-  - \setlength{\headheight}{13.7pt}
 bibliography: reference.bib
 csl: https://www.zotero.org/styles/pnas
 ---
@@ -33,6 +29,10 @@ suppressMessages(source(here::here("code/set_rmd.R")))
 
 ```{=tex}
 \newpage
+\pagestyle{fancy}
+\fancyhead[L]{Terui et al.}
+\fancyhead[C]{}
+\setlength{\headheight}{13.7pt}
 \pagenumbering{arabic}
 \def\figurename{Figure S\hspace{-.4ex}}
 \def\tablename{Table S\hspace{-.4ex}}
@@ -82,7 +82,7 @@ In this model, intrinsic growth rates of unenhanced species $r_{i,i \ne 1}$ and 
 
 ### Model analysis
 
-First, we analyzed a two-species community to gain insights into the model behavior and to guide the N-species analysis. Specifically, we examined the release effect with $20$ parameter values of intrinsic population growth rate $r_i$ ($0.5$ to $3.5$ with an equal interval) and carrying capacity $K$ ($50$ to $500$ with an equal interval), resulting in $400$ parameter combinations. In a single-species Ricker model, the chosen range of $r_i$ can generate stable equilibrium, damped oscillations, limit cycle, and chaos (XXX). For simplicity, we assumed $r_1 = r_2$. We crossed this parameter setup with environmental stochasticity ($\sigma_{\varepsilon} =$ `r unique(list_param[[1]]$sd_env)`) and competition strength ($\alpha_{ij} =$ `r unique(list_param[[1]]$alpha)`) and generated `r nrow(list_param[[1]])` simulation scenarios ($400 \times 2 \times 2$).
+First, we analyzed a two-species community to gain insights into the model behavior and to guide the N-species analysis. Specifically, we examined the release effect with $20$ parameter values of intrinsic population growth rate $r_i$ ($0.5$ to $3.5$ with an equal interval) and carrying capacity $K$ ($50$ to $500$ with an equal interval), resulting in $400$ parameter combinations. In a single-species Ricker model, the chosen range of $r_i$ can generate stable equilibrium, damped oscillations, limit cycle, and chaos [@sunDynamicBehaviorsRicker2000]. For simplicity, we assumed $r_1 = r_2$. We crossed this parameter setup with environmental stochasticity ($\sigma_{\varepsilon} =$ `r unique(list_param[[1]]$sd_env)`) and competition strength ($\alpha_{ij} =$ `r unique(list_param[[1]]$alpha)`) and generated `r nrow(list_param[[1]])` simulation scenarios ($400 \times 2 \times 2$).
 
 Under each simulation scenario, we ran `r attr(list_param[[1]], "n_sim")` timesteps of community dynamics for $100$ values of release level $R$ (0 to 500 with an equal interval). We introduced 50 individuals of each species and allowed them to grow with no intentional release for the first `r unique(list_sim[[1]]$n_warmup)` timesteps (initialization). After the initialization period, we released $R$ individuals of the enhanced species every timestep over the next `r unique(list_sim[[1]]$n_burnin)` timesteps to reach a new equilibrium with the intentional release (burn-in period). We continued the simulation run with intentional release and saved the last `r unique(list_sim[[1]]$n_timestep)` timesteps, which were used to obtain the following summary statistics of the whole community $\sum_i^S N_i$: the coefficient of variation (CV), the temporal mean ($\mu$), and the SD ($\sigma$).
 
@@ -172,7 +172,7 @@ R'_s &= \eta_{w,s'} R_w\\
 \end{split}
 \end{align}
 ```
-In Equation \@ref(eq:effr), $\eta_{w,s'}$ represents the effective proportion of total release affecting the community at site $s'$ within watershed $w$. The summation of $\eta_{w,s'}$ over $S_w+1$ is assumed to be unity because a non-negligible portion of release may escape into unsurveyed areas. Since the values of $\eta_{w,s'}$ are not available in our dataset, we estimated them through a stochastic search while fitting the regression model to the data within a Bayesian framework (see **model fitting**). Other site-level predictors include upstream watershed area (log-transformed), air temperature, precipitation, and forest land use. Urban and agricultural land use was omitted because of either a limited value range (**Figure S**\@ref(fig:fig-env)) or a strong correlation with forest land use (**Figure S**\@ref(fig:fig-cor)). The watershed-specific intercept was related to watershed-level predictors as:
+In Equation \@ref(eq:effr), $\eta_{w,s'}$ represents the effective proportion of total release affecting the community at site $s'$ within watershed $w$. The summation of $\eta_{w,s'}$ over $S_w+1$ is assumed to be unity because a non-negligible portion of release may escape into unsurveyed areas. Since the values of $\eta_{w,s'}$ are not available in our dataset, we estimated them through a stochastic search while fitting the regression model to the data within a Bayesian framework (see **model fitting**). Other site-level predictors include upstream watershed area (log-transformed), air temperature, precipitation, and forest land use. Urban and agricultural land use was omitted because of either a limited value range (**Figure S**\@ref(fig:fig-env)) or a strong correlation with forest land use (**Figure S**\@ref(fig:fig-cor)). The watershed-specific intercept was related to a watershed-level predictor as:
 
 ```{=tex}
 \begin{align}
@@ -182,9 +182,9 @@ In Equation \@ref(eq:effr), $\eta_{w,s'}$ represents the effective proportion of
 \end{split}
 \end{align}
 ```
-$\gamma'_{0}$ is the global intercept and $\gamma'_1$ is the regression coefficient of ocean productivity $\gamma'_{w}$ (chlorophyll *a* concentration; averaged for 2002 -- 2019). Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictors cannot capture.
+$\gamma'_{0}$ is the global intercept and $\gamma'_1$ is the regression coefficient of ocean productivity $\gamma'_{w}$ (chlorophyll *a* concentration; averaged for 2002 -- 2019). Ocean productivity was included because the majority of the observed species use marine habitats at a certain life stage (i.e., diadromous). The parameter $\sigma_{\gamma}$ accounts for random variation among watersheds that the watershed-level predictor cannot capture.
 
-Since the CV is an additive function of mean $\mu$ and SD $\sigma$ in a log scale, we can derive the effects of environmental factors on the CV from Equation \@ref(eq: model):
+Since the CV is an additive function of mean $\mu$ and SD $\sigma$ in a log scale, we can derive the effects of environmental factors on the CV from Equation \@ref(eq:model):
 
 ```{=tex}
 \begin{align}
@@ -242,7 +242,7 @@ We assumed that environmental noise $\varepsilon_{i,t}^{\text{state}}$ is correl
 ```
 where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0, \sigma_{\epsilon,i}^2)$, and $I_{ij}$ is the identity matrix ($I_{ii}=1$ and $I_{ij, i \ne j} = 0$). With this formulation, the matrix $\pmb{\Omega_{\varepsilon}}$ can be described as $\pmb{\Omega_{\varepsilon}}=\pmb{\Delta}^T\pmb{\Delta} + \text{diag}(\sigma_{\epsilon,i}^2)$, where $\pmb{\Delta}$ is the matrix of factor loadings $\delta_{d,i}$. This model structure has the merit of the reduced number of parameters while capturing the correlated nature of species responses to environmental fluctuations [@ovaskainenHowAreSpecies2017]. We set $D=2$ in our model. We reported the estimates of $\alpha_{ij}$, so the values are comparable to those used in the theoretical analysis.
 
-**Model fitting.** We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned vague or weakly informative priors to parameters (**Table S**\@ref(tab:tab-prior)). Four Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. The total MCMC iterations ranged from `r min(df_mcmc$n_total_mcmc)` to `r max(df_mcmc$n_total_mcmc)`, in which MCMC samples were saved every `r unique(df_mcmc$n_thin)` steps for the calculation of posterior distributions after the initial `r max(df_mcmc$n_burn)` burn-in period. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached $<1.1$ [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.2.1 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Tables S**\@ref(tab:tab-reg1) -- S\@ref(tab:tab-reg3).
+**Model fitting.** We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned vague or weakly informative priors to parameters (**Table S**\@ref(tab:tab-prior)). Four Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. The total MCMC iterations ranged from `r min(df_mcmc$n_total_mcmc)` to `r max(df_mcmc$n_total_mcmc)`, in which MCMC samples were saved every `r unique(df_mcmc$n_thin)` steps for the calculation of posterior distributions after the initial `r max(df_mcmc$n_burn)` burn-in period. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached $<1.1$ [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.2.1 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Tables S**\@ref(tab:tab-ssm-ar) -- **S**\@ref(tab:tab-reg3).
 
 \newpage
 
@@ -282,7 +282,7 @@ suppressMessages(source(here::here("code/table_prior.R")))
 
 knitr::kable(df_prior,
              format = "markdown",
-             caption = "Prior distributions used in the Bayesian models. See Durante [@duranteNoteMultiplicativeGamma2017] for multiplicative gamma priors. The parameter $\\pmb{\\phi}$ is a vector of prior scales ($\\pmb{\\phi}=2.5,...,2.5$).")
+             caption = "Prior distributions used in the Bayesian models. See Durante [@duranteNoteMultiplicativeGamma2017] for multiplicative gamma priors. The parameter $\\pmb{\\omicron}$ is a vector of prior scales ($\\pmb{\\omicron}=2.5,...,2.5$).")
 
 ```
 
@@ -358,9 +358,9 @@ for(i in seq_len(length(list_reg))) {
 
 # Supplementary Figures
 
-## Theoretical prediction (2-species community)
+## Theoretical prediction (two-species community)
 
-```{r fig-2sp, fig.width=11, fig.height=8, fig.cap = paste0("Theoretical predictions in a 2-species community. **(A)** Spearman's rank correlations between intentional release and community dynamics in a strong competition scenario ($\\bar{\\alpha}=$ ", max(list_param[[1]]$alpha) ,"). Rows distinguish different summary statistics of community dynamics (top: CV, middle: mean, bottom: SD) while columns distinguish deterministic ($\\sigma_{\\varepsilon}=$ ", min(list_param[[1]]$sd_env) ,") and stochastic simulations ($\\sigma_{\\varepsilon}=$ ", max(list_param[[1]]$sd_env) ,"). Cells indicate 400 combinations of carrying capacity and intrinsic growth rate (20 values each). Colors are proportional to Spearman's rank correlations. Dots indicate parameter combinations that are used in the whole community simulation. **(B)** Examples of community dynamics with and without intentional release. Community dynamics diverge at the broken vertical lines, the timestep at which intentional release begins. Rows distinguish intrinsic growth rates, while columns distinguish deterministic and stochastic simulations. Colors indicate release levels, and line types differ in carrying capacities.")}
+```{r fig-2sp, fig.width=12, fig.height=8, fig.cap = paste0("Theoretical predictions in a two-species community. **(A)** Spearman's rank correlations between intentional release and community dynamics in a strong competition scenario ($\\bar{\\alpha}=$ ", max(list_param[[1]]$alpha) ,"). Rows distinguish different summary statistics of community dynamics (top: CV, middle: mean, bottom: SD) while columns distinguish deterministic ($\\sigma_{\\varepsilon}=$ ", min(list_param[[1]]$sd_env) ,") and stochastic simulations ($\\sigma_{\\varepsilon}=$ ", max(list_param[[1]]$sd_env) ,"). Cells indicate 400 combinations of carrying capacity and intrinsic growth rate (20 values each). Colors are proportional to Spearman's rank correlations. Dots indicate parameter combinations that are used in the whole community simulation. **(B)** Examples of community dynamics with and without intentional release. Community dynamics diverge at the broken vertical lines, the timestep at which intentional release begins. Rows distinguish intrinsic growth rates, while columns distinguish deterministic and stochastic simulations. Colors indicate release levels, and line types differ in carrying capacities.")}
 
 source(here::here("code/figure_theory_2sp.R"))
 print(list_g_c[[2]])
@@ -379,13 +379,13 @@ figure_sim_chunk <- knit_chunk <- cap <- NULL
 
 for(i in seq_len(nrow(df_param))) {
   
-  cap[i] <- paste0("Theoretical predictions for the release effect on community dynamics. Rows represent different response variables, and columns show distinct simulation scenarios with different strengths of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters are: ",
+  cap[i] <- paste0("Theoretical predictions for the release effect in a ten-species community. Rows represent different response variables, and columns show distinct simulation scenarios with different strengths of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters are: ",
                        "number of species $S$ = ", df_param$n_species[i], "; intrinsic growth rate of an enhanced species $r_1$ = ", df_param$r1[i], "; maximum intrinsic growth rate of unenhanced species $r_{max}$ = ", df_param$r_max[i], "; environmental stochasticity $\\sigma_{\\varepsilon}$ = ", df_param$sd_env[i], "; carrying capacity $K$ = ", df_param$k[i], ".")
   
   knit_chunk <- paste0("## Theoretical prediction (",
                        "$r_1$ = `r df_param$r1[",i,"]`, ",
                        "$K$ = `r df_param$k[",i,"]`) \n",
-                       "\n```{r fig-sim", i,", fig.width = 10, fig.height = 7, fig.cap = cap[", i, "]}
+                       "\n```{r fig-sim", i,", fig.width = 10, fig.height = 8.5, fig.cap = cap[", i, "]}
                        \n\n
                        list_g_theory[[",i,"]]
                        \n\n
@@ -460,10 +460,10 @@ suppressMessages(source(here::here("code/si_figure_cor.R")))
 
 ## Empirical estimates of competition coefficients
 
-```{r fig-int, fig.width=11, fig.height=11, fig.cap="Estimates of competition coefficients $\\alpha_{ij}$ in a multi-species Ricker model. Panels distinguish sites, and values in each cell indicate median estimates of $\\alpha_{ij}$ for a given pair of species. Cells are colored in proportion to $\\alpha_{ij}$."}
+```{r fig-int, fig.width=7, fig.height=7, fig.cap="Estimates of competition coefficients $\\alpha_{ij}$ in a multi-species Ricker model. Panels distinguish sites, and values in each cell indicate median estimates of $\\alpha_{ij}$ for a given pair of species. Cells are colored in proportion to $\\alpha_{ij}$."}
 
 source(here::here("code/si_figure_species_int.R"))
-print(g_alpha_site)
+knitr::include_graphics(here::here("output/figure_alpha_site.pdf"))
 ```
 
 \newpage
