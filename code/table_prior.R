@@ -54,12 +54,12 @@ df_prior <- tibble(Model = c(rep("State space (AR model)", 8),
                              "Beta(1, 1)",
                              "Beta(1, 1)",
                              "Normal(0, 1)",
-                             "Multiplicative gamma prior",
+                             "Multiplicative gamma prior ($\\nu = 3$, $a_1 = 2$, $a_2 = 3$)",
                              "Half-t(-2, 2, 6)",
                              
                              "Normal(0, 10)",
                              "Normal(0, 10)",
-                             "Dirichlet(1,...,$S_w$)",
+                             "Dirichlet(1,...,1) for $s' = 1,...,S_w$)",
                              "Scaled Inv-Wishart($\\pmb{\\phi}$)"),
                    ) %>% 
   mutate(Model = replace(Model, duplicated(Model), NA))
