@@ -1,0 +1,36 @@
+---
+title: README
+output: github_document
+knit: (function(inputFile, encoding) {
+        rmarkdown::render(inputFile,
+                          encoding = encoding, 
+                          output_dir = here::here())
+      })
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+## Article Information
+
+Title: Intentional release of native species undermines ecological stability
+Authors: Akira Terui, Hirokazu Urabe, Masayuki Senzaki, Bungo Nishizawa
+
+## Contents
+
+```{r}
+source(here::here("code/set_readme.R"))
+knitr::kable(tbl_readme)
+```
+
+
+## Session Information
+
+```{r}
+sessionInfo()
+```
+
+
