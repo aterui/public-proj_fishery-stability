@@ -343,9 +343,29 @@ for(i in seq_len(length(list_reg))) {
 
 # Supplementary Figures
 
+<!--# Figure S1 -->
+
+```{r fig_2sp}
+
+cap <- paste0("(A) Spearman's rank correlations between intentional release and community dynamics in a strong cometition scenario ($\\bar{\\alpha}=$ ", max(list_param[[1]]$alpha) ,"). Rows distinguish different summary statistics of community dynamics (top: CV, middle: mean, bottom: SD) while columns distinguish deterministic ($\\sigma_{\\varepsilon}=$ ", min(list_param[[1]]$sd_env) ,") and stochastic simulations ($\\sigma_{\\varepsilon}=$ ", max(list_param[[1]]$sd_env) ,"). Cells indicate 400 combinations of carrying capacity and intrinsic growth rate (20 values each). Colors are proportional to Spearman's rank correlations. Dots indicate parameter combinations that are used in the whole community simulation. (B) Examples of community dynamics with and without intentional release. Community dynamics diverge at the broken vertical lines, the time step at which intentional release begins. Rows distinguish intrinsic growth rates while columns distinguish deterministic and stochastic simulations. Colors indicate release levels, and line types differ in carrying capacities.")
+
+source(here::here("code/figure_theory_2sp.R"))
+
+figure_sim2sp <- paste0("## Theoretical prediction (2-species community)",
+                        "\n```{r fig_sim2sp, fig.width = 10, fig.height = 8, fig.cap = cap}
+                       \n\n
+                       print(list_g_c[[2]])
+                       \n\n
+                       ```\n",
+                        "\n\\pagebreak\n")
+```
+
+`r paste(knitr::knit(text = figure_sim2sp), collapse = '\n')`
+
+<!--# Figure S2-S9 -->
+
 ```{r figure_sim}
 
-# Figure S1-8
 ## load figures
 suppressMessages(source(here::here("code/si_figure_theory.R")))
 
@@ -374,9 +394,10 @@ for(i in seq_len(nrow(df_param))) {
 
 `r paste(knitr::knit(text = figure_sim_chunk), collapse = '\n')`
 
+<!--# Figure S10-12 -->
+
 ```{r fig_dyns}
 
-# Figure S9-11
 ## load figures
 suppressMessages(source(here::here("code/si_figure_obs_dyns.R")))
 
@@ -427,6 +448,16 @@ print(g_env)
 ```{r fig_cor, fig.width=11, fig.height=11, fig.cap="Correlation plot among environmental variables in the protected watersheds. Numbers indicate Spearman's rank correlations."}
 
 suppressMessages(source(here::here("code/si_figure_cor.R")))
+```
+
+\newpage
+
+## Empirical estimates of competition coefficients
+
+```{r fig_int, fig.width=11, fig.height=11, fig.cap="Estimates of competition coefficients $\\alpha_{ij}$ in a multi-species Ricker model. Panels distinguish sites, and values in each cell indicate median estimates of $\\alpha_{ij}$ for a given pair of species. Cells are colored in proportion to $\\alpha_{ij}$."}
+
+source(here::here("code/si_figure_species_int.R"))
+print(g_alpha_site)
 ```
 
 \newpage
