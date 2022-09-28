@@ -69,6 +69,12 @@ list_g_theory <- foreach(i = seq_len(nrow(df_param))) %do% {
                scales = "free_y",
                labeller = label_parsed, 
                switch = "y") +
+    scale_color_hue(h = c(hs[1], hs[3]),
+                    l = 60,
+                    labels = c("Whole", "Enhanced", "Unenhanced")) +
+    scale_fill_hue(h = c(hs[1], hs[3]),
+                   l = lum,
+                   c = con) +
     guides(color = guide_legend(override.aes = list(fill = NA)),
            fill = "none") +
     theme(axis.title.y = element_blank(),
