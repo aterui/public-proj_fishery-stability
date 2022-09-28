@@ -5,9 +5,9 @@ rm(list = ls())
 source(here::here("code/library.R"))
 source(here::here("code/set_functions.R"))
 
-list_df0 <- readRDS(here::here("output/summary_multi_ricker_sparse.rds"))
+df0 <- readRDS(here::here("output/summary_multi_ricker_sparse.rds"))
 
-df_est <- list_df0[[1]] %>% 
+df_est <- df0 %>% 
   mutate(taxon.y = spabb(taxon.y, sep = "_"),
          taxon.x = spabb(taxon.x, sep = "_"),
          lbs.y = ifelse(test = str_detect(taxon.y, "\\sspp\\."),
@@ -115,7 +115,6 @@ g_alpha <- df_plot %>%
         axis.ticks.x = element_line(color = "gray"),
         axis.line = element_line(color = "gray"))
 
-print(g_alpha)
 
 ## by site ####
 g_alpha_site <- df_plot %>%
@@ -143,8 +142,6 @@ g_alpha_site <- df_plot %>%
   labs(y = expression("Taxon"~italic("i")),
        x = expression("Taxon"~italic("j")),
        fill = expression(alpha[ij]))
-
-print(g_alpha_site)
 
 
 # export ------------------------------------------------------------------
