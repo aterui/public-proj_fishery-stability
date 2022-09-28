@@ -1,6 +1,7 @@
 ---
 output:
   bookdown::pdf_document2:
+    fig_caption: true
     number_sections: false
     latex_engine: xelatex
     toc: true
@@ -18,6 +19,9 @@ header-includes:
   - \usepackage{amsmath,fancyhdr, caption}
   - \captionsetup{width=1.3\linewidth, labelfont={bf}}
   - \pagestyle{fancy}
+  - \fancyhead[L]{}
+  - \fancyhead[C]{}
+  - \setlength{\headheight}{13.7pt}
 bibliography: reference.bib
 csl: https://www.zotero.org/styles/pnas
 ---
@@ -236,7 +240,7 @@ We assumed that environmental noise $\varepsilon_{i,t}^{\text{state}}$ is correl
 \varepsilon_{i,t}^{\text{state}}=\sum_{d}^{D}\zeta_{t,d}\delta_{d,i} + I_{ij}\epsilon_{i,t}
 \end{align}
 ```
-where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0, \sigma_{\epsilon,i}^2)$, and $I_{ij}$ is the identity matrix ($I_{ii}=1$ and $I_{ij, i \ne j} = 0$). With this formulation, the matrix $\pmb{\Omega_{\varepsilon}}$ can be described as $\pmb{\Omega_{\varepsilon}}=\pmb{\Delta}^T\pmb{\Delta} + \text{diag}(\sigma_{\epsilon,i}^2)$, where $\pmb{\Delta}$ is the matrix of factor loadings $\delta_{d,i}$. This model structure has a merit of reduced number of parameters while capturing the correlated nature of environmental noises [@ovaskainenHowAreSpecies2017]. We set $D=2$ in our model. We reported the estimates of $\alpha_{ij}$ so the values are comparable to those used in the theoretical analysis.
+where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0, \sigma_{\epsilon,i}^2)$, and $I_{ij}$ is the identity matrix ($I_{ii}=1$ and $I_{ij, i \ne j} = 0$). With this formulation, the matrix $\pmb{\Omega_{\varepsilon}}$ can be described as $\pmb{\Omega_{\varepsilon}}=\pmb{\Delta}^T\pmb{\Delta} + \text{diag}(\sigma_{\epsilon,i}^2)$, where $\pmb{\Delta}$ is the matrix of factor loadings $\delta_{d,i}$. This model structure has a merit of reduced number of parameters while capturing the correlated nature of species responses to environmental fluctuations [@ovaskainenHowAreSpecies2017]. We set $D=2$ in our model. We reported the estimates of $\alpha_{ij}$ so the values are comparable to those used in the theoretical analysis.
 
 **Model fitting.** We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned vague or weakly informative priors to parameters (**Table S3**). Four Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. The total MCMC iterations ranged from `r min(df_mcmc$n_total_mcmc)` to `r max(df_mcmc$n_total_mcmc)`, in which MCMC samples were saved every `r unique(df_mcmc$n_thin)` steps for the calculation of posterior distributions after the initial `r max(df_mcmc$n_burn)` burn-in period. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached $<1.1$ [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.2.1 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Table S7 -- S10**.
 
@@ -244,40 +248,36 @@ where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0,
 
 # Supplementary Tables
 
-## Table S1 Simulation parameter
+## Simulation parameter
 
-Parameter values used in the whole community simulation.
+```{r tab_para}
 
-```{r table_s1}
-
-# Table S1
 suppressMessages(source(here::here("code/table_param_set.R")))
-knitr::kable(df_param, format = "markdown")
+knitr::kable(df_param,
+             format = "markdown",
+             caption = "Parameter values used in the whole community simulation.")
 
 ```
 
 \newpage
 
-## Table S2 Observed species
+## Observed species
 
-Fish species found in the study watersheds.
+```{r tab_splist}
 
-```{r table_s2}
-
-# Table S2
 suppressMessages(source(here::here("code/table_species_list.R")))
 
 knitr::kable(df_sp_list,
-             format = "markdown")
+             format = "markdown",
+             caption = "Fish species found in the study watersheds.")
 ```
 
 \newpage
 
 ## Priors
 
-```{r table_s3}
+```{r tab_prior}
 
-# Table S6
 suppressMessages(source(here::here("code/table_prior.R")))
 
 knitr::kable(df_prior,
@@ -288,11 +288,10 @@ knitr::kable(df_prior,
 
 \newpage
 
-## Parameter estimates of the Bayesian state-space model
+## Parameter estimates for the Bayesian state-space model
 
-```{r table_s7}
+```{r tab_ssm}
 
-# Table S7
 suppressMessages(source(here::here("code/table_ssm.R")))
 
 knitr::kable(df_ssm,
@@ -306,7 +305,6 @@ knitr::kable(df_ssm,
 
 ```{r table_reg}
 
-# Table S8-10
 ## load regression tables
 suppressMessages(source(here::here("code/table_reg.R")))
 j <- 7
@@ -316,20 +314,20 @@ c_text <- case_when(group == "all" ~ "whole community",
                     group == "masu_salmon" ~ "masu salmon",
                     group == "other" ~ "unenhanced species")
 
-## common text
-table_legend <- "Median estimates and standard errors (SEs) of regression coefficients are shown. Pr(> 0) and Pr(< 0) represent the proportion of positive and negative estimates in MCMC samples, respectively (i.e., posterior probability)."
-
-table_reg_chunk <- knit_chunk <- NULL
+table_reg_chunk <- knit_chunk <- table_legend <- NULL
 
 for(i in seq_len(length(list_reg))) {
   
-  knit_chunk <- paste0("## Table S", i + j, " Parameter estimates for the regression model (", c_text[i], ") \n",
-                       table_legend,
-                       "\n```{r table_s", i + j,"}
+  table_legend[i] <- paste0("Parameter estimates for the regression model (", c_text[i], "). Median estimates and standard errors (SEs) of regression coefficients are shown. Pr(> 0) and Pr(< 0) represent the proportion of positive and negative estimates in MCMC samples, respectively (i.e., posterior probability).")
+
+  
+  knit_chunk <- paste0("## Parameter estimates for the regression model (", c_text[i], ")",
+                       "\n```{r tab_reg", i, "}
                        \n\n
                        kable(list_reg[[",i,"]],
-                             align = c(rep('l', 3), rep('c', 4)),
-                             format = 'markdown')
+                             align = c(rep('l', 2), 'r', rep('c', 3)),
+                             format = 'markdown',
+                             caption = table_legend[",i,"])
                        \n\n
                        ```\n",
                        "\n\\pagebreak\n")
@@ -351,28 +349,21 @@ for(i in seq_len(length(list_reg))) {
 ## load figures
 suppressMessages(source(here::here("code/si_figure_theory.R")))
 
-j <- 0
-figure_sim_chunk <- knit_chunk <- NULL
+figure_sim_chunk <- knit_chunk <- cap <- NULL
 
 for(i in seq_len(nrow(df_param))) {
   
-  knit_chunk <- paste0("## Figure S", i + j,
-                       " Theoretical prediction (",
+  cap[i] <- paste0("Theoretical predictions for the release effect on community dynamics. Rows represent different response variables, and columns show distinct simulation scenarios with different strength of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters are: ",
+                       "number of species $S$ = ", df_param$n_species[i], "; intrinsic growth rate of an enhanced species $r_1$ = ", df_param$r1[i], "; maximum intrinsic growth rate of unenhanced species $r_{max}$ = ", df_param$r_max[i], "; environmental stochasticity $\\sigma_{\\varepsilon}$ = ", df_param$sd_env[i], "; carrying capacity $K$ = ", df_param$k[i], ".")
+  
+  knit_chunk <- paste0("## Theoretical prediction (",
                        "$r_1$ = `r df_param$r1[",i,"]`, ",
                        "$K$ = `r df_param$k[",i,"]`) \n",
-                       
-                       "\n```{r figure_s", i + j,", fig.width = 10, fig.height = 7}
+                       "\n```{r fig_sim", i,", fig.width = 10, fig.height = 7, fig.cap = cap[", i, "]}
                        \n\n
                        list_g_theory[[",i,"]]
                        \n\n
                        ```\n",
-                       
-                       "Theoretical predictions for the release effect on community dynamics. Rows represent different response variables, and columns show distinct simulation scenarios with different strength of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters are: ",
-                       "number of species $S$ = `r df_param$n_species[",i,"]`; ",
-                       "intrinsic growth rate of an enhanced species $r_1$ = `r df_param$r1[",i,"]`; ",
-                       "maximum intrinsic growth rate of unenhanced species $r_{max}$ = `r df_param$r_max[",i,"]`; ",
-                        "environmental stochasticity $\\sigma_{\\varepsilon}$ = `r df_param$sd_env[",i,"]`; ",
-                        "carrying capacity $K$ = `r df_param$k[",i,"]`.",
                         "\n\\pagebreak\n")
 
   figure_sim_chunk <- c(figure_sim_chunk, knit_chunk)
@@ -383,12 +374,11 @@ for(i in seq_len(nrow(df_param))) {
 
 `r paste(knitr::knit(text = figure_sim_chunk), collapse = '\n')`
 
-```{r figure_dyns}
+```{r fig_dyns}
 
 # Figure S9-11
 ## load figures
 suppressMessages(source(here::here("code/si_figure_obs_dyns.R")))
-j <- 8
 
 c_text <- tibble(Group) %>% 
   mutate(text = case_when(Group == "all" ~ "whole community",
@@ -396,20 +386,20 @@ c_text <- tibble(Group) %>%
                           Group == "other" ~ "unenhanced species")) %>% 
   pull(text)
 
-figure_dyns_chunk <- knit_chunk <- NULL
+figure_dyns_chunk <- knit_chunk <- cap <- NULL
 
 for(i in seq_len(length(list_g_dyns))) {
   
-  knit_chunk <- paste0("## Figure S", i + j,
-                       " Temporal dynamics of stream fish communities (`r c_text[",i,"]`) \n",
-                       
-                       "\n```{r figure_s", i + j,", fig.width = 11, fig.height = 11}
-                       \n\n
-                       list_g_dyns[[",i,"]]
-                       \n\n
-                       ```\n",
-                       "Temporal dynamics of stream fish communities (`r c_text[",i,"]`) in Hokkaido, Japan. Dots represent observed density, and solid lines are the predicted values of the Bayesian state-space model. Panels correspond to individual watersheds, and colors distinguish sampling sites within a watershed.",
-                        "\n\\pagebreak\n")
+  cap[i] <- paste0("Temporal dynamics of stream fish communities (", c_text[i], ") in Hokkaido, Japan. Dots represent observed density, and solid lines are the predicted values of the Bayesian state-space model. Panels correspond to individual watersheds, and colors distinguish sampling sites within a watershed.")
+    
+  knit_chunk <- paste0(
+    "## Temporal dynamics of stream fish communities (`r c_text[",i,"]`)\n",
+    "\n```{r fig_d", i,", fig.width = 10, fig.height = 7, fig.cap=cap[", i ,"]}
+    \n\n
+    list_g_dyns[[",i,"]]
+    \n\n
+    ```\n",
+    "\n\\pagebreak\n")
 
   figure_dyns_chunk <- c(figure_dyns_chunk, knit_chunk)
   
@@ -421,27 +411,23 @@ for(i in seq_len(length(list_g_dyns))) {
 
 \newpage
 
-## Figure S12 Environmental variables
+## Environmental variables
 
-```{r figure_s12, fig.width=11, fig.height=8}
+```{r fig_env, fig.width=11, fig.height=8, fig.cap="Distribution of environmental variables in the protected watershed. Note that the number of fish released and ocean productivity (chlorophyll a) are measured at the watershed level while others are measured at the site level."}
 
 suppressMessages(source(here::here("code/si_figure_env.R")))
 
 print(g_env)
 ```
 
-Distribution of environmental variables in the protected watershed. Note that the number of fish released and ocean productivity (chlorophyll *a*) are measured at the watershed level while others are measured at the site level.
-
 \newpage
 
-## Figure S13 Correlation plot
+## Correlation plot
 
-```{r figure_s13, fig.width=11, fig.height=11}
+```{r fig_cor, fig.width=11, fig.height=11, fig.cap="Correlation plot among environmental variables in the protected watersheds. Numbers indicate Spearman's rank correlations."}
 
 suppressMessages(source(here::here("code/si_figure_cor.R")))
 ```
-
-Correlation plot among environmental variables in the protected watersheds. Numbers indicate Spearman's rank correlations.
 
 \newpage
 
