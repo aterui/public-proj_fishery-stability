@@ -295,7 +295,7 @@ knitr::kable(df_prior,
 suppressMessages(source(here::here("code/table_ssm.R")))
 
 knitr::kable(df_ssm,
-             align = c(rep("l", 2), rep("c", 2)),
+             align = c(rep("l", 2), rep("r", 2)),
              format = "markdown",
              caption = "Median estimates of the Bayesian state-space model. Site-specific parameters were excluded due to a large number of parameters.")
 
@@ -325,7 +325,7 @@ for(i in seq_len(length(list_reg))) {
                        "\n```{r tab-reg", i, "}
                        \n\n
                        kable(list_reg[[",i,"]],
-                             align = c(rep('l', 2), 'r', rep('c', 3)),
+                             align = c(rep('l', 2), rep('r', 4)),
                              format = 'markdown',
                              caption = table_legend[",i,"])
                        \n\n
@@ -345,7 +345,7 @@ for(i in seq_len(length(list_reg))) {
 
 ## Theoretical prediction (2-species community)
 
-```{r fig-2sp, fig.width=11, fig.height=8, fig.cap = paste0("(A) Spearman's rank correlations between intentional release and community dynamics in a strong cometition scenario ($\\bar{\\alpha}=$ ", max(list_param[[1]]$alpha) ,"). Rows distinguish different summary statistics of community dynamics (top: CV, middle: mean, bottom: SD) while columns distinguish deterministic ($\\sigma_{\\varepsilon}=$ ", min(list_param[[1]]$sd_env) ,") and stochastic simulations ($\\sigma_{\\varepsilon}=$ ", max(list_param[[1]]$sd_env) ,"). Cells indicate 400 combinations of carrying capacity and intrinsic growth rate (20 values each). Colors are proportional to Spearman's rank correlations. Dots indicate parameter combinations that are used in the whole community simulation. (B) Examples of community dynamics with and without intentional release. Community dynamics diverge at the broken vertical lines, the time step at which intentional release begins. Rows distinguish intrinsic growth rates while columns distinguish deterministic and stochastic simulations. Colors indicate release levels, and line types differ in carrying capacities.")}
+```{r fig-2sp, fig.width=11, fig.height=8, fig.cap = paste0("Theoretical predictions in a 2-species community. **(A)** Spearman's rank correlations between intentional release and community dynamics in a strong competition scenario ($\\bar{\\alpha}=$ ", max(list_param[[1]]$alpha) ,"). Rows distinguish different summary statistics of community dynamics (top: CV, middle: mean, bottom: SD) while columns distinguish deterministic ($\\sigma_{\\varepsilon}=$ ", min(list_param[[1]]$sd_env) ,") and stochastic simulations ($\\sigma_{\\varepsilon}=$ ", max(list_param[[1]]$sd_env) ,"). Cells indicate 400 combinations of carrying capacity and intrinsic growth rate (20 values each). Colors are proportional to Spearman's rank correlations. Dots indicate parameter combinations that are used in the whole community simulation. **(B)** Examples of community dynamics with and without intentional release. Community dynamics diverge at the broken vertical lines, the time step at which intentional release begins. Rows distinguish intrinsic growth rates while columns distinguish deterministic and stochastic simulations. Colors indicate release levels, and line types differ in carrying capacities.")}
 
 source(here::here("code/figure_theory_2sp.R"))
 print(list_g_c[[2]])
