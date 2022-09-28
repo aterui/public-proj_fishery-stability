@@ -2,7 +2,7 @@
 output:
   bookdown::pdf_document2:
     fig_caption: true
-    number_sections: false
+    number_sections: true
     latex_engine: xelatex
     toc: true
     includes:
@@ -240,7 +240,7 @@ We assumed that environmental noise $\varepsilon_{i,t}^{\text{state}}$ is correl
 \varepsilon_{i,t}^{\text{state}}=\sum_{d}^{D}\zeta_{t,d}\delta_{d,i} + I_{ij}\epsilon_{i,t}
 \end{align}
 ```
-where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0, \sigma_{\epsilon,i}^2)$, and $I_{ij}$ is the identity matrix ($I_{ii}=1$ and $I_{ij, i \ne j} = 0$). With this formulation, the matrix $\pmb{\Omega_{\varepsilon}}$ can be described as $\pmb{\Omega_{\varepsilon}}=\pmb{\Delta}^T\pmb{\Delta} + \text{diag}(\sigma_{\epsilon,i}^2)$, where $\pmb{\Delta}$ is the matrix of factor loadings $\delta_{d,i}$. This model structure has the merit of the reduced number of parameters while capturing the correlated nature of species responses to environmental fluctuations [@ovaskainenHowAreSpecies2017]. We set $D=2$ in our model. We reported the estimates of $\alpha_{ij}$, so the values are comparable to those used in the theoretical analysis.
+where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0, \sigma_{\epsilon,i}^2)$, and $I_{ij}$ is the identity matrix ($I_{ii}=1$ and $I_{ij, i \ne j} = 0$). With this formulation, the matrix $\pmb{\Omega_{\varepsilon}}$ can be described as $\pmb{\Omega_{\varepsilon}}=\pmb{\Delta}^T\pmb{\Delta} + \text{diag}(\sigma_{\epsilon,i}^2)$, where $\pmb{\Delta}$ is the matrix of factor loadings $\delta_{d,i}$. This model structure with multiplicative gamma priors on factor loadings [@duranteNoteMultiplicativeGamma2017] has the merit of the reduced number of parameters while capturing the correlated nature of species responses to environmental fluctuations [@ovaskainenHowAreSpecies2017]. We set $D=2$ in our model. We reported the estimates of $\alpha_{ij}$, so the values are comparable to those used in the theoretical analysis.
 
 **Model fitting.** We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned vague or weakly informative priors to parameters (**Table S**\@ref(tab:tab-prior)). Four Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. The total MCMC iterations ranged from `r min(df_mcmc$n_total_mcmc)` to `r max(df_mcmc$n_total_mcmc)`, in which MCMC samples were saved every `r unique(df_mcmc$n_thin)` steps for the calculation of posterior distributions after the initial `r max(df_mcmc$n_burn)` burn-in period. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached $<1.1$ [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.2.1 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Tables S**\@ref(tab:tab-ssm-ar) -- **S**\@ref(tab:tab-reg3).
 
