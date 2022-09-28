@@ -2,7 +2,7 @@
 # setup -------------------------------------------------------------------
 
 rm(list = ls())
-source("code/library.R")
+source(here::here("code/library.R"))
 source(here::here("code/set_figure_theme.R"))
 
 # read data ---------------------------------------------------------------
@@ -112,6 +112,7 @@ list_g_c <- foreach(x = 1:length(v_alpha)) %do% {
          fill = expression("Correlation"~rho)) +
     theme_classic() +
     theme(strip.background = element_blank(),
+          legend.position = "bottom",
           axis.title = element_text(size = 12),
           strip.text.x = element_text(size = 10),
           strip.text.y = element_text(size = 10))
@@ -136,7 +137,8 @@ list_g_c <- foreach(x = 1:length(v_alpha)) %do% {
     labs(y = "Community density",
          x = "Time step",
          color = "Release level",
-         linetype = "Carrying capacity K")
+         linetype = "Carrying capacity K") +
+    theme(legend.position = "bottom")
   
   
   # combine plot ------------------------------------------------------------
