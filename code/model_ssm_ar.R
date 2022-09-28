@@ -81,11 +81,11 @@ model {
     for (g in 1:Ng) {
       ### process error
       tau_r_time[i, g] ~ dscaled.gamma(scale0, df0)
-      sd_r_time[i, g] <- sqrt(1 / tau_r_time[i, g])
+      sigma_r_time[i, g] <- sqrt(1 / tau_r_time[i, g])
       
       ### observation error
       tau_obs[i, g] ~ dscaled.gamma(scale0, df0)
-      sd_obs[i, g] <- sqrt(1 / tau_obs[i, g])
+      sigma_obs[i, g] <- sqrt(1 / tau_obs[i, g])
       
       ### density dependence
       xi[i, 1:2, g] ~ dmnorm(mu_xi[ , g], TAU[ , , g])
