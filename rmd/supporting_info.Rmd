@@ -1,6 +1,7 @@
 ---
 output:
   bookdown::pdf_document2:
+    number_sections: false
     latex_engine: xelatex
     toc: true
     includes:
@@ -14,7 +15,9 @@ knit: (function(inputFile, encoding) {
       })
 header-includes:
   - \pagenumbering{gobble}
-  - \usepackage{amsmath}
+  - \usepackage{amsmath,fancyhdr, caption}
+  - \captionsetup{width=1.3\linewidth, labelfont={bf}}
+  - \pagestyle{fancy}
 bibliography: reference.bib
 csl: https://www.zotero.org/styles/pnas
 ---
@@ -27,6 +30,8 @@ suppressMessages(source(here::here("code/set_rmd.R")))
 ```{=tex}
 \newpage
 \pagenumbering{arabic}
+\def\figurename{Figure S\hspace{-.6ex}}
+\def\tablename{Table S\hspace{-.6ex}}
 ```
 # Methods
 
@@ -268,9 +273,7 @@ knitr::kable(df_sp_list,
 
 \newpage
 
-## Table S3 Priors
-
-Prior distributions used in the Bayesian models.
+## Priors
 
 ```{r table_s3}
 
@@ -278,15 +281,14 @@ Prior distributions used in the Bayesian models.
 suppressMessages(source(here::here("code/table_prior.R")))
 
 knitr::kable(df_prior,
-             format = "markdown")
+             format = "markdown",
+             caption = "Prior distributions used in the Bayesian models. See Durante [@duranteNoteMultiplicativeGamma2017] for multiplicative gamma priors. The parameter $\\pmb{\\phi}$ is a vector of prior scales ($\\pmb{\\phi}=2.5,...,2.5$).")
 
 ```
 
 \newpage
 
-## Table S4 Parameter estimates of the Bayesian state-space model
-
-Median estimates of the Bayesian state-space model. See Durante [@duranteNoteMultiplicativeGamma2017] for multiplicative gamma priors. The parameter $\pmb{\phi}$ is a vector of prior scales ($\pmb{\phi}=2.5,...,2.5$). Site-specific parameters were excluded due to a large number of parameters.
+## Parameter estimates of the Bayesian state-space model
 
 ```{r table_s7}
 
@@ -295,7 +297,8 @@ suppressMessages(source(here::here("code/table_ssm.R")))
 
 knitr::kable(df_ssm,
              align = c(rep("l", 2), rep("c", 2)),
-             format = "markdown")
+             format = "markdown",
+             caption = "Median estimates of the Bayesian state-space model. Site-specific parameters were excluded due to a large number of parameters.")
 
 ```
 
