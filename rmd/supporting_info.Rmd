@@ -379,7 +379,7 @@ figure_sim_chunk <- knit_chunk <- cap <- NULL
 
 for(i in seq_len(nrow(df_param))) {
   
-  cap[i] <- paste0("Theoretical predictions for the release effect in a ten-species community. Rows represent different response variables, and columns show distinct simulation scenarios with different strengths of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Other parameters are: ",
+  cap[i] <- paste0("Theoretical predictions for the release effect in a ten-species community. Rows represent different response variables, and columns show distinct simulation scenarios with different strengths of interspecific competition ($\\bar{\\alpha}$) and relative fitness of captive-bred individuals ($f_R$). Lines are loess curves (mean) with shades indicating associated 95% confidence intervals. Other parameters are: ",
                        "number of species $S$ = ", df_param$n_species[i], "; intrinsic growth rate of an enhanced species $r_1$ = ", df_param$r1[i], "; maximum intrinsic growth rate of unenhanced species $r_{max}$ = ", df_param$r_max[i], "; environmental stochasticity $\\sigma_{\\varepsilon}$ = ", df_param$sd_env[i], "; carrying capacity $K$ = ", df_param$k[i], ".")
   
   knit_chunk <- paste0("## Theoretical prediction (",
