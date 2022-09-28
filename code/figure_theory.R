@@ -17,7 +17,7 @@ df0 <- sim_result %>%
   filter(r1 == 1.5,
          sd_env == max(sim_result$sd_env), # sd_env = 0.75
          alpha == min(sim_result$alpha), # alpha = 0.25
-         phi == min(sim_result$phi), # phi = 0.5
+         phi == max(sim_result$phi), # phi = 1
          k == min(sim_result$k), # k= 100
          response %in% c("n_sp_last", "cv", "mean_density", "sd_density")) %>% 
   filter(!(response == "cv" & status != "all")) %>%
@@ -48,7 +48,7 @@ df1 <- df0 %>%
            response, 
            response_name) %>% 
   do(fit = loess.sd(dplyr::select(., stock, value), # fit loess by group
-                    nsigma = 1,
+                    nsigma = 0.67, # 50% prediction interval multiplier
                     span = 0.8)) %>% # 1 SD prediction interval
   ungroup()
 
@@ -104,7 +104,8 @@ g_theory <- df0 %>%
                   l = 60,
                   labels = c("Whole", "Enhanced", "Unenhanced")) +
   scale_fill_hue(h = c(hs[1], hs[3]),
-                 l = 85) +
+                 l = lum,
+                 c = con) +
   labs(x = "Number of releases (individuals)",
        y = "Value") +
   facet_wrap(facets = ~ response_name,

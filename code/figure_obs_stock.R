@@ -166,7 +166,8 @@ g_obs <- ggplot(data = df_m,
                   l = 60,
                   labels = c("Whole", "Enhanced", "Unenhanced")) +
   scale_fill_hue(h = c(hs[1], hs[3]),
-                 l = 85,
+                 l = lum,
+                 c = con,
                  labels = c("Whole", "Enhanced", "Unenhanced")) +
   scale_linetype_manual(values = c(`a` = "solid",
                                    `b` = "dashed",

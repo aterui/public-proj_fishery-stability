@@ -75,7 +75,8 @@ g_coef <- df_mcmc %>%
                   l = 50,
                   labels = c("Whole", "Enhanced", "Unenhanced")) +
   scale_fill_hue(h = c(hs[1], hs[3]),
-                 l = 95,
+                 l = lum,
+                 c = con,
                  labels = c("Whole", "Enhanced", "Unenhanced")) +
   theme_ridges()
 
