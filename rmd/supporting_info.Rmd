@@ -34,8 +34,8 @@ suppressMessages(source(here::here("code/set_rmd.R")))
 ```{=tex}
 \newpage
 \pagenumbering{arabic}
-\def\figurename{Figure S\hspace{-.6ex}}
-\def\tablename{Table S\hspace{-.6ex}}
+\def\figurename{Figure S\hspace{-.4ex}}
+\def\tablename{Table S\hspace{-.4ex}}
 ```
 # Methods
 
@@ -88,13 +88,13 @@ Under each simulation scenario, we ran `r attr(list_param[[1]], "n_sim")` time s
 
 We subsequently analyzed a whole community model with 10 species using important parameter combinations identified in the two-species simulation: intrinsic growth of enhanced species ($r_1 =$ `r unique(list_param[[2]]$r1)`), average strength of interspecific competition ($\bar{\alpha}=$ `r unique(list_param[[2]]$alpha)`), carrying capacity ($K=$ `r unique(list_param[[2]]$k)`). We also varied relative fitness of captive-bred individuals ($f_R=$ `r unique(list_param[[2]]$phi)`) as this is a common interest in captive-breeding programs. Meanwhile, we fixed values of the following parameters: the number of species ($S=$ `r unique(list_param[[2]]$n_species)`), maximum intrinsic growth rate of unenhanced species ($r_{max}=$ `r unique(list_param[[2]]$r_max)`), and environmental stochasticity ($\sigma_{\varepsilon}=$ `r unique(list_param[[2]]$sd_env)`). This simulation setup resulted in `r nrow(list_param[[2]])` sets of parameter combinations.
 
-As with the two-species model, we ran `r attr(list_param[[2]], "n_sim")` time steps of community dynamics with `r max(list_sim[[2]]$n_rep)` values of release level $R$ ($0$ to $500$ with a constant interval) for each simulation scenario. In this simulation, we initialized the community by introducing five individuals of each species and repeated this seeding every 10 time steps to account for possible complex dynamics of a ten-species community. The rest of the simulation procedure is identical to the two-species model. We summarized values of simulation parameters in **Table S1**.
+As with the two-species model, we ran `r attr(list_param[[2]], "n_sim")` time steps of community dynamics with `r max(list_sim[[2]]$n_rep)` values of release level $R$ ($0$ to $500$ with a constant interval) for each simulation scenario. In this simulation, we initialized the community by introducing five individuals of each species and repeated this seeding every 10 time steps to account for possible complex dynamics of a ten-species community. The rest of the simulation procedure is identical to the two-species model. We summarized values of simulation parameters in **Table S**\@ref(tab:tab-para).
 
 ## Empirical analysis
 
 ### Data
 
-**Time-series data.** We assembled time-series fish data at `r n_distinct(d0$site_id)` sites within `r n_distinct(d0$river)` protected watersheds of Hokkaido Island, Japan. The Hokkaido Research Organization leads a long-term monitoring program at these watersheds, and the data are published as annual reports [@salmonandfreshwaterfisheriesresearchinstitutehokkaidoresearchorganizationAnnualReportMonitoring2021]. The program began in 1963, but an effective, standardized sampling method has been implemented since 1999 (two-pass sampling with a combination of electrofishing and cast net). Most data were collected in summer with irregular interannual intervals (1- to 3-year intervals for most cases), and sampling efforts were quantified by sampling area (average: `r op(mean(df_area$area))` $\pm$ `r op(sd(df_area$area))` m^2^). We confined our analysis to the sites that meet the following criteria: (i) the observation span (from the first to the last year of observation) exceeds 10 years, (ii) the number of observation years exceeds five years, and (iii) masu salmon is observed at least twice during the observation period. As a result, we used time-series data at `r n_distinct(df_fish$site_id)` sites within `r n_distinct(df_fish$river)` watersheds from 1999 to 2019. Summed abundance of first and second passes was used in the following analysis. **Table S5** summarizes observed species in these watersheds.
+**Time-series data.** We assembled time-series fish data at `r n_distinct(d0$site_id)` sites within `r n_distinct(d0$river)` protected watersheds of Hokkaido Island, Japan. The Hokkaido Research Organization leads a long-term monitoring program at these watersheds, and the data are published as annual reports [@salmonandfreshwaterfisheriesresearchinstitutehokkaidoresearchorganizationAnnualReportMonitoring2021]. The program began in 1963, but an effective, standardized sampling method has been implemented since 1999 (two-pass sampling with a combination of electrofishing and cast net). Most data were collected in summer with irregular interannual intervals (1- to 3-year intervals for most cases), and sampling efforts were quantified by sampling area (average: `r op(mean(df_area$area))` $\pm$ `r op(sd(df_area$area))` m^2^). We confined our analysis to the sites that meet the following criteria: (i) the observation span (from the first to the last year of observation) exceeds 10 years, (ii) the number of observation years exceeds five years, and (iii) masu salmon is observed at least twice during the observation period. As a result, we used time-series data at `r n_distinct(df_fish$site_id)` sites within `r n_distinct(df_fish$river)` watersheds from 1999 to 2019. Summed abundance of first and second passes was used in the following analysis. **Table S**\@ref(tab:tab-splist) summarizes observed species in these watersheds.
 
 **Fish release.** The release of masu salmon began in the 1950s. Hatchery fish are released in spring (fry and smolt stages) and fall (juvenile stage). Although the fish release occurs at multiple locations within a watershed, the release information is available only at the watershed level. For each release stage, we assembled annual records of intentional release (the number of fish released; 1999-2019) from annual investigations by the Japan Fisheries Research and Education Agency and Salmon and Freshwater Fisheries Research Institute. During the study period, the majority of release took place in spring at a fry stage (fry : juvenile : smolt = `r pull(df_stock_stage, ratio)[1]` : `r op(pull(df_stock_stage, ratio)[2])` : `r op(pull(df_stock_stage, ratio)[3])`)
 
@@ -131,7 +131,7 @@ In the state model, we model temporal dynamics of fish density $n_{s,t}$ as foll
 (\#eq:state)
 \end{align}
 ```
-where $\xi_{1,s}$ is the site-specific constant at site $s$, $\xi_{2,s}$ the parameter characterizing an autoregressive (AR) process, and $\varepsilon_{s,t}^{\text{state}}$ the process error that follows a normal distribution as $\varepsilon_{s,t}^{\text{state}} \sim \text{Normal}(0, \sigma_{\text{state},s}^2)$. The parameters $\xi_{1,s}$ and $\xi_{2,s}$ were drawn from a multi-variate normal distribution as $\pmb{\xi} \sim \text{MVN}(\pmb{\theta_{\xi}}, \pmb{\Omega_{\xi}})$, where $\pmb{\xi}$ is the matrix of $\xi_{1,s}$ and $\xi_{2,s}$. Equation \@ref(eq:state) is structurally equivalent to a $Q$-order AR model; however, we expressed the part of AR parameters as a geometric-series $\tau^q$ to reduce the number of parameters (our model has two AR parameters $\xi_{2,s}$ and $\tau$ regardless of order $Q$). The parameter $\tau$ controls how fast the density influence attenuates towards the past [@takagiTimescaleDependencyHost2015]. In this study, we set $Q=3$ given the life span of the study species (typically 1 -- 3 years). We used median estimates of fish density $n_{s,t}$ to calculate the temporal CV, mean ($\mu$), and SD ($\sigma$) for each site. For a whole community, we summed the densities of enhanced and unenhanced species. We summarized the reconstructed community dynamics in **Figures S7 -- S9**.
+where $\xi_{1,s}$ is the site-specific constant at site $s$, $\xi_{2,s}$ the parameter characterizing an autoregressive (AR) process, and $\varepsilon_{s,t}^{\text{state}}$ the process error that follows a normal distribution as $\varepsilon_{s,t}^{\text{state}} \sim \text{Normal}(0, \sigma_{\text{state},s}^2)$. The parameters $\xi_{1,s}$ and $\xi_{2,s}$ were drawn from a multi-variate normal distribution as $\pmb{\xi} \sim \text{MVN}(\pmb{\theta_{\xi}}, \pmb{\Omega_{\xi}})$, where $\pmb{\xi}$ is the matrix of $\xi_{1,s}$ and $\xi_{2,s}$. Equation \@ref(eq:state) is structurally equivalent to a $Q$-order AR model; however, we expressed the part of AR parameters as a geometric-series $\tau^q$ to reduce the number of parameters (our model has two AR parameters $\xi_{2,s}$ and $\tau$ regardless of order $Q$). The parameter $\tau$ controls how fast the density influence attenuates towards the past [@takagiTimescaleDependencyHost2015]. In this study, we set $Q=3$ given the life span of the study species (typically 1 -- 3 years). We used median estimates of fish density $n_{s,t}$ to calculate the temporal CV, mean ($\mu$), and SD ($\sigma$) for each site. For a whole community, we summed the densities of enhanced and unenhanced species. We summarized the reconstructed community dynamics in **Figures S**\@ref(fig:fig-d1) -- **S**\@ref(fig:fig-d3).
 
 We assessed the predictive performance of our model using the Bayesian p-value [@keryIntroductionWinBUGSEcologists2010], a value of which takes a range of 0 --1 and indicates over- (\~0.00), under- (\~1.00), or suitable-fitting (\~0.50) to the data. A Bayesian p-value for our state-space models was `r op(round(df_bp$mean, 2))`, indicating that our model specification is appropriate.
 
@@ -172,7 +172,7 @@ R'_s &= \eta_{w,s'} R_w\\
 \end{split}
 \end{align}
 ```
-In Equation \@ref(eq:effr), $\eta_{w,s'}$ represents the effective proportion of total release affecting the community at site $s'$ within watershed $w$. The summation of $\eta_{w,s'}$ over $S_w+1$ is assumed to be a unity because non-negligible portion of release may escape into unsurveyed areas. Since the values of $\eta_{w,s'}$ are not available in our dataset, we estimated them through a stochastic search while fitting the regression model to the data within a Bayesian framework (see **Model fitting**). Other site-level predictors include upstream watershed area (log-transformed), air temperature, precipitation, and forest land use. Urban and agricultural land use were omitted because of either a limited value range (**Figure S10**) or a strong correlation with forest land use (**Figure S11**). The watershed-specific intercept was related to watershed-level predictors as:
+In Equation \@ref(eq:effr), $\eta_{w,s'}$ represents the effective proportion of total release affecting the community at site $s'$ within watershed $w$. The summation of $\eta_{w,s'}$ over $S_w+1$ is assumed to be a unity because non-negligible portion of release may escape into unsurveyed areas. Since the values of $\eta_{w,s'}$ are not available in our dataset, we estimated them through a stochastic search while fitting the regression model to the data within a Bayesian framework (see **Model fitting**). Other site-level predictors include upstream watershed area (log-transformed), air temperature, precipitation, and forest land use. Urban and agricultural land use were omitted because of either a limited value range (**Figure S**\@ref(fig:fig-env)) or a strong correlation with forest land use (**Figure S**\@ref(fig:fig-cor)). The watershed-specific intercept was related to watershed-level predictors as:
 
 ```{=tex}
 \begin{align}
@@ -242,7 +242,7 @@ We assumed that environmental noise $\varepsilon_{i,t}^{\text{state}}$ is correl
 ```
 where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0, \sigma_{\epsilon,i}^2)$, and $I_{ij}$ is the identity matrix ($I_{ii}=1$ and $I_{ij, i \ne j} = 0$). With this formulation, the matrix $\pmb{\Omega_{\varepsilon}}$ can be described as $\pmb{\Omega_{\varepsilon}}=\pmb{\Delta}^T\pmb{\Delta} + \text{diag}(\sigma_{\epsilon,i}^2)$, where $\pmb{\Delta}$ is the matrix of factor loadings $\delta_{d,i}$. This model structure has a merit of reduced number of parameters while capturing the correlated nature of species responses to environmental fluctuations [@ovaskainenHowAreSpecies2017]. We set $D=2$ in our model. We reported the estimates of $\alpha_{ij}$ so the values are comparable to those used in the theoretical analysis.
 
-**Model fitting.** We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned vague or weakly informative priors to parameters (**Table S3**). Four Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. The total MCMC iterations ranged from `r min(df_mcmc$n_total_mcmc)` to `r max(df_mcmc$n_total_mcmc)`, in which MCMC samples were saved every `r unique(df_mcmc$n_thin)` steps for the calculation of posterior distributions after the initial `r max(df_mcmc$n_burn)` burn-in period. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached $<1.1$ [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.2.1 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Table S7 -- S10**.
+**Model fitting.** We fitted the models to the data using JAGS version 4.1.0 through *runjags* package version 2.2.0-2 in R [@denwoodRunjagsPackageProviding2016]. We assigned vague or weakly informative priors to parameters (**Table S**\@ref(tab:tab-prior)). Four Markov chain Monte Carlo (MCMC) chains were run until parameter estimates converged. The total MCMC iterations ranged from `r min(df_mcmc$n_total_mcmc)` to `r max(df_mcmc$n_total_mcmc)`, in which MCMC samples were saved every `r unique(df_mcmc$n_thin)` steps for the calculation of posterior distributions after the initial `r max(df_mcmc$n_burn)` burn-in period. Convergence was assessed by examining whether the $\hat{R}$ indicator of each parameter approached $<1.1$ [@gelmanDataAnalysisUsing2007]. Data manipulation and analysis were performed in R version 4.2.1 [@rcoreteamLanguageEnvironmentStatistical2021]. Parameter estimates were summarized in **Tables S**\@ref(tab:tab-reg1) -- S\@ref(tab:tab-reg3).
 
 \newpage
 
@@ -288,16 +288,31 @@ knitr::kable(df_prior,
 
 \newpage
 
-## Parameter estimates for the Bayesian state-space model
+## Parameter estimates for the state-space autoregressive model
 
-```{r tab-ssm}
+```{r tab-ssm-ar}
 
-suppressMessages(source(here::here("code/table_ssm.R")))
+suppressMessages(source(here::here("code/table_ssm_ar.R")))
 
-knitr::kable(df_ssm,
+knitr::kable(df_ssm_ar,
              align = c(rep("l", 2), rep("r", 2)),
              format = "markdown",
-             caption = "Median estimates of the Bayesian state-space model. Site-specific parameters were excluded due to a large number of parameters.")
+             caption = "Median estimates for key parameters of the state-space autoregressive model. Site-specific parameters were excluded due to a large number of parameters.")
+
+```
+
+\newpage
+
+## Parameter estimates for the state-space Ricker model
+
+```{r tab-ricker}
+
+suppressMessages(source(here::here("code/table_ricker.R")))
+
+knitr::kable(df_ricker,
+             align = c(rep("l", 2), rep("r", 2)),
+             format = "markdown",
+             caption = "Median estimates for key parameters of the state-space Ricker model. Site-specific parameters were excluded due to a large number of parameters.")
 
 ```
 
