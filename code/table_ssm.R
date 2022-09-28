@@ -1,7 +1,6 @@
 
 # setup -------------------------------------------------------------------
 
-rm(list = ls())
 lapply(paste0("code/", c("library.R", "set_functions.R")),
        FUN = function(x) source(here::here(x)))
 
