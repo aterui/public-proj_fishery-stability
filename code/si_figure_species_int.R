@@ -123,7 +123,7 @@ g_alpha_site <- df_plot %>%
              x = lbs.y,
              fill = value,
              label = sprintf("%.2f", value))) +
-  geom_tile() +
+  geom_tile(alpha = 0.8) +
   geom_text(size = 2) +
   facet_wrap(facets = ~site_id,
              scales = "free",
@@ -133,9 +133,9 @@ g_alpha_site <- df_plot %>%
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         axis.text.x = element_text(face = "italic",
-                                   angle = 75,
-                                   vjust = 0.5,
-                                   hjust = 0.5)) +
+                                   angle = 90,
+                                   vjust = 0.2,
+                                   hjust = 0.95)) +
   scale_x_discrete(labels = label_parse()) +
   scale_y_discrete(labels = label_parse()) +
   MetBrewer::scale_fill_met_c("Hiroshige", direction = -1) +

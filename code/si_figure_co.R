@@ -72,8 +72,8 @@ g_co <- df_cop %>%
         panel.border = element_blank(),
         axis.text.x = element_text(face = "italic",
                                    angle = 90,
-                                   vjust = 0.5,
-                                   hjust = 0.5)) +
+                                   vjust = 0.2,
+                                   hjust = 0.95)) +
   labs(y = expression("Taxon"~italic("i")),
        x = expression("Taxon"~italic("j")),
        fill = "Proportion") +
