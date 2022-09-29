@@ -8,9 +8,9 @@ pacman::p_load(tidyverse)
 
 source(here::here("code/data_fmt_fishdata.R"))
 df_trait <- readRDS(here::here("data_fmt/data_trait.rds")) %>% 
-  mutate(body_size = case_when(max_total_length < 100 ~ "small",
-                               between(max_total_length, 100, 200) ~ "medium",
-                               max_total_length > 200 ~ "large")) %>% 
+  mutate(body_size = case_when(max_total_length < 100 ~ "S",
+                               between(max_total_length, 100, 200) ~ "M",
+                               max_total_length > 200 ~ "L")) %>% 
   dplyr::select(-max_total_length)
 
 df_sp_list <- df_selected %>% 
