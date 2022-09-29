@@ -269,7 +269,7 @@ suppressMessages(source(here::here("code/table_species_list.R")))
 
 knitr::kable(df_sp_list,
              format = "markdown",
-             caption = "Fish species found in the study watersheds. Trait information is based on the literature [@gotoEcologicalMorphologicalDivergence1975;@gotoLifeHistoryDistibution1981;@ministryofenvironmentofjapanThreatenedWildlifeJapan2014;@natsumedaEvaluationEcologicalFeatures2010;@fishbaseFishBaseHttpsWww] and expert knowledge. Body size is categoraized as follows: total length (TL) $< 100$ mm (small), $100\\le$  TL $\\le 200$ (medium), and TL $> 200$ (large).")
+             caption = "Fish species found in the study watersheds. Trait information is based on the literature [@gotoEcologicalMorphologicalDivergence1975;@gotoLifeHistoryDistibution1981;@ministryofenvironmentofjapanThreatenedWildlifeJapan2014;@natsumedaEvaluationEcologicalFeatures2010;@fishbaseFishBaseHttpsWww] and expert knowledge. Body size is coded as follows: maximum total length (TL) $< 100$ mm (S), $100\\le$  TL $\\le 200$ (M), and TL $> 200$ (L).")
 ```
 
 \newpage
@@ -363,12 +363,12 @@ for(i in seq_len(length(list_reg))) {
 ```{r fig-2sp, fig.width=12, fig.height=8, fig.cap = paste0("Theoretical predictions in a two-species community. **(A)** Spearman's rank correlations between intentional release and community dynamics in a strong competition scenario ($\\bar{\\alpha}=$ ", max(list_param[[1]]$alpha) ,"). Rows distinguish different summary statistics of community dynamics (top: CV, middle: mean, bottom: SD) while columns distinguish deterministic ($\\sigma_{\\varepsilon}=$ ", min(list_param[[1]]$sd_env) ,") and stochastic simulations ($\\sigma_{\\varepsilon}=$ ", max(list_param[[1]]$sd_env) ,"). Cells indicate 400 combinations of carrying capacity and intrinsic growth rate (20 values each). Colors are proportional to Spearman's rank correlations. Dots indicate parameter combinations that are used in the whole community simulation. **(B)** Examples of community dynamics with and without intentional release. Community dynamics diverge at the broken vertical lines, the timestep at which intentional release begins. Rows distinguish intrinsic growth rates, while columns distinguish deterministic and stochastic simulations. Colors indicate release levels, and line types differ in carrying capacities.")}
 
 source(here::here("code/figure_theory_2sp.R"))
-print(list_g_c[[2]])
+knitr::include_graphics(here::here("output/figure_2sp_model_strong.pdf"))
 ```
 
 \newpage
 
-<!--# Figure S2-S9 -->
+<!--# Figure for the whole community simulation -->
 
 ```{r figure-sim}
 
