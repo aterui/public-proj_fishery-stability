@@ -1,10 +1,10 @@
 ---
 title: "Intentional release of native species undermines ecological stability"
 output:
-  pdf_document:
-    latex_engine: xelatex
-  #word_document:
-  # reference_docx: word_format.docx
+  #bookdown::pdf_document2:
+  #  latex_engine: xelatex
+  bookdown::word_document2:
+   reference_docx: word_format.docx
 csl: pnas.csl
 knit: (function(inputFile, encoding) {
         rmarkdown::render(inputFile,
@@ -20,104 +20,7 @@ header-includes:
 
 ```{r setup, include=FALSE}
 
-# setup
-knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse)
-op <- function(x, d = 2) sprintf(paste0("%1.", d, "f"), x) 
-
-# theory ####
-load(here::here("result/result_ricker.RData"))
-
-n_sim <- sim_result %>% 
-  mutate(n_sim = n_warmup + n_burnin + n_timestep) %>% 
-  pull(n_sim) %>% 
-  unique()
-
-param_set <- sim_result %>% 
-  distinct(n_species,
-           k,
-           r_type,
-           r1,
-           r_min,
-           r_max,
-           sd_env,
-           phi,
-           int_type,
-           alpha,
-           model,
-           seed)
-
-# empirical data ####
-source(here::here("code/data_fmt_fishdata.R"))
-source(here::here("code/data_fmt_analysis.R"))
-
-df_area <- d0 %>% 
-  group_by(site_id, year) %>% 
-  summarize(area = unique(area))
-
-filename <- list.files(path = here::here("result"), full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(string = .$value, pattern = "reg")) %>% 
-  filter(!str_detect(string = .$value, pattern = "reg_rich")) %>% 
-  pull()
-
-df_beta <- lapply(filename, function(x) {
-  read_csv(here::here(x)) %>% 
-    filter(parameter == "b[2]")
-})
-names(df_beta) <- str_extract(filename, "all|masu|other")  
-
-## ssm estimate
-df_bp <- list.files(path = here::here("data_fmt"), full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(string = .$value, pattern = "ssm")) %>% 
-  pull() %>% 
-  lapply(function(x) {
-    read_csv(x) %>% 
-      filter(param == "bp_value") %>% 
-      select(mean) %>% 
-      mutate(group = str_extract(x, "all|masu|other"))
-  }) %>% 
-  bind_rows()
-
-## mcmc sample size
-df_mcmc_ssm <- list.files(path = here::here("data_fmt"), full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(string = .$value, pattern = "ssm")) %>% 
-  pull() %>% 
-  lapply(function(x) {
-    read_csv(x) %>% 
-      select(n_total_mcmc,
-             n_sample,
-             n_thin,
-             n_burn) %>% 
-      distinct()
-  }) %>% 
-  bind_rows()
-
-df_mcmc_reg <- list.files(path = here::here("result"), full.names = T) %>% 
-  as_tibble() %>% 
-  filter(str_detect(string = .$value, pattern = "reg_")) %>% 
-  filter(!str_detect(string = .$value, pattern = "rich")) %>% 
-  pull() %>% 
-  lapply(function(x) {
-    read_csv(x) %>% 
-      select(n_total_mcmc,
-             n_sample,
-             n_thin,
-             n_burn) %>% 
-      distinct()
-  }) %>% 
-  bind_rows()
-
-## release data
-source(here::here("code/data_fmt_stock.R"))
-
-df_stock_stage <- df_stock %>% 
-  group_by(release_stage) %>% 
-  summarize(stock = sum(abundance)) %>% 
-  mutate(ratio = stock / max(stock),
-         prop = stock / sum(stock))
+suppressMessages(source(here::here("code/set_rmd.R")))
 
 ```
 
@@ -150,7 +53,7 @@ Here, we show that intentional release undermines long-term community stability,
 We employed a multispecies Ricker model [@fowlerSpeciesDynamicsAlter2012] to simulate community dynamics with the selective intentional release of a constituent species (species 1). Specifically, the population density of species $i$ at time $t+1$, $N_{i,t+1}$, is modeled as:
 
 $$
-N_{i,t+1} = (N_{i,t}+\phi_i R_t)~exp\left[r_i\left(1-\frac{N_{i,t}+\alpha_{i1} R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i}\right)\right]~exp(\epsilon_{i,t})
+N_{i,t+1} = (N_{i,t}+\phi_i R_t)~exp\left[r_i\left(1-\frac{\alpha_{i1} R_t + \sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i}\right)\right]~exp(\epsilon_{i,t})
 $$
 
 where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on species $i$, $K_i$ the carrying capacity, $R_t$ the number of released individuals for the enhancement of species 1, and $\epsilon_{i,t}$ the species response to stochastic environmental fluctuations that follow a normal distribution $Normal(0,\sigma_{\epsilon}^2)$. To capture variation in species traits, intrinsic growth rates of unenhanced species and interspecific competition coefficients were drawn randomly from a uniform ($r_{i,i \ne 1} \sim Unif(0.5,2)$) and an exponential distribution ($\alpha_{ij,i \ne j} \sim Exp(1/\bar{\alpha})$). The parameter $\phi_i$ controls the relative fitness of captive-bred individuals as follows:
