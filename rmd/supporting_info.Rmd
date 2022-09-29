@@ -458,6 +458,16 @@ suppressMessages(source(here::here("code/si_figure_cor.R")))
 
 \newpage
 
+## Co-occurrence matrix
+
+```{r fig-co, fig.cap="Co-occurrence matrix of stream fishes at 97 sites. Values in each cell indicate the proportion of co-occurrence for a given pair of species (off-diagonal) or the propotion of sites occurred for a given species (diagonal). Colors are proportional to the values."}
+
+source(here::here("code/si_figure_co.R"))
+knitr::include_graphics(here::here("output/figure_co.pdf"))
+```
+
+\newpage
+
 ## Empirical estimates of competition coefficients
 
 ```{r fig-int, fig.width=7, fig.height=7, fig.cap="Estimates of competition coefficients $\\alpha_{ij}$ in a multi-species Ricker model. Panels distinguish sites, and values in each cell indicate median estimates of $\\alpha_{ij}$ for a given pair of species. Cells are colored in proportion to $\\alpha_{ij}$."}
