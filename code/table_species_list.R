@@ -11,9 +11,7 @@ df_trait <- readRDS(here::here("data_fmt/data_trait.rds"))
 
 df_sp_list <- df_selected %>% 
   filter(abundance > 0) %>% 
-  group_by(taxon) %>% 
-  summarise(n_site = n_distinct(site_id)) %>% 
-  ungroup() %>% 
+  distinct(taxon) %>% 
   left_join(df_trait, by = "taxon") %>% 
   mutate(taxon = str_replace_all(taxon,
                                  pattern = "_",
@@ -25,10 +23,13 @@ df_sp_list <- df_selected %>%
          taxon = str_replace(taxon,
                              pattern = "\\sspp.*",
                              replacement = "* spp.")) %>% 
-  rename('Number of sites observed' = n_site) %>%
   mutate(across(.fns = str_replace_all,
                 pattern = "_",
                 replace = " ")) %>% 
   rename_with(.fn = function(x) str_to_sentence(x) %>%
                 str_replace_all(pattern = "_",
-                                replace = " ")) %>% view
+                                replace = " ")) %>% 
+  rename("Current preference" = Current,
+         "Max total length (mm)" = "Max total length")
+
+  
