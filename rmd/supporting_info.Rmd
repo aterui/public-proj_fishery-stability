@@ -200,7 +200,7 @@ Considering that $\text{E}(\ln y_s^{(\sigma)}) = \theta_{y,s}^{(\sigma)}$ and $\
 ```
 All predictors were standardized (mean = 0, SD = 1) before the analysis.
 
-**Species interaction.** We analyzed a subset of our data to estimate the strength of interspecific interactions among stream fishes. In this analysis, we focused on `r n_distinct(df_complete$site_id)` sites with $>16$ years of observations and no intentional release of masu salmon. These additional constraints were necessary to estimate parameters in a complex multi-species model within a state-space modeling framework.
+**Species interaction.** We analyzed a subset of our data to estimate the strength of interspecific interactions among stream fishes. In this analysis, we focused on `r n_distinct(df_complete$site_id)` sites with $>16$ years of observations and no intentional release of masu salmon. Further, at each site, we confined our analysis to species that occurred more than four times. These additional constraints were necessary to estimate parameters in a complex multi-species model within a state-space modeling framework.
 
 We fitted the following state-space model to the data for each site separately. In the observation model, we modeled fish abundance $N_{i,t}$ for species $i$ at year $t$ as:
 
