@@ -91,7 +91,7 @@ spabb <- function(x, sep = "\\s") {
     
     if (length(q) > 1) {
       ## length > 1
-      if (any(str_detect(q, "spp|sp"))) {
+      if (any(str_detect(q, "(spp$)|(sp$)"))) {
         ## sp or spp
         z <- paste(str_to_sentence(q[1]),
                    paste0(na.omit(str_extract(q, "(^sp{1,2})$")),
