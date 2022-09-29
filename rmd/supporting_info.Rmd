@@ -269,7 +269,7 @@ suppressMessages(source(here::here("code/table_species_list.R")))
 
 knitr::kable(df_sp_list,
              format = "markdown",
-             caption = "Fish species found in the study watersheds.")
+             caption = "Fish species found in the study watersheds. Trait information is based on the literature [@gotoEcologicalMorphologicalDivergence1975;@gotoLifeHistoryDistibution1981;@ministryofenvironmentofjapanThreatenedWildlifeJapan2014;@natsumedaEvaluationEcologicalFeatures2010;@fishbaseFishBaseHttpsWww] and expert knowledge.")
 ```
 
 \newpage
