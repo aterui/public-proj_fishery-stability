@@ -12,39 +12,12 @@ source(here::here("code/set_functions.R"))
 ## trophic guild - herbivore = 1; detritivore = 2; omnivore = 3; invertivore = 4; invertivore-piscivore = 5
 ## spawning substrate - vegetation = 1; mineral substrate = 2; various = 3
 
-### fish shape, species-level average
-df_fs_sp <- read_csv(here::here("data_raw/data_fish_shapes.csv")) %>% 
-  rename_with(.fn = str_to_lower) %>% 
-  group_by(tree_name) %>% 
-  summarize(across(.fns = function(x) mean(x, na.rm = T),
-                   .cols = where(is.numeric))) %>% 
-  pivot_longer(cols = where(is.numeric),
-               names_to = "trait",
-               values_to = "value")
-
-### fish shape, genus-level average
-df_fs_genus <- read_csv(here::here("data_raw/data_fish_shapes.csv")) %>% 
-  rename_with(.fn = str_to_lower) %>% 
-  separate(tree_name,
-           into = c("genus", "species"),
-           sep = "_",
-           remove = FALSE) %>% 
-  group_by(genus) %>% 
-  summarize(across(.fns = function(x) mean(x, na.rm = T),
-                   .cols = where(is.numeric))) %>% 
-  pivot_longer(cols = where(is.numeric),
-               names_to = "trait",
-               values_to = "genus_value")
-
 df_trait <- read_csv(here::here("data_raw/data_trait_full.csv"))
-
 skimr::skim(df_trait)
 
 
 # summarize trait ---------------------------------------------------------
 
-## -  substitute FishShape values with genus mean only if no species-level value
-##    available within the genus
 ## -  Pseudorasbora spp; data from Pseudorasbora parva were used
 
 ## long format
@@ -53,14 +26,6 @@ df_trait_l <- df_trait %>%
            into = c("genus", "species"),
            sep = "_",
            remove = FALSE) %>% 
-  left_join(df_fs_genus,
-            by = c("genus", "trait")) %>%
-  group_by(genus) %>% 
-  mutate(fishshape = ifelse(trait %in% unique(df_fs_sp$trait), 1, 0),
-         value = ifelse(str_detect(taxon, "spp|Rhynchocypris") & fishshape == 1,
-                        genus_value,
-                        value)) %>% 
-  ungroup() %>% 
   group_by(taxon, trait) %>% 
   summarize(value = f_num(value),
             source = source,
@@ -70,7 +35,7 @@ df_trait_l <- df_trait %>%
          comment = ifelse(str_detect(taxon, "spp|Rhynchocypris"),
                           "genus mean",
                           comment)) %>% 
-  filter(!(trait %in% c("longevity", "maximum_fecundity")))
+  filter(!(trait %in% c("longevity", "maximum_fecundity", "standard_length")))
 
 ## wide format
 df_trait_w <- df_trait_l %>% 
@@ -98,42 +63,7 @@ df_trait_w <- df_trait_l %>%
            vertical_position,
            spawning_substrate) %>% 
   mutate(across(.cols = where(is.character),
-                .fns = as.factor),
-         across(.cols = unique(df_fs_sp$trait),
-                .fns = function(x) x / standard_length)) %>% 
-  dplyr::select(-standard_length, -total_weight)
+                .fns = as.factor))
 
 saveRDS(df_trait_w,
         here::here("data_fmt/data_trait.rds"))
-
-
-# functional distance -----------------------------------------------------
-
-## ATTENTION: Lethenteron spp lack FishShape data
-
-## reformat data for FD
-df_trait_value <- df_trait_w %>% 
-  dplyr::select(-taxon) %>% 
-  data.frame()
-
-rownames(df_trait_value) <- df_trait_w$taxon
-
-df_trait_type <- sapply(df_trait_value,
-                        function(x) ifelse(class(x)=="factor", "N", "Q")) %>% 
-  tibble(trait_name = names(.),
-         trait_type = .)
-
-## species traits summary:
-mFD::sp.tr.summary(tr_cat = df_trait_type,
-                   sp_tr = df_trait_value,
-                   stop_if_NA = F)
-
-## functional distance
-m_fd <- mFD::funct.dist(sp_tr = df_trait_value,
-                        tr_cat = df_trait_type,
-                        metric = "gower",
-                        stop_if_NA = F) %>% 
-  data.matrix()
-
-saveRDS(m_fd,
-        here::here("data_fmt/data_fd.rds"))

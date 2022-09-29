@@ -7,11 +7,14 @@ pacman::p_load(tidyverse)
 # data --------------------------------------------------------------------
 
 source(here::here("code/data_fmt_fishdata.R"))
+df_trait <- readRDS(here::here("data_fmt/data_trait.rds"))
 
 df_sp_list <- df_selected %>% 
   filter(abundance > 0) %>% 
   group_by(taxon) %>% 
   summarise(n_site = n_distinct(site_id)) %>% 
+  ungroup() %>% 
+  left_join(df_trait, by = "taxon") %>% 
   mutate(taxon = str_replace_all(taxon,
                                  pattern = "_",
                                  replacement = " "),
@@ -22,5 +25,10 @@ df_sp_list <- df_selected %>%
          taxon = str_replace(taxon,
                              pattern = "\\sspp.*",
                              replacement = "* spp.")) %>% 
-  rename(Taxon = taxon,
-         'Number of sites observed' = n_site)
+  rename('Number of sites observed' = n_site) %>%
+  mutate(across(.fns = str_replace_all,
+                pattern = "_",
+                replace = " ")) %>% 
+  rename_with(.fn = function(x) str_to_sentence(x) %>%
+                str_replace_all(pattern = "_",
+                                replace = " ")) %>% view
