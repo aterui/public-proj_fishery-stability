@@ -7,7 +7,11 @@ pacman::p_load(tidyverse)
 # data --------------------------------------------------------------------
 
 source(here::here("code/data_fmt_fishdata.R"))
-df_trait <- readRDS(here::here("data_fmt/data_trait.rds"))
+df_trait <- readRDS(here::here("data_fmt/data_trait.rds")) %>% 
+  mutate(body_size = case_when(max_total_length < 100 ~ "small",
+                               between(max_total_length, 100, 200) ~ "medium",
+                               max_total_length > 200 ~ "large")) %>% 
+  dplyr::select(-max_total_length)
 
 df_sp_list <- df_selected %>% 
   filter(abundance > 0) %>% 
@@ -29,7 +33,6 @@ df_sp_list <- df_selected %>%
   rename_with(.fn = function(x) str_to_sentence(x) %>%
                 str_replace_all(pattern = "_",
                                 replace = " ")) %>% 
-  rename("Current preference" = Current,
-         "Max total length (mm)" = "Max total length")
+  rename("Current preference" = Current)
 
   
