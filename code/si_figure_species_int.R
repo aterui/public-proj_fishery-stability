@@ -124,7 +124,7 @@ g_alpha_site <- df_plot %>%
              fill = value,
              label = sprintf("%.2f", value))) +
   geom_tile() +
-  geom_text(size = 3) +
+  geom_text(size = 2) +
   facet_wrap(facets = ~site_id,
              scales = "free",
              nrow = 3,
@@ -148,8 +148,8 @@ g_alpha_site <- df_plot %>%
 
 ggsave(g_alpha_site,
        filename = here::here("output/figure_alpha_site.pdf"),
-       height = 10,
-       width = 11)
+       height = 9,
+       width = 10)
 
 ggsave(g_alpha,
        filename = here::here("output/figure_alpha_dist.pdf"),
