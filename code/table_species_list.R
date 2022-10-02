@@ -27,6 +27,7 @@ df_sp_list <- df_selected %>%
          taxon = str_replace(taxon,
                              pattern = "\\sspp.*",
                              replacement = "* spp.")) %>% 
+  arrange(taxon) %>% 
   mutate(across(.fns = str_replace_all,
                 pattern = "_",
                 replace = " ")) %>% 
@@ -34,5 +35,5 @@ df_sp_list <- df_selected %>%
                 str_replace_all(pattern = "_",
                                 replace = " ")) %>% 
   rename("Current preference" = Current)
-
+  
   
