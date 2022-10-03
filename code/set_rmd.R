@@ -54,6 +54,14 @@ list_param <- list_sim %>%
 ## raw data
 source(here::here("code/data_fmt_fishdata.R"))
 source(here::here("code/data_fmt_reg.R"))
+source(here::here("code/data_fmt_stock.R")) # call `df_stock_mu`
+source(here::here("code/si_figure_species_int.R")) # call `df_pd`
+
+df_stock_stage <- df_stock %>% 
+  group_by(release_stage) %>% 
+  summarize(stock = sum(abundance)) %>% 
+  mutate(ratio = stock / max(stock),
+         prop = stock / sum(stock))
 
 df_area <- d0 %>% 
   group_by(site_id, year) %>% 
@@ -66,6 +74,7 @@ df_bp <- list.files(path = here::here("output"),
   readRDS() %>% 
   filter(param == "bp_value") %>% 
   dplyr::select(mean)
+
 
 ## mcmc sample size
 
@@ -84,12 +93,3 @@ df_mcmc <- lapply(c("summary_ssm_ar", "summary_reg", "summary_multi_ricker"),
                       mutate(model = str_extract(x, "ssm|reg|ricker"))
                   }) %>% 
   bind_rows()
-
-## release data
-source(here::here("code/data_fmt_stock.R"))
-
-df_stock_stage <- df_stock %>% 
-  group_by(release_stage) %>% 
-  summarize(stock = sum(abundance)) %>% 
-  mutate(ratio = stock / max(stock),
-         prop = stock / sum(stock))
