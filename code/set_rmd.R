@@ -55,6 +55,7 @@ list_param <- list_sim %>%
 source(here::here("code/data_fmt_fishdata.R"))
 source(here::here("code/data_fmt_reg.R"))
 source(here::here("code/data_fmt_stock.R")) # call `df_stock_mu`
+source(here::here("code/figure_obs_stock.R")) # call `df_beta`
 source(here::here("code/si_figure_species_int.R")) # call `df_pd`
 
 df_stock_stage <- df_stock %>% 

@@ -125,7 +125,7 @@ theme_set(plt_theme)
 
 ## plot
 ylab <- c(`cv` = "CV~sigma/mu",
-          `species_richness` = "Species~richness",
+          `species_richness` = "Taxonomic~richness",
           `mu` = "Mean~mu~(ind.~m^-2)",
           `sigma` = "SD~sigma~(ind.~m^-2)")
 

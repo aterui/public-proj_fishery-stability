@@ -1,7 +1,6 @@
 
 # setup -------------------------------------------------------------------
 
-rm(list = ls(all.names = TRUE))
 source(here::here("code/library.R"))
 
 
