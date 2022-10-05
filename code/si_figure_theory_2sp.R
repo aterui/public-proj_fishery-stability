@@ -146,7 +146,7 @@ list_g_c <- foreach(x = 1:length(v_alpha)) %do% {
   
   ggsave(g_c,
          filename = here::here(paste0("output/figure_2sp_model_", lbs[x], ".pdf")),
-         height = 9,
+         height = 8,
          width = 12)
   
   return(g_c)  
