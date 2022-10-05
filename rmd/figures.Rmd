@@ -17,26 +17,38 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE,
                       warning = FALSE)
 
-```
-
-```{r figure_1, fig.width=9, fig.height=11}
-
-source(here::here("code/figure_theory_obs.R"))
-
-print(g)
+source(here::here("code/set_functions.R"))
 
 ```
 
-**Figure 1** Theory and empirical observations agree that intentional release destabilizes community dynamics. In A and B, panels and colors distinguish response variables and species groups. (A) Theoretical predictions. Dots represent individual simulation replicates, and lines and shades are loess curves fitted to simulated data and 95% confidence intervals. Parameters used in this simulation are: intrinsic growth rate of an enhanced species $r_1=$ `r unique(df0$r1)`, average interspecific competition $\bar{\alpha}=$ `r unique(df0$alpha)`, carrying capacity $K=$ `r unique(df0$k)`, environmental stochasticity $\sigma_{\epsilon}=$ `r unique(df0$sd_env)`, relative fitness of captive-bred individuals $f_R=$ `r unique(df0$phi)`. (B) Empirical evidence. Dots represent geometric means of site-level observations in 31 watersheds. Lines are the predicted values of the regression models, and line types correspond to the coefficient's posterior probabilities. See Tables S8-10 for full statistics. (C) Map of sampling sites (black dots) in Hokkaido, Japan. (D) Example of a protected watershed (Okushibetsu). (E) Masu salmon *Oncorhynchus masou masou*. Photo credit: Akira Terui.
+```{r figure1, fig.width=9, fig.height=11}
+
+source(here::here("code/figure_layout.R"))
+
+knitr::include_graphics(here::here("output/figure_theory_obs.pdf"))
+```
+
+**Figure 1** Theory and empirical observations agree that intentional release destabilizes community dynamics. In A and B, panels and colors distinguish response variables and species groups. (A) Theoretical predictions. Dots represent individual simulation replicates, and lines are the loess curves fitted to simulated data with their 95% confidence (dark shade) and 50% prediction intervals (light shade). Parameters used in this simulation are: intrinsic growth rate of an enhanced species $r_1=$ `r round(na.omit(unique(df0$r1)), 2)`, average interspecific competition $\bar{\alpha}=$ `r round(na.omit(unique(df0$alpha)), 2)`, carrying capacity $K=$ `r round(na.omit(unique(df0$k)), 2)`, environmental stochasticity $\sigma_{\epsilon}=$ `r round(na.omit(unique(df0$sd_env)), 2)`, relative fitness of captive-bred individuals $f_R=$ `r round(na.omit(unique(df0$phi)), 2)`. These parameter values are comparable to the estimates of the multi-species Ricker model. (B) Empirical evidence. Dots represent observations at 97 sites within 31 watersheds. Lines and shades are the predicted values and their 95% credible intervals of the regression models, and line types correspond to the coefficient's posterior probabilities. Effective release is a latent explanatory variable estimated in our hierarchical Baysian model. See Methods for details. Full statistics were reported in Tables S6-8. (C) Map of sampling sites (black dots) in Hokkaido, Japan. (D) Example of a protected watershed (Okushibetsu). (E) Masu salmon *Oncorhynchus masou masou*. Photo credit: Akira Terui.
 
 \newpage
 
 ```{r figure2, fig.width=8, fig.height=6}
 
-source(here::here("code/figure_coef.R"))
+source(here::here("code/figure_obs_coef.R"))
 
-print(g_coef)
+knitr::include_graphics(here::here("output/figure_coef.pdf"))
 
 ```
 
-**Figure 2** Posterior distributions for the standardized regression coefficients of intentional release. Y-axis represents different response variables grouped by colors distinguishing species groups (whole community, enhanced species [masu salmon], and unenhanced species).
+**Figure 2** Posterior distributions for the standardized regression coefficients of intentional release. Y-axis represents different response variables grouped by colors distinguishing species groups (whole community, enhanced species [masu salmon], and unenhanced species). Triangles indicate median estimates.
+
+\newpage
+
+```{r figure3, fig.width=9, fig.height=11}
+
+source(here::here("code/si_figure_species_int.R"))
+
+knitr::include_graphics(here::here("output/figure_alpha_dist.pdf"))
+```
+
+**Figure 3** Estimated competition coefficients of the multi-species Ricker model. Dots represent a given pair of taxa, and box plots show median (thick vertical lines) and quantile (hinges). Whiskers show smallest (largest) observation less (greater) than or equal to upper hinge - 1.5 \* quantile (+ 1.5 \* quantile). The vertical line denotes the median. The density plot on the top shows the overall distribution of the competition coefficient. Colors distinguish taxa.
