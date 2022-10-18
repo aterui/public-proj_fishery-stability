@@ -1,0 +1,144 @@
+---
+title: "Reply to: 2022-05603 Intentional release of native species undermines ecological stability"
+output:
+  bookdown::pdf_document2:
+   latex_engine: xelatex
+   toc: false
+   number_sections: false
+csl: https://www.zotero.org/styles/pnas
+knit: (function(inputFile, encoding) {
+        rmarkdown::render(inputFile,
+                          encoding = encoding, 
+                          output_dir = "document_output")
+      })
+bibliography: reference.bib
+fontsize: 11pt
+mainfont: "Times New Roman"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Dear Editor,
+
+Thank you for giving us the opportunity to revise our manuscript. The comments were very helpful to improve our manuscript. When revising the manuscript, we have put a particular emphasis on the following points:
+
+1.  **Improve the introduction and implications**: both reviewers noted an absence of context in the previous manuscript. We agree with this comment. To address this issue, we revised the text to better contextualize our work. In particular, we have carefully reviewed cases to which our findings may apply, and discussed the relevance of our work to those systems.
+2.  **Two-species simulation.** The Editor suggested to include a two-species simulation to guide the full community model. We really appreciate this suggestion and were able to draw deeper insights into our theoretical analysis. This improvement helped address the concern raised by the reviewer 2 (they pointed the lack of depth in theoretical analysis). We revised Methods and Results in accordance with this change. In particular, we removed the old sensitivity analysis as it was redundant with two-species simulations.
+3.  **Ecological interpretation of our empirical results (i.e., masu salmon system).** The reviewers and editor pointed that the interpretation of our empirical analysis is superficial -- we agree with this comment too. We have carefully enriched the text related to this issue. We have greatly increased the number of citations and discussed more carefully possible mechanisms that may produce the observed patterns. In particular, we have added a new Ricker model analysis for empirical data to estimate competition coefficients in stream fish communities. The estimated parameter indicated that competition among species certainly exists.
+4.  **Life history of masu salmon.** Lastly, we enriched the text for life history of masu salmon and how release programs for this species are operated.
+
+We appended a point-by-point response below. We hope our manuscript is now suitable for publication in your journal.
+
+Sincerely,
+
+Akira Terui on behalf of the authors
+
+\clearpage
+
+## Point-by-point response
+
+**NOTE: original comments from reviewers and editor are italicized**
+
+### Response to editor
+
+*Because the Ricker model can yield damped oscillations, limit cycles, and even chaos depending on intrinsic growth rate, I would have first understood the impact of population supplementation analytically in a deterministic two species system. This is straightforward and relevant since the tendency to experience fluctuations without stochasticity is the baseline for your model. Moreover, this analysis can illuminate how you organize any exploration of parameter space. In particular, I would vary intrinsic rate of increase so that it captured monotonic convergence to equilibrium, damped oscillations en route to equilibrium, limit cycle, and chaos....The results reported from the model lack depth - especially considering the many possible parameter combinations. Since the Ricker model can produce fluctuations deterministically, the tendency to fluctuate deterministically (which is governed by intrinsic rate of increase) should be used to organize the simulation results. A more systematic examination of results would cross varying levels of K with varying r's, where the r's selected capture the different dynamical possibilities of the deterministic model.*
+
+> Thank you for this constructive comment! We followed this direction, analyzing the model in a two-species community to guide a whole community analysis. As we detailed in the maintext, the different combinations of $r$ and $K$ produced distinct parameter spaces where intentional release had destabilizing, neutral, and stabilizing effects. Stabilizing effects appeared when the community shows limit cycles or chaos; otherwise, intentional release had destabilizing effects in general. We have clarified this point in the revised manuscript (see section **Theoretical prediction**).
+
+*Second, for figure 1, it is important to use estimated Ricker parameters for salmon (several have been published) for the simulations. If there are no published estimates for masu salmon, there are estimates for other species in the same genus. Pairing model simulations with empirical plots has greater merit if the parameters used in the simulations are related to the species being released.*
+
+> XXX
+
+*Obviously species do not go extinct in your simulations (since populations can never go to zero or become negative). You contrive extinction to be an N = .01 or lower. In your words "the number of species persist (defied as 𝑁𝑖 \> 0.01 at 𝑡 = 1600)". Apart from the typo it is not clear to me if you:\
+\
+1) at t= 1600, you simply tally up all N's less than .01 and call that an extinction. or, alternatively,\
+\
+2) whenever a species' population falls below .01 during the course of the potential 1600 time steps, that species is considered extinct. So if at time step 634, N fell to .005, that would then be an absorbing boundary and the species is removed from the simulation.\
+\
+It is essential that you make clear whether it is #1 or #2 above that accounts for the loss of species.*
+
+> XXX
+
+*Both reviewers noted an absence of context, and literature cited that might better provide a framework for this study. What other species might this apply to? What are levels of supplementation in other salmon systems? The discussion does not place the work in the context of general research regarding captive breeding for enhancement, salmon hatcheries, and salmon conservation.*
+
+> XXX
+
+*The discussion of the masu data is too superficial. You need to include more about their life history and the supplementation systems. To what extent do the released salmon overlap with other species in space and time?*
+
+> XXX
+
+*I am not sure "collapse" is the appropriate word. Because extinction is the result of an absorbing boundary at N= .01, really it is fluctuations and mean community density that you are examining. The extinctions that generate what you call "collapse" are the result of fluctuations that take populations down to the absorbing boundary.*
+
+> XXX
+
+### Response to Reviewer 1
+
+*Is the subject sufficiently general? Hatchery supplementation of salmonid populations is common practice globally. However, are there other taxa where this issue pertains? Though the authors a couple of citations, I worry this system may be a bit niche for readers of PNAS. I recommend the authors describe specific case studies in the Discussion where similar dynamics may apply and point to the types of additional research needed to determine if similar inferences may apply in those systems. Also, it would be helpful to include (widely available) estimates of the extent of salmonid hatchery supplementation in North America, and to contextualize the dynamics estimated in the state space model for masu salmon relative to these other well-studied populations.*
+
+> XXX
+
+*The authors employ a state of the art space-state model for the empirical portion of their paper, but I believe other interpretations of the data are possible. The empirical results shown here are consistent with the theoretical model, but a correlative statistical model does not allow direct causal inference. So I recommend the authors review their interpretations of their state space model and revise causal language in the text with this in mind.*
+
+> Agreed. We have revised the paragraph stating the limitation of our work (the last paragraph of section **Empirical evidence**)
+
+*How much time do they spend in the freshwater life stage?*
+
+> Masu salmon spend at least one year before sea migration (they show partial migration, and some males stay in freshwater for their entire life). We have clarified details of masu salmon's life history.
+
+*Marine life stage before spawning? How does this map to the AR1 process assumed in the state space model?*
+
+> Thank you - we have given a deep thought on this. Masu salmon has a 1-year marine life stage (typically). However, many other species are also diadromous, and some of them return freshwater in a couple of months (e.g., amphidromous). Given the complexity of this system, we reconsidered our state-space model to account for up to AR3 process (fish species in our system typically 1-3 years of life-span). The results were qualitatively similar.
+
+*If hatchery releases began in the 1950s, how has the proportion of natural origin fish changed over time?*
+
+> XXX
+
+*What other species are part of the masu salmon stream communities? Are they subject to supplementation, exploitation, or other factors that may also influence temporal variability and other aspects of these communities?*
+
+> We have detailed species information in Table S2. Masu salmon often co-occur with white-spotted charr, sculpins, and stone loaches. Since our watersheds are "protected" watersheds, any form of exploitation (including angling) is not allowed (regardless of fish species). Therefore, other factors are very unlikely to shape the observed patterns of temporal community variability. Please note that we have statistically accounted for natural variation in land use, watershed size, climate etc.
+
+### Response to Reviewer 2
+
+*The general model seems logical in that there is a non-linear response to numbers of releases. It does not seem too surprising that when releases are 5x carrying capacity that there is a negative impact, especially given a fairly large alpha.*
+
+> We agree that our results are not surprising -- we are not surprised either. However, we strongly believe that our result is important and worth publishing because to our knowledge, no study has rigorously quantified the community-level impact of intentional release in the long-term. Also, and perhaps more importantly, many release programs for commercial and recreational species release **millions of individuals to a single system EVERY YEAR** (clarified in the revised manuscript)! This magnitude is way larger than the release program in our study system. Therefore, release numbers of $5\times$ carrying capacity seem even conservative to us. Although we cannot provide quantitative evidence for this claim (we found no data on the carrying capacities of the recipient ecosystems), our analysis should represent a conservative scenario, rather than an extreme, unrealistic scenario.
+>
+> Regarding the competition coefficient, please note that the interspecific competition coefficients $\alpha_{ij}$ ($i \ne j$) are measured relative to intraspecific competition, i.e., two competing species can coexist when $\alpha_{ij} < 1$ (if carrying capacities are identical between the species). The values in our simulation (0.25 or 0.50 in the revised manusucript) are thus weak enough to allow species co-existence in the absence of intentional release. Therefore, it is certain that the intentional release disrupted the sensitive balance of species interactions. In the revised text, we have also provided empirical estimates of species interactions -- the median value was 0.29, so our simulation setup is reasonable.
+
+*But in the mean* $\mu$ *panel in Figure 1A, the enhanced population shows no effect of releases until about 2x carrying capacity, which seems significant. This appears to occur at the same time there is steep decline of the unenhanced species, even when the number of releases is below.*
+
+> Thank you for this comment. We agree that this pattern is important, and we do acknowledge that there are cases where intentional release works very well (see the revised text; last paragraph of **Theoretical prediction**). However, our focus here is not the influence of intentional release on the enhanced species -- we are interested in how unenhanced species respond to the intentional release. This is the knowledge gap we are trying to fill, as no study has focused on this "side-effect" of intentional release so far. We hope the reviewer will understand the significance of this finding.
+
+*In general, I found the results reported from this model to be lacking depth, especially given the many variations of model output in the supplemental material.*
+
+> Thank you for this critical comment. Following the editor's suggestion, we have greatly improved the analysis by introducing two-species simulations (see our response to editor).
+
+*Although the model is general, it is motivated by salmon. As a salmon model, it may lack the nuance needed to really explore the impacts of hatchery releases on salmon or communities. In particular, I wonder if a life-cycle model would provide a better insight of the potential impacts of hatchery releases on the enhanced species and community. **Table s9 shows the importance of ocean productivity and forest cover for mean*** $\mu$ ***in salmon, for example.** This makes sense for an anadromous species, but also highlights that the species occurs in multiple habitats with potentially different and asynchronously varying capacities. The model does not address this important life history trait. Consequently, results of the model may or may not be relevant to fishery managers - does it matter to the enhanced species or the community if releases are 5x K, when ocean productivity is high, for example.*
+
+> Thank you, we agree that a detailed life-history model will provide useful insights into salmon management. However, we decided not to perform this analysis for the following reasons. First, given the readership of PNAS, as well as the suggestions from reviewer 1 and editor, we believe it is important to keep our model as general as possible. In fact, as clarified in the revised manuscript, there are a number of cases where our phenomenological model may apply. Second, a detailed life-history model has already been developed by Morita et al. [@moritaTemperaturedependentVariationAlternative2014]. The readers interested in specifics of masu salmon can refer to this article. We have cited it in the revised manuscript. Lastly, we believe the reviewer has misread our results in the previous manuscript. Table S9 in the previous manuscript did not show significant effects of ocean productivity (coef = $0.09 \pm 0.29$) or forest cover (coef = $0.36 \pm 0.28$), thus largely overlapping zero or marginal at best. This result remains the same in the improved analysis in the revised manuscript. Therefore, there is little evidence supporting the importance of detailed life-history processes in explaining long-term population dynamics for our dataset.
+
+*We are not provided with any life history or hatchery-operation detail of Masu salmon or the other species examined. It is difficult to discern, for instance, how much hatchery salmon would overlap with other species in space or time.*
+
+> We are glad that the reviewer caught this issue. We improved as follows:
+>
+> \- enriched the text explaining masu salmon's life history
+>
+> \- added species traits to Table S2
+>
+> \- added spatial/temporal overlap between masu salmon and other species (see Table S16 for co-occurrence matrix)
+>
+> As we clarified in the revised text, we are pretty sure that (hatchery) masu salmon interact with other species. Indeed, masu salmon always occurred with other species (in particular, white-spotted charr, sculpins, stone loaches). In addition, there are numerous research documenting competition between masu salmon and other stream fish species. We have clarified these points in the revised manuscript.
+
+*I did not see any attempt to estimate a competition coefficient among species (perhaps from diet and spatial overlap). This would also make the statistical analysis more compatible with the model.*
+
+> Thank you, this is very important. To address this issue, we have developed a Bayesian Ricker model to estimate competition coefficients in our data (note: we used a subset of data because it requires non-sparse data to estimate parameters reliably). The results were very promising, supporting the considerable interspecific competition among stream fishes. We chose this approach to make it directly comparable with theoretical parameters. As the reviewer suggests, spatial/diet overlap may be useful, but it does not necessarily translate into "population" level interactions (in fact, estimated competition coefficients are varied greatly among sites for a given species pair). Therefore, our approach would give stronger evidence for interspecific competition occurring in natural systems.
+
+*The Introduction of the paper does not set up the problem well. There is a large literature about captive breeding for enhancement, and an especially large literature for salmonids. For example, the paper suggests in line 45 that "use of captive breeding is perhaps because of the myth that the demographic benefits of released individuals may exceed the associated risks." This statement highlights that the introduction is not well grounded in the vast literature regarding the science and politics of hatcheries. Similarly, the discussion of the paper does not place this work in the larger body of scholarship around captive breeding for enhancement , salmon hatcheries, and salmon conservation.*
+
+> XXX
+
+\clearpage
+
+# References
