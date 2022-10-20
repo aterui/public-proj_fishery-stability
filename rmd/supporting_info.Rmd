@@ -50,6 +50,7 @@ We employed a multi-species Ricker model [@fowlerSpeciesDynamicsAlter2012]. In t
 ```{=tex}
 \begin{align}
 N_{i,t+1} = N_{i,t}~\exp\left[r_i \left(1-\frac{\sum_{j=1}^S \alpha_{ij}N_{j,t}}{K_i} \right) \right]\exp(\varepsilon_{i,t})
+(\#eq:ricker0)
 \end{align}
 ```
 where $r_i$ is the intrinsic growth rate, $\alpha_{ij}$ the competition coefficient of species $j$ on $i$, $K_i$ the carrying capacity, and $\varepsilon_{i,t}$ the species response to stochastic environmental fluctuations that obey a normal distribution $\text{Normal}(0, \sigma_{\varepsilon}^2)$. We modified this formula to include the effects of intentional release (species 1) on reproduction and competition as follows:
@@ -222,7 +223,7 @@ where $\varepsilon_{i,t}^{\text{obs}} \sim \text{Normal}(0, \sigma_{\text{obs},i
 (\#eq:ricker-ssm)
 \end{align}
 ```
-Equation \@ref(eq:ricker-ssm) is equivalent to Equation \@ref(eq:ricker) except the scale of competition coefficients $\alpha'_{ij}$ ($\frac{\alpha'_{ij}}{\alpha'_{ii}}=\alpha_{ij}$, where $\alpha'_{ii}=\frac{r_i}{K_i}$). We used sparse priors for $\alpha'_{ij}$ to reduce the risk of over-fitting [@mutshindaWhatDrivesCommunity2009]:
+Equation \@ref(eq:ricker-ssm) is equivalent to Equation \@ref(eq:ricker0) except the scale of competition coefficients $\alpha'_{ij}$ ($\frac{\alpha'_{ij}}{\alpha'_{ii}}=\alpha_{ij}$, where $\alpha'_{ii}=\frac{r_i}{K_i}$). We used sparse priors for $\alpha'_{ij}$ to reduce the risk of over-fitting [@mutshindaWhatDrivesCommunity2009]:
 
 ```{=tex}
 \begin{align}
