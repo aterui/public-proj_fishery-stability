@@ -35,7 +35,6 @@ stock <- seq(0, 500, length = n_rep)
 pb <- txtProgressBar(max = nrow(df_param), style = 3)
 fun_progress <- function(n) setTxtProgressBar(pb, n)
 opts <- list(progress = fun_progress)
-set.seed(123)
 
 result <- foreach(x = iter(df_param, by = 'row'),
                   .combine = "bind_rows",
@@ -45,6 +44,9 @@ result <- foreach(x = iter(df_param, by = 'row'),
                     df_set <- foreach(j = seq_len(n_rep),
                                       .combine = "bind_rows") %do% {
                                         
+                                        ## for reproducibility
+                                        set.seed(j)
+                                                                                    
                                         ## simulation
                                         dyn <- cdynsim(n_timestep = x$n_timestep,
                                                        n_warmup = x$n_warmup,
