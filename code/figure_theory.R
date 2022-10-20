@@ -9,7 +9,7 @@ source(here::here("code/library.R"))
 ## call `sim_result`
 sim_result <- readRDS(file = here::here("output/result_ricker.rds"))
 
-df0 <- sim_result %>% 
+df_sim <- sim_result %>% 
   mutate(cv = sd_density / mean_density) %>% 
   pivot_longer(cols = mean_density:cv,
                names_to = "response",
@@ -41,7 +41,7 @@ df0 <- sim_result %>%
                                            "SD~sigma~(ind.)")))
 
 ## loess prediction with prediction intervals
-df1 <- df0 %>% 
+df1 <- df_sim %>% 
   filter(status != "dummy") %>% 
   group_by(status,
            group_id,
@@ -75,7 +75,7 @@ df_plot <- lapply(seq_len(nrow(df1)),
 source(here::here("code/set_figure_theme.R"))
 theme_set(plt_theme)
 
-g_theory <- df0 %>% 
+g_theory <- df_sim %>% 
   ggplot(aes(y = value,
              x = stock,
              color = group_id,
@@ -89,13 +89,13 @@ g_theory <- df0 %>%
                   ymax = upper),
               alpha = 0.4,
               color = grey(0, alpha = 0)) +
-  # geom_point(data = df0 %>% filter(status == "enhanced"),
+  # geom_point(data = df_sim %>% filter(status == "enhanced"),
   #            size = pt_size,
   #            color = hue_pal(h.start = hs[2], l = lum, c = con)(1)) +
-  # geom_point(data = df0 %>% filter(status == "unenhanced"),
+  # geom_point(data = df_sim %>% filter(status == "unenhanced"),
   #            size = pt_size,
   #            color = hue_pal(h.start = hs[3], l = lum, c = con)(1)) +
-  # geom_point(data = df0 %>% filter(status == "all"),
+  # geom_point(data = df_sim %>% filter(status == "all"),
   #            size = pt_size,
   #            color = hue_pal(h.start = hs[1], l = lum, c = con)(1)) +
   geom_smooth(size= 0.5,

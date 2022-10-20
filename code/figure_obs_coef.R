@@ -81,5 +81,5 @@ g_coef <- df_mcmc %>%
 
 ggsave(g_coef,
        filename = here::here("output/figure_coef.pdf"),
-       width = 8,
-       height = 6)
+       width = 7,
+       height = 4.5)
