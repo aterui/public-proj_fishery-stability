@@ -161,6 +161,7 @@ g_obs <- ggplot(data = df_m,
                 x = x,
                 color = group,
                 linetype = lty),
+            size = lwd,
             data = df_y) +
   scale_color_hue(h = c(hs[1], hs[3]),
                   l = 60,

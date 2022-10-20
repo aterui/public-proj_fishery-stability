@@ -27,5 +27,6 @@ theme_set(plt_theme)
 lum <- 85
 con <- 40
 hs <- c(30, 140, 250)
-pt_size <- 0.8
+pt_size <- 0.6
+lwd <- 0.5
 
