@@ -5,6 +5,7 @@
 *old
 *.html
 *.pdf
+*.log
 data_raw/gis/albers_chelsa_clim.tif
 data_raw/gis/albers_chelsa_clim.tif.aux.xml
 data_raw/gis/CHELSA_bio10_01.tif
