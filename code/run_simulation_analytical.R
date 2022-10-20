@@ -17,7 +17,7 @@ df_param <- expand.grid(n_timestep = 1000,
                         k = seq(50, 500, length = 20),
                         r_type = "constant",
                         r1 = seq(0.5, 3.5, length = 20),
-                        sd_env = c(0, 0.75),
+                        sd_env = c(0, 0.5),
                         phi = 1,
                         int_type = "constant",
                         alpha = c(0.25, 0.5),
@@ -46,6 +46,10 @@ result <- foreach(x = iter(df_param, by = 'row'),
                     df_set <- foreach(j = seq_len(n_rep),
                                       .combine = "bind_rows") %do% {
                                         
+                                        ## for reproducibility
+                                        set.seed(j)
+                                        
+                                        ## simulation
                                         dyn <- cdynsim(n_timestep = x$n_timestep,
                                                        n_warmup = x$n_warmup,
                                                        n_burnin = x$n_burnin,
