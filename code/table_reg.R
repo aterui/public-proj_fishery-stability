@@ -12,8 +12,8 @@ group <- unique(df_reg$group) %>%
   na.omit() %>% 
   c()
 
-r_level <- c("Species richness",
-             "CV",
+r_level <- c("CV",
+             "Species richness",
              "Mean $\\mu$",
              "SD $\\sigma$")
 
