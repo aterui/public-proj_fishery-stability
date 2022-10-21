@@ -8,7 +8,7 @@ output:
     includes:
         before_body: title.tex
 mainfont: "Times New Roman"
-fontsize: 11pt
+fontsize: 10.5pt
 knit: (function(inputFile, encoding) {
         rmarkdown::render(inputFile,
                           encoding = encoding, 
@@ -99,7 +99,7 @@ As with the two-species model, we ran `r attr(list_param[[2]], "n_sim")` timeste
 
 **Time-series data.** We assembled time-series fish data at `r n_distinct(d0$site_id)` sites within `r n_distinct(d0$river)` protected watersheds of Hokkaido Island, Japan. The Hokkaido Research Organization leads a long-term monitoring program at these watersheds, and the data are published as annual reports [@salmonandfreshwaterfisheriesresearchinstitutehokkaidoresearchorganizationAnnualReportMonitoring2021]. The program began in 1963, but an effective, standardized sampling method has been implemented since 1999 (two-pass sampling with a combination of electrofishing and cast net). Most data were collected in summer with irregular interannual intervals (1- to 3-year intervals for most cases), and sampling efforts were quantified by sampling area (average: `r op(mean(df_area$area))` $\pm$ `r op(sd(df_area$area))` m^2^). We confined our analysis to the sites that meet the following criteria: (i) the observation span (from the first to the last year of observation) exceeds ten years, (ii) the number of observation years exceeds five years, and (iii) masu salmon is observed at least twice during the observation period. As a result, we used time-series data at `r n_distinct(df_fish$site_id)` sites within `r n_distinct(df_fish$river)` watersheds from 1999 to 2019. The summed abundance of first and second passes was used in the following analysis. **Table S**\@ref(tab:tab-splist) summarizes observed species in these watersheds.
 
-**Fish release.** The release of masu salmon began in the 1950s. Hatchery fish are released in spring (fry and smolt stages) and fall (juvenile stage). Although the fish release occurs at multiple locations within a watershed, the release information is available only at the watershed level. For each release stage, we assembled annual records of intentional release (the number of fish released; 1999-2019) from annual investigations by the Japan Fisheries Research and Education Agency and Salmon and Freshwater Fisheries Research Institute. During the study period, the majority of release took place in spring at a fry stage (fry : juvenile : smolt = `r pull(df_stock_stage, ratio)[1]` : `r op(pull(df_stock_stage, ratio)[2])` : `r op(pull(df_stock_stage, ratio)[3])`)
+**Fish release.** The release of masu salmon began in the 1950s. Although the program aims to release a constant number of hatchery fish for each watershed, uncontrollable factors (e.g., disease, budget allocation) produce some variation in the number of releases among years. Hatchery fish are released in spring (fry and smolt stages) and fall (juvenile stage). Most fish are released near the fish survey sites. However, the number of fish released at each site was reported as an aggregate for each watershed, and the site-specific information of release is unavailable. For each release stage, we assembled annual records of intentional release (the number of fish released; 1999 -- 2019) from annual investigations by the Japan Fisheries Research and Education Agency and Salmon and Freshwater Fisheries Research Institute. During the study period, the majority of release took place in spring at a fry stage (fry : juvenile : smolt = `r pull(df_stock_stage, ratio)[1]` : `r op(pull(df_stock_stage, ratio)[2])` : `r op(pull(df_stock_stage, ratio)[3])`)
 
 **Environmental data.** At each sampling site, we measured the following environmental variables as potential covariates: upstream watershed area (km^2^; a proxy for stream size), proportional land use in the upstream watershed (forest, urban, agriculture), local climates (annual mean air temperature [$^\circ C$] and cumulative precipitation [mm]), and ocean productivity (sea surface chlorophyll *a* concentration [mg m^-3^]). We used MERIT Hydro [@yamazakiMERITHydroHighresolution2019] to delineate the upstream watershed polygon for each sampling site. We estimated the proportion of forest, urban, and agriculture in each watershed polygon based on land use data in 2015 from Copernicus Global Land Service (100-m resolution) [@marcelbuchhornCopernicusGlobalLand2020]. Climate data at each sampling site were extracted from CHELSA version 1.2 [@kargerClimatologiesHighResolution2017; @kargerDataClimatologiesHigh2018]. We extracted annual data of chlorophyll *a* concentration (2002 -- 2019; resolution, 4.6 km^2^) from OceanColor [@seawifsmissionpageNasaOceanBiology2019] as a proxy for ocean productivity and calculated the average value within the 30-km radius of each river mouth. We used the following R packages to perform geospatial analysis: *sf* [@pebesmaSimpleFeaturesStandardized2018]*, raster* [@hijmansRasterGeographicData2020]*, exactextractr* [@bastonExactextractrFastExtraction2020]*, stars* [@pebesmaStarsSpatiotemporalArrays2020]*, whitebox* [@lindsayWhiteboxGATCase2016]*.*
 
@@ -169,8 +169,8 @@ $\gamma_{0,w(s)}$ is the watershed-specific intercept ($w(s)$ refers to site $s$
 ```{=tex}
 \begin{align}
 \begin{split}
-R'_s &= \eta_{w,s'} R_w\\
-\sum_{s'}^{S_w + 1} \eta_{w,s'} &= 1
+R'_s = \eta_{w,s'} R_w~\text{where}~
+\sum_{s'}^{S_w + 1} \eta_{w,s'} = 1
 (\#eq:effr)
 \end{split}
 \end{align}
@@ -210,8 +210,8 @@ We fitted the following state-space model to the data for each site separately. 
 ```{=tex}
 \begin{align}
 \begin{split}
-N_{i,t} \sim \text{Poisson}(\lambda_{i,t} A_{t})\\
-\lambda_{s,t} = n_{i,t}\exp(\varepsilon_{i,t}^{\text{obs}})
+N_{i,t} &\sim \text{Poisson}(\lambda_{i,t} A_{t})\\
+\lambda_{s,t} &= n_{i,t}\exp(\varepsilon_{i,t}^{\text{obs}})
 \end{split}
 \end{align}
 ```
@@ -253,7 +253,7 @@ where $D$ is the number of latent factors, $\epsilon_{i,t} \sim \text{Normal}(0,
 
 ## Two-species model
 
-The analysis of a two-species community revealed the distinct parameter space predicting a stabilizing, neutral, or destabilizing effect of intentional release. The left column in **Figure S**\@ref(fig:fig-2sp-w)**A** shows the predictions in scenarios with no environmental stochasticity ($\sigma_{\varepsilon} =$ `r min(list_param[[1]]$sd_env)`) and weak competition ($\bar{\alpha}=$ `r min(list_param[[1]]$alpha)`). For lower values of intrinsic growth rate $r_i$ ($<1.5$), intentional release had neutral (with higher $K$) to destabilizing effects (with lower $K$) on community dynamics. In the meantime, stabilization with intentional release occurred for higher values of $r_i$ ($\ge 1.5$) by dampening limit cycles or chaos (**Figure S**\@ref(fig:fig-2sp-s)), which is reflected in decreased SD $\sigma$ (**Figure S**\@ref(fig:fig-2sp-w)). However, the long-term mean of community density $\mu$ consistently decreased with intentional release in almost all cases except for only a few combinations of $r_i$ and $K$ (**Figure S**\@ref(fig:fig-2sp-w)).
+The analysis of a two-species community revealed the distinct parameter spaces predicting a stabilizing, neutral, or destabilizing effect of intentional release. The left column in **Figure S**\@ref(fig:fig-2sp-w)**A** shows the predictions in scenarios with no environmental stochasticity ($\sigma_{\varepsilon} =$ `r min(list_param[[1]]$sd_env)`) and weak competition ($\bar{\alpha}=$ `r min(list_param[[1]]$alpha)`). For lower values of intrinsic growth rate $r_i$ ($<1.5$), intentional release had neutral (with higher $K$) to destabilizing effects (with lower $K$) on community dynamics. In the meantime, stabilization with intentional release occurred for higher values of $r_i$ ($\ge 1.5$) by dampening limit cycles or chaos (**Figure S**\@ref(fig:fig-2sp-w)), which is reflected in decreased SD $\sigma$ (**Figure S**\@ref(fig:fig-2sp-w)). However, the long-term mean of community density $\mu$ consistently decreased with intentional release in almost all cases except for only a few combinations of $r_i$ and $K$ (**Figure S**\@ref(fig:fig-2sp-w)).
 
 Environmental stochasticity did not change the qualitative patterns of deterministic simulations; however, it greatly expanded the parameter space with destabilizing effects of intentional release (the right columns in **Figure S**\@ref(fig:fig-2sp-w)**A and B**). In particular, destabilizing effects were more broadly observed when intrinsic growth rates were low.
 
