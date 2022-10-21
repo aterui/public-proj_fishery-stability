@@ -41,7 +41,7 @@ df_param <- sim_result %>%
                           Parameter == "k" ~ "$K$",
                           Parameter == "r1" ~ "$r_1$",
                           Parameter == "r_max" ~ "$r_{max}$",
-                          Parameter == "sd_env" ~ "$\\sigma_{\\epsilon}$",
+                          Parameter == "sd_env" ~ "$\\sigma_{\\varepsilon}$",
                           Parameter == "phi" ~ "$f_R$",
                           Parameter == "alpha" ~ "$\\bar{\\alpha}$")
   ) %>% 
