@@ -296,6 +296,7 @@ knitr::kable(df_sp_list,
 suppressMessages(source(here::here("code/table_prior.R")))
 
 knitr::kable(df_prior,
+             align = rep("l", 3),
              format = "markdown",
              caption = "Prior distributions used in the Bayesian models. See Durante [@duranteNoteMultiplicativeGamma2017] for multiplicative gamma priors. The parameter $\\pmb{\\omicron}$ is a vector of prior scales ($\\pmb{\\omicron}=2.5,...,2.5$).")
 
