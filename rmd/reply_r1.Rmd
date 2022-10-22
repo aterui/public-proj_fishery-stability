@@ -22,9 +22,9 @@ knitr::opts_chunk$set(echo = FALSE)
 
 Dear editor,
 
-Thank you for allowing us to revise our manuscript. The comments were very helpful in improving our manuscript. When revising the manuscript, we have put a particular emphasis on the following points:
+This is a re-submission of a manuscript: "2022­05603 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. The comments were very helpful in improving our manuscript. When revising the manuscript, we have put a particular emphasis on the following points:
 
-1.  **Improve the Introduction and implications**: both reviewers noted an absence of context in the previous manuscript. We agree with this comment. We revised the text to contextualize our work better. In particular, we have carefully reviewed cases to which our findings may apply and discussed the relevance of our work to those systems.
+1.  **Improve the Introduction and broad implications**: both reviewers noted an absence of context in the previous manuscript. We agree with this comment. We revised the text to contextualize our work better. In particular, we have carefully reviewed cases to which our findings may apply and discussed the relevance of our work to those systems.
 2.  **Two-species simulation.** The editor suggested including a two-species simulation to guide the full community model. We appreciated this suggestion and were able to draw deeper insights into our theoretical analysis. At the same time, this improvement helped address the concern raised by reviewer 2 (they pointed out the lack of depth in theoretical analysis). We revised the Methods and Results following this change. In particular, we removed the old sensitivity analysis as it was redundant with two-species simulations.
 3.  **Ecological interpretation of our empirical results (i.e., masu salmon system).** The reviewers and editor pointed out that the interpretation of our empirical analysis is superficial; we agree with this comment. We have enriched the text pertinent to this issue. We have greatly increased the number of citations and discussed possible mechanisms (e.g., diet overlap, exploitative competition) that may produce the observed patterns more carefully. In particular, we have added a new Ricker model analysis for empirical data to estimate competition coefficients in stream fish communities. The estimated parameter indicated that competition among species certainly exists.
 4.  **Life history of masu salmon.** Lastly, we enriched the text for the life history of masu salmon and how release programs for this species are operated.
@@ -61,7 +61,7 @@ Akira Terui, on behalf of the authors
 
 *Both reviewers noted an absence of context and literature cited that might better provide a framework for this study. What other species might this apply to? What are levels of supplementation in other salmon systems? The Discussion does not place the work in the context of general research regarding captive breeding for enhancement, salmon hatcheries, and salmon conservation.*
 
-> Agreed. We followed your guidance to improve the Introduction and Discussion (**paragraph L185 --, paragraph L209 --**). In short, we have clarified the following point:
+> Agreed. We followed your guidance to improve the Introduction and Discussion (**paragraph L186 --, paragraph L210 --**). In short, we have clarified the following point:
 >
 > Introduction -- We have included representative works that report the scale of intentional release for commercial and recreational species. The release programs included plants, insects, mollusks, crustaceans, fish, birds, and others. The magnitude was enormous, releasing several tens of thousands to \> 10 millions of individuals annually. Thus, our system certainly represents a typical scenario of release programs (our program releases 0.24 million fish per year at the most intense watershed).
 >
@@ -87,7 +87,7 @@ Akira Terui, on behalf of the authors
 
 *Also, it would be helpful to include (widely available) estimates of the extent of salmonid hatchery supplementation in North America, and to contextualize the dynamics estimated in the state space model for masu salmon relative to these other well-studied populations.*
 
-> This greatly helped improve our manuscript, making the results relevant to other systems. We included more information on other salmon and fishery release programs (**paragraph L185 --**).
+> This greatly helped improve our manuscript, making the results relevant to other systems. We included more information on other salmon and fishery release programs (**paragraph L186 --**).
 
 *The authors employ a state of the art space-state model for the empirical portion of their paper, but I believe other interpretations of the data are possible. The empirical results shown here are consistent with the theoretical model, but a correlative statistical model does not allow direct causal inference. So I recommend the authors review their interpretations of their state space model and revise causal language in the text with this in mind.*
 
