@@ -15,3 +15,4 @@ data_raw/gis/epsg4326_lu_hkd.tif.aux.xml
 data_raw/ocean
 rmd/document_output
 output/post_*
+rmd/test.Rmd
