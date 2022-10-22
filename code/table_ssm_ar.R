@@ -41,11 +41,11 @@ df_ssm_ar <- list.files(path = here::here("output"),
          estimate = paste0("$",
                            op(median),
                            "$"),
-         "95% CI" = paste0("$",
-                           op(lower), "~\\text{to}~", op(upper),
-                           "$")) %>%
-  dplyr::select(group, parameter, estimate, "95% CI") %>% 
+         "95\\% CI" = paste0("$",
+                             op(lower), "~\\text{to}~", op(upper),
+                             "$")) %>%
+  dplyr::select(group, parameter, estimate, "95\\% CI") %>% 
   arrange(group, parameter) %>% 
   mutate(group = replace(group, duplicated(group), values = NA)) %>% 
-  rename_with(.cols = -"95% CI",
+  rename_with(.cols = -"95\\% CI",
               .fn = str_to_sentence)

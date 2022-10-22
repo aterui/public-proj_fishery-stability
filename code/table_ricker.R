@@ -17,8 +17,8 @@ df_ricker <- list.files(path = here::here("output"),
                                   param == "p0[2]" ~ "$p_{\\alpha}^{\\text{inter}}$"),
             Site = str_to_sentence(site),
             Estimate = paste0("$", op(median), "$"),
-            "95% CI" = paste0("$", 
-                              op(lower), "~\\text{to}~", op(upper),
-                              "$")) %>% 
+            "95\\% CI" = paste0("$", 
+                                op(lower), "~\\text{to}~", op(upper),
+                                "$")) %>% 
   mutate(Parameter = replace(Parameter, duplicated(Parameter), NA))
-  
+
