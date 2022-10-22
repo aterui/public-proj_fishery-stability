@@ -311,7 +311,7 @@ knitr::kable(df_prior,
 
 ```
 
-See Durante [@duranteNoteMultiplicativeGamma2017] for multiplicative gamma priors.
+Note: see Durante [@duranteNoteMultiplicativeGamma2017] for multiplicative gamma priors.
 
 \newpage
 
