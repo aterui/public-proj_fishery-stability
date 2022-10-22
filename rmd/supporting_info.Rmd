@@ -16,7 +16,7 @@ knit: (function(inputFile, encoding) {
       })
 header-includes:
   - \pagenumbering{gobble}
-  - \usepackage{amsmath,fancyhdr, caption}
+  - \usepackage{amsmath, fancyhdr, caption, booktabs}
   - \captionsetup{width=1.35\linewidth, labelfont={bf}}
 bibliography: reference.bib
 csl: https://www.zotero.org/styles/pnas
@@ -27,6 +27,7 @@ nocite: |
 ```{r setup, include=FALSE}
 
 suppressMessages(source(here::here("code/set_rmd.R")))
+
 ```
 
 ```{=tex}
@@ -34,7 +35,6 @@ suppressMessages(source(here::here("code/set_rmd.R")))
 \pagestyle{fancy}
 \fancyhead[L]{Terui et al.}
 \fancyhead[C]{}
-\setlength{\headheight}{13.7pt}
 \pagenumbering{arabic}
 \def\figurename{Figure S\hspace{-.4ex}}
 \def\tablename{Table S\hspace{-.4ex}}
@@ -269,8 +269,10 @@ Increasing the competition coefficient $\bar{\alpha}$ shifted the region with th
 
 suppressMessages(source(here::here("code/table_param_set.R")))
 knitr::kable(df_param,
-             format = "markdown",
-             caption = "Parameter values used in the whole community simulation.")
+             escape = FALSE,
+             booktabs = TRUE,
+             caption = "Parameter values used in the whole community simulation.") %>% 
+  kableExtra::kable_styling(latex_options = "HOLD_position")
 
 ```
 
@@ -283,9 +285,14 @@ knitr::kable(df_param,
 suppressMessages(source(here::here("code/table_species_list.R")))
 
 knitr::kable(df_sp_list,
-             format = "markdown",
-             caption = "Fish species found in the study watersheds. Trait information is based on the literature [@gotoEcologicalMorphologicalDivergence1975;@gotoLifeHistoryDistibution1981;@ministryofenvironmentofjapanThreatenedWildlifeJapan2014;@natsumedaEvaluationEcologicalFeatures2010;@fishbaseFishBaseHttpsWww] and expert knowledge. Body size is coded as follows: maximum total length (TL) $< 100$ mm (S), $100\\le$  TL $\\le 200$ (M), and TL $> 200$ (L).")
+             booktabs = TRUE,
+             escape = FALSE,
+             caption = "Fish species found in the study watersheds. Body size is coded as follows: maximum total length (TL) $< 100$ mm (S), $100\\le$  TL $\\le 200$ (M), and TL $> 200$ (L).") %>% 
+  kableExtra::kable_styling(latex_options = c("HOLD_position",
+                                              "scale_down"))
 ```
+
+Note: Trait information is based on the literature [@gotoEcologicalMorphologicalDivergence1975; @gotoLifeHistoryDistibution1981; @ministryofenvironmentofjapanThreatenedWildlifeJapan2014; @natsumedaEvaluationEcologicalFeatures2010; @fishbaseFishBaseHttpsWww] and expert knowledge.
 
 \newpage
 
@@ -297,10 +304,14 @@ suppressMessages(source(here::here("code/table_prior.R")))
 
 knitr::kable(df_prior,
              align = rep("l", 3),
-             format = "markdown",
-             caption = "Prior distributions used in the Bayesian models. See Durante [@duranteNoteMultiplicativeGamma2017] for multiplicative gamma priors. The parameter $\\pmb{\\omicron}$ is a vector of prior scales ($\\pmb{\\omicron}=2.5,...,2.5$).")
+             escape = FALSE,
+             booktabs = TRUE,
+             caption = "Prior distributions used in the Bayesian models. The parameter $\\pmb{\\omicron}$ is a vector of prior scales ($\\pmb{\\omicron}=2.5,...,2.5$).") %>% 
+  kableExtra::kable_styling(latex_options = "HOLD_position")
 
 ```
+
+See Durante [@duranteNoteMultiplicativeGamma2017] for multiplicative gamma priors.
 
 \newpage
 
@@ -312,8 +323,10 @@ suppressMessages(source(here::here("code/table_ssm_ar.R")))
 
 knitr::kable(df_ssm_ar,
              align = c(rep("l", 2), rep("r", 2)),
-             format = "markdown",
-             caption = "Median estimates for key parameters of the state-space autoregressive model. Site-specific parameters were excluded due to a large number of parameters.")
+             escape = FALSE,
+             booktabs = TRUE,
+             caption = "Median estimates for key parameters of the state-space autoregressive model. Site-specific parameters were excluded due to a large number of parameters.") %>% 
+  kableExtra::kable_styling(latex_options = "HOLD_position")
 
 ```
 
@@ -327,8 +340,10 @@ suppressMessages(source(here::here("code/table_ricker.R")))
 
 knitr::kable(df_ricker,
              align = c(rep("l", 2), rep("r", 2)),
-             format = "markdown",
-             caption = "Median estimates for key parameters of the state-space Ricker model. Site-specific parameters were excluded due to a large number of parameters.")
+             escape = FALSE,
+             booktabs = TRUE,
+             caption = "Median estimates for key parameters of the state-space Ricker model. Site-specific parameters were excluded due to a large number of parameters.") %>% 
+  kableExtra::kable_styling(latex_options = "HOLD_position")
 
 ```
 
@@ -357,8 +372,11 @@ for(i in seq_len(length(list_reg))) {
                        \n\n
                        kable(list_reg[[",i,"]],
                              align = c(rep('l', 2), rep('r', 4)),
-                             format = 'markdown',
-                             caption = table_legend[",i,"])
+                             escape = FALSE,
+                             booktabs = TRUE,
+                             caption = table_legend[",i,"]) %>% 
+  kableExtra::kable_styling(latex_options = 'HOLD_position')
+                             
                        \n\n
                        ```\n",
                        "\n\\pagebreak\n")
