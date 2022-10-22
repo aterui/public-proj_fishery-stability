@@ -11,7 +11,8 @@ knitr::opts_chunk$set(echo = FALSE,
                       warning = FALSE,
                       eval.after = "fig.cap") # to embed codes in fig.cap
 
-options(knitr.kable.NA = '')
+options(knitr.kable.NA = "",
+        knitr.table.format = "latex")
 
 
 # theory ------------------------------------------------------------------

@@ -22,11 +22,11 @@ df_sp_list <- df_selected %>%
                                  replacement = " "),
          taxon = str_replace(taxon,
                              pattern = "\\sspp",
-                             replacement = " spp."),
-         taxon = paste0("*", taxon, "*"),
+                             replacement = " spp\\."),
+         taxon = paste0("\\textit{", taxon, "}"),
          taxon = str_replace(taxon,
-                             pattern = "\\sspp.*",
-                             replacement = "* spp.")) %>% 
+                             pattern = "\\sspp\\.\\}",
+                             replacement = "\\} spp\\.")) %>% 
   arrange(taxon) %>% 
   mutate(across(.fns = str_replace_all,
                 pattern = "_",
