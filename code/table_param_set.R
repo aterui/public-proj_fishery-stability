@@ -40,7 +40,7 @@ df_param <- sim_result %>%
     Parameter = case_when(Parameter == "n_species" ~ "$S$",
                           Parameter == "k" ~ "$K$",
                           Parameter == "r1" ~ "$r_1$",
-                          Parameter == "r_max" ~ "$r_{max}$",
+                          Parameter == "r_max" ~ "$r_{\\text{max}}$",
                           Parameter == "sd_env" ~ "$\\sigma_{\\varepsilon}$",
                           Parameter == "phi" ~ "$f_R$",
                           Parameter == "alpha" ~ "$\\bar{\\alpha}$")
