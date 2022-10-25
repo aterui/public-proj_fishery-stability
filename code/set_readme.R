@@ -9,6 +9,8 @@ pacman::p_load(tidyverse)
 
 tbl_readme <- tibble(name = list.files(here::here("code")),
                      dir = "code") %>% 
+  bind_rows(tibble(name = list.files(here::here("data_fmt")),
+                   dir = "data_fmt")) %>% 
   filter(name != "readme.R") %>% 
   mutate(class = case_when(str_detect(name, "analysis_") ~ "analysis",
                            str_detect(name, "^figure_|^si_figure_") ~ "figure",
@@ -17,12 +19,9 @@ tbl_readme <- tibble(name = list.files(here::here("code")),
                            str_detect(name, "model_|run_jags") ~ "jags",
                            str_detect(name, "run_simulation") ~ "simulation",
                            str_detect(name, "table_") ~ "table",
-                           str_detect(name, "set_") ~ "set")
-  ) %>% 
-  bind_rows(tibble(name = list.files(here::here("data_fmt")),
-                   dir = "data_fmt")) %>%
-  # bind_rows(tibble(name = list.files(here::here("data_raw")),
-  #                  dir = "data_raw")) %>% 
+                           str_detect(name, "set_") ~ "set",
+                           str_detect(name, "data_") ~ "data")
+  ) %>%
   relocate(dir, class) %>% 
   arrange(dir, class, name) %>% 
   mutate(description = case_when(str_detect(class, "analysis") ~ "correlation for sensitivity analysis of theoretical model",
@@ -34,12 +33,14 @@ tbl_readme <- tibble(name = list.files(here::here("code")),
                                  str_detect(class, "gis") ~ ifelse(str_detect(name, "watershed"),
                                                                    "delineate watersheds",
                                                                    paste("extract layer data for", str_extract(name, "environment|ocean"))
-                                 ),
+                                                                   ),
                                  str_detect(class, "jags") & str_detect(name, "model") ~ "jags model for joint state-space (`_joint`), multi-species ricker (`_multi_ricker_sparse`), and regression (`_reg`)",
                                  str_detect(class, "jags") & str_detect(name, "run") ~ "run corresponding jags models",
                                  str_detect(class, "simulation") ~ "run simulation model for species rich (no postfix) and 2-species community (`_analytical`) or sensitivity analysis (`_stvy`)",
                                  str_detect(class, "table") ~ "tables for theoretical parameters (`_param_set`), priors (`_prior`), species list (`_species_list`), and estimated regression (`_reg` and `_stvy_analysis`) or state-space model parameters (`_ssm`)",
-                                 str_detect(class, "set") ~ "set defaults")
+                                 str_detect(class, "set") ~ "set defaults",
+                                 str_detect(class, "data") ~ "formatted data for species trait (`_trait`), ocean data (`_ocean`), environment (`_env`), fish abundance (`_hkd_prtwsd`), and fish stocking (`_hkd_prtwsd_stock`)"
+                                 )
   )
 
 n_dir <- tbl_readme %>% 

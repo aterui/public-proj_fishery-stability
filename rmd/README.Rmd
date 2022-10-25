@@ -16,8 +16,9 @@ knitr::opts_chunk$set(echo = FALSE,
 
 ## Article Information
 
-Title: Intentional release of native species undermines ecological stability
-Authors: Akira Terui, Hirokazu Urabe, Masayuki Senzaki, Bungo Nishizawa
+**Title:** Intentional release of native species undermines ecological stability
+
+**Authors:** Akira Terui, Hirokazu Urabe, Masayuki Senzaki, Bungo Nishizawa
 
 ## Contents
 
@@ -26,11 +27,9 @@ source(here::here("code/set_readme.R"))
 knitr::kable(tbl_readme)
 ```
 
-
 ## Session Information
 
 ```{r}
+source(here::here("code/library.R"))
 sessionInfo()
 ```
-
-
