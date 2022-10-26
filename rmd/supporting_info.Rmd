@@ -8,7 +8,7 @@ output:
     includes:
         before_body: title.tex
 mainfont: "Times New Roman"
-fontsize: 10.5pt
+fontsize: 11pt
 knit: (function(inputFile, encoding) {
         rmarkdown::render(inputFile,
                           encoding = encoding, 
