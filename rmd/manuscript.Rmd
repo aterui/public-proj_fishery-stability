@@ -124,7 +124,7 @@ Despite the significant attention to the fate of captive-bred individuals [@arak
 
 While socioeconomic analysis is required to provide detailed guidance on release programs, it is clear that habitat conservation should be prioritized for the sustainability of the natural resources. Protected areas and environmental restoration are promising tools to conserve biodiversity, and a smart spatial design is integral to achieving successful conservation. For example, coordinated placement of conservation sites considering spatial biodiversity patterns is crucial in improving the ecological outcomes [@akasakaSmartProtectedArea2017; @teruiEmergentDualScaling2021; @koningNetworkGrassrootsReserves2020; @fontouraProtectingConnectivityPromotes2022]. Governance may also play a central role in enforcing environmental legislation, potentially determining the effectiveness of conservation investment [@amanoSuccessfulConservationGlobal2018]. These considerable potentials indicate that viable management options exist before blindly accepting intentional release. Without a comprehensive framework that appreciates the ecological integrity of natural communities, the intentional release will never be effective but impairs biodiversity.
 
-# Methods
+# Materials and Methods
 
 ## Theory
 
