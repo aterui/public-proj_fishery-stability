@@ -17,7 +17,7 @@ knit: (function(inputFile, encoding) {
 header-includes:
   - \pagenumbering{gobble}
   - \usepackage{amsmath, fancyhdr, caption, booktabs}
-  - \captionsetup{width=1.35\linewidth, labelfont={bf}}
+  - \setlength{\headheight}{13.6pt}
 bibliography: reference.bib
 csl: https://www.zotero.org/styles/pnas
 ---
