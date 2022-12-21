@@ -47,6 +47,10 @@ Environmental stochasticity did not change the qualitative patterns of determini
 
 Increasing the competition coefficient $\bar{\alpha}$ shifted the region with the destabilizing effects to higher carrying capacities ($\bar{\alpha}=$ `r max(list_param[[1]]$alpha)`, **Figure S**\@ref(fig:fig-2sp-s)); otherwise, general patterns were similar to the weak competition scenario.
 
+## Fish sampling
+
+In the monitoring program, a two-pass sampling method was employed at all sampling sites. In each pass, a combination of electrofishing and cast net (two-pass) was used to effectively catch both benthic and water-column species in a given area. The number of cast-net throws was determined as the sampled area divided by $4.5~\text{m}^2$ (the area covered by a cast net). Thus, this sampling method has a constant sampling effort per unit area across sites.
+
 \newpage
 
 # Supplementary Tables
