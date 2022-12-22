@@ -105,9 +105,9 @@ albers_dem <- list.files(dem_path, full.names = T) %>%
 
 ## extract dem by watershed
 df_elev <- exact_extract(albers_dem,
-              albers_sf_wsd_outlet,
-              c("mean", "stdev"),
-              append_cols = TRUE) %>% 
+                         albers_sf_wsd_outlet,
+                         c("mean", "stdev"),
+                         append_cols = TRUE) %>% 
   as_tibble()
 
 # merge data --------------------------------------------------------------
