@@ -103,6 +103,7 @@ albers_dem <- list.files(dem_path, full.names = T) %>%
   terra::project(y = wkt_jgd_albers,
                  method = "bilinear")
 
+## extract dem by watershed
 df_elev <- exact_extract(albers_dem,
               albers_sf_wsd_outlet,
               c("mean", "stdev"),
