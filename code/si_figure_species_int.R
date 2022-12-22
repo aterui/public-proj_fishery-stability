@@ -7,16 +7,16 @@ source(here::here("code/set_functions.R"))
 df0 <- readRDS(here::here("output/summary_multi_ricker_sparse.rds"))
 
 df_est <- df0 %>% 
-  mutate(taxon.y = spabb(taxon.y, sep = "_"),
-         taxon.x = spabb(taxon.x, sep = "_"),
-         lbs.y = ifelse(test = str_detect(taxon.y, "\\sspp\\."),
+  mutate(taxon.y = str_replace_all(taxon.y, pattern = "_", replacement = " "),
+         taxon.x = str_replace_all(taxon.x, pattern = "_", replacement = " "),
+         lbs.y = ifelse(test = str_detect(taxon.y, "\\sspp"),
                         yes = paste0('italic("',
-                                     str_remove(taxon.y, "\\sspp\\."),
+                                     str_remove(taxon.y, "\\sspp"),
                                      '")~spp.'),
                         no = paste0('italic("', taxon.y, '")')),
-         lbs.x = ifelse(test = str_detect(taxon.x, "\\sspp\\."),
+         lbs.x = ifelse(test = str_detect(taxon.x, "\\sspp"),
                         yes = paste0('italic("',
-                                     str_remove(taxon.x, "\\sspp\\."),
+                                     str_remove(taxon.x, "\\sspp"),
                                      '")~spp.'),
                         no = paste0('italic("', taxon.x, '")'))
   )
