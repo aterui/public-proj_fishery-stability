@@ -21,7 +21,8 @@ M <- df_env %>%
                 'Precipitation' = ppt,
                 'Watershed area' = wsd_area,
                 'Number of fish released' = mean_stock,
-                'Chlorophyll a' = chr_a) %>% 
+                'Chlorophyll a' = chr_a,
+                'SD Elevation' = sd_elev) %>% 
   cor(method = "spearman")
 
 corrplot(M,

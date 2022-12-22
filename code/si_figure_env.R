@@ -32,15 +32,20 @@ df_site <- df_env %>%
                                variable == "temp" ~ "Temperature~(degree*C)",
                                variable == "wsd_area" ~ "Watershed~area~(km^2)"))
 
-df_river <- df_stock_mu %>% 
+df_river <- df_env %>% 
+  group_by(river) %>% 
+  summarize(sd_elev = unique(sd_elev)) %>% 
+  left_join(df_stock_mu, by = "river") %>% 
   left_join(df_ocean, by = "river") %>% 
   pivot_longer(cols = c(mean_stock,
-                        chr_a),
+                        chr_a,
+                        sd_elev),
                names_to = "variable",
                values_to = "value") %>% 
   dplyr::select(-starts_with("scl")) %>% 
   mutate(var_label = case_when(variable == "mean_stock" ~ "Number~of~releases~(million~fish)",
-                               variable == "chr_a" ~ "Chlorophyll~a~(mg~m^-3)"))
+                               variable == "chr_a" ~ "Chlorophyll~a~(mg~m^-3)",
+                               variable == "sd_elev" ~ "SD~Elevation~(m)"))
 
 df0 <- bind_rows(df_site, df_river) %>% 
   mutate(var_label = factor(var_label, levels = c("Watershed~area~(km^2)",
@@ -50,7 +55,8 @@ df0 <- bind_rows(df_site, df_river) %>%
                                                   "Fraction~agriculture",
                                                   "Fraction~urban",
                                                   "Number~of~releases~(million~fish)",
-                                                  "Chlorophyll~a~(mg~m^-3)")))
+                                                  "Chlorophyll~a~(mg~m^-3)",
+                                                  "SD~Elevation~(m)")))
 
 g_env <- df0 %>% 
   ggplot(aes(x = value)) + 
