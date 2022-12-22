@@ -108,22 +108,24 @@ df_elev <- exact_extract(albers_dem,
                          albers_sf_wsd_outlet,
                          c("mean", "stdev"),
                          append_cols = TRUE) %>% 
-  as_tibble()
+  as_tibble() %>% 
+  rename(mean_elev = mean,
+         sd_elev = stdev)
 
 # merge data --------------------------------------------------------------
 
-albers_sf_wsd <- albers_sf_wsd %>% 
+albers_sf_wsd_env <- albers_sf_wsd %>% 
   left_join(df_lu, by = c("river", "site")) %>% 
   left_join(df_clim, by = c("river", "site")) %>% 
   left_join(df_elev, by = "river") %>% 
   mutate(area = st_area(.),
          area = units::set_units(area, km^2))
 
-st_write(albers_sf_wsd,
+st_write(albers_sf_wsd_env,
          dsn = "data_raw/gis/albers_wsd_env.gpkg",
          append = FALSE)
 
-df_env <- albers_sf_wsd %>% 
+df_env <- albers_sf_wsd_env %>% 
   as_tibble() %>% 
   dplyr::select(-geometry)
 
