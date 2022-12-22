@@ -109,8 +109,9 @@ df_elev <- exact_extract(albers_dem,
                          c("mean", "stdev"),
                          append_cols = TRUE) %>% 
   as_tibble() %>% 
-  rename(mean_elev = mean,
-         sd_elev = stdev)
+  dplyr::select(river,
+                mean_elev = mean,
+                sd_elev = stdev)
 
 # merge data --------------------------------------------------------------
 
