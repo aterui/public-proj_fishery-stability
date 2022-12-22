@@ -8,7 +8,7 @@ pacman::p_load(tidyverse)
 
 df_prior <- tibble(Model = c(rep("AR model", 9),
                              rep("Ricker model", 11),
-                             rep("Regression", 4)),
+                             rep("Regression", 6)),
                    Parameter = c(
                      "$\\theta_{\\beta}$",
                      "$\\theta_{\\xi_1}$",
@@ -34,6 +34,8 @@ df_prior <- tibble(Model = c(rep("AR model", 9),
                      
                      "$\\gamma$",
                      "$\\gamma'$",
+                     "$\\sigma_{\\lambda}$",
+                     "$\\sigma_{\\gamma}$",
                      "$\\pmb{\\eta_{w}}$ ($\\pmb{\\eta_{w}} = \\eta_{w,1},...,\\eta_{w,S_w}$)",
                      "$\\pmb{\\Omega_{y}}$"),
                    Prior = c("Normal(0, 10)",
@@ -60,6 +62,8 @@ df_prior <- tibble(Model = c(rep("AR model", 9),
                              
                              "Normal(0, 10)",
                              "Normal(0, 10)",
+                             "Half-t(0, 2.5, 4)",
+                             "Half-t(0, 2.5, 4)",
                              "Dirichlet(1,...,1)",
                              "Scaled Inv-Wishart$_2$($\\pmb{\\omicron}$)"),
                    ) %>% 
