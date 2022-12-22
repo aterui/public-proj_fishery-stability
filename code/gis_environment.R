@@ -10,9 +10,13 @@ source(here::here("code/set_crs.R"))
 # read polygons and points ------------------------------------------------
 
 ## watershed polygons
+### by site
 albers_sf_wsd <- readRDS("data_raw/gis/albers_wsd.rds") %>%
   dplyr::select(river,
                 site)
+
+### by watershed
+albers_sf_wsd_outlet <- readRDS("data_raw/gis/albers_wsd_outlet.rds")
 
 ## sampling sites
 wgs84_sf_site <- readRDS("data_raw/gis/epsg4326_point_snap.rds")
@@ -85,11 +89,32 @@ df_lu <- exact_extract(albers_rs_fua,
          frac_agri = mean.agri)
 
 
+# elevation ---------------------------------------------------------------
+
+## read dem data
+dem_path <- here::here() %>% 
+  str_remove("/public-proj_fishery-stability") %>% 
+  paste0("/priv-proj_hokkaido-gis/data_org_dem")
+
+albers_dem <- list.files(dem_path, full.names = T) %>% 
+  lapply(terra::rast) %>% 
+  terra::sprc() %>% 
+  terra::merge() %>% 
+  terra::project(y = wkt_jgd_albers,
+                 method = "bilinear")
+
+df_elev <- exact_extract(albers_dem,
+              albers_sf_wsd_outlet,
+              c("mean", "stdev"),
+              append_cols = TRUE) %>% 
+  as_tibble()
+
 # merge data --------------------------------------------------------------
 
 albers_sf_wsd <- albers_sf_wsd %>% 
   left_join(df_lu, by = c("river", "site")) %>% 
   left_join(df_clim, by = c("river", "site")) %>% 
+  left_join(df_elev, by = "river") %>% 
   mutate(area = st_area(.),
          area = units::set_units(area, km^2))
 
