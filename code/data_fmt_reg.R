@@ -10,12 +10,17 @@ source(here::here("code/data_fmt_fishdata.R"))
 
 river_id <- pull(distinct(df_fish, river))
 
+## df for # observed years
+df_n_obs <- df_fish %>% 
+  group_by(river, site, site_id) %>% 
+  summarize(n_obs = n_distinct(year)) %>% 
+  ungroup()
+
 ## df for species richness
 df_sp <- df_selected %>% 
   filter(abundance > 0) %>% 
   group_by(river, site, site_id) %>% 
-  summarize(n_species = n_distinct(taxon),
-            n_species_unstock = n_distinct(taxon[.data$taxon != "Oncorhynchus_masou_masou"])) %>% 
+  summarize(n_species = n_distinct(taxon)) %>% 
   ungroup()
 
 ## df for environmental covariates
@@ -46,6 +51,7 @@ df_ssm <- readRDS(file = here::here("output/summary_ssm_ar3.rds")) %>%
   ungroup() %>% 
   left_join(df_env, by = c("river", "site", "site_id")) %>% 
   left_join(df_sp, by = c("river", "site", "site_id")) %>% 
+  left_join(df_n_obs, by = c("river", "site", "site_id")) %>% 
   left_join(df_stock_mu, by = "river") %>% 
   left_join(df_ocean, by = "river") %>% 
   pivot_longer(cols = c(n_species, mu, sigma, cv),
