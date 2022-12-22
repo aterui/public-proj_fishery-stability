@@ -15,7 +15,8 @@ model {
           a[3, g, p] * scl_log_wsd_area[i] +
           a[4, g, p] * scl_temp[i] +
           a[5, g, p] * scl_ppt[i] +
-          a[6, g, p] * scl_forest[i]
+          a[6, g, p] * scl_forest[i] +
+          a[7, g, p] * scl_n_obs[i]
       }
     }
     
@@ -29,6 +30,7 @@ model {
       a[4, 1, 3] * scl_temp[i] +
       a[5, 1, 3] * scl_ppt[i] +
       a[6, 1, 3] * scl_forest[i] +
+      a[7, 1, 3] * scl_n_obs[i] +
       eps[i]
     
     eps[i] ~ dnorm(0, tau_eps)
@@ -46,18 +48,18 @@ model {
       for (p in 1:Np) {
         ## watershed-level random effect
         r[j, g, p] ~ dnorm(theta[j, g, p], tau_r[g, p])
-        theta[j, g, p] <- b[1, g, p] * scl_chr_a[j]
+        theta[j, g, p] <- b[1, g, p] * scl_chr_a[j] + b[2, g, p] * scl_sd_elev[j]
       }
     }
   }
   
   for (g in 1:Ngroup) {
-    ## parameters for CV
-    for (k in 1:6) {
+    ## parameters for CV (p = 4)
+    for (k in 1:7) {
       a[k, g, 4] <- a[k, g, 1] - a[k, g, 2]
     }
     
-    for (q in 1) {
+    for (q in 1:2) {
       b[q, g, 4] <- b[q, g, 1] - b[q, g, 2]
     }
     
@@ -100,11 +102,11 @@ model {
       sigma_r[g, p] <- sqrt(1 / tau_r[g, p])
       
       ## regression intercepts/slopes
-      for (k in 1:6) {
+      for (k in 1:7) {
         a[k, g, p] ~ dnorm(0, tau0)
       }
       
-      for (q in 1) {
+      for (q in 1:2) {
         b[q, g, p] ~ dnorm(0, tau0)
       }
     }
@@ -131,10 +133,12 @@ data {
     scl_temp[i] <- (Temp[i] - mean(Temp[])) / sd(Temp[])
     scl_ppt[i] <- (Ppt[i] - mean(Ppt[])) / sd(Ppt[])
     scl_forest[i] <- (Forest[i] - mean(Forest[])) / sd(Forest[])
+    scl_n_obs[i] <- (N_obs[i] - mean(N_obs[])) / sd(N_obs[])
   }
   
   for (j in 1:Nriver) {
     scl_chr_a[j] <- (Chr_a[j] - mean(Chr_a[])) / sd(Chr_a[])
+    scl_sd_elev[j] <- (Sd_elev[j] - mean(Sd_elev[])) / sd(Sd_elev[])
   }
   
   ## alphas for dirichlet distributions

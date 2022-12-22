@@ -7,7 +7,7 @@ source(here::here("code/library.R"))
 
 # data --------------------------------------------------------------------
 
-source("code/data_fmt_reg.R")
+source(here::here("code/data_fmt_reg.R"))
 
 df_m <- df_ssm %>%
   filter(response %in% c("mu", "sigma", "n_species"),
@@ -17,7 +17,8 @@ df_m <- df_ssm %>%
   mutate(site0 = as.numeric(factor(site)),
          p_id = as.numeric(factor(response,
                                   levels = c("sigma", "mu", "n_species"))),
-         group_id = as.numeric(factor(group))) %>% 
+         group_id = as.numeric(factor(group,
+                                      levels = c("all", "masu_salmon", "other")))) %>% 
   ungroup() %>% 
   relocate(river, river_id, site, site0, site_id, group, group_id)
 
@@ -29,7 +30,8 @@ df_site <- df_m %>%
            wsd_area,
            temp,
            ppt,
-           frac_forest) %>% 
+           frac_forest,
+           n_obs) %>% 
   relocate(site_id_numeric, river, river_id) %>% 
   arrange(site_id_numeric)
 
@@ -37,6 +39,7 @@ df_river <- df_m %>%
   group_by(river, river_id) %>% 
   summarize(stock = unique(mean_stock),
             chr_a = unique(chr_a),
+            sd_elev = unique(sd_elev),
             n_site = n_distinct(site_id))
 
 
@@ -85,11 +88,13 @@ d_jags <- list(Y = df_m$value,
                Temp = df_site$temp,
                Ppt = df_site$ppt,
                Forest = df_site$frac_forest,
+               N_obs = df_site$n_obs,
                River = df_site$river_id,
                Reach = df_site$site0,
                
                Stock = df_river$stock,
                Chr_a = df_river$chr_a,
+               Sd_elev = df_river$sd_elev,
                Ngs = df_river$n_site,
                
                Nsite = nrow(df_site),
