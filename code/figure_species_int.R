@@ -114,6 +114,26 @@ g_alpha <- df_plot %>%
         axis.ticks.x = element_line(color = "gray"),
         axis.line = element_line(color = "gray"))
 
+## add fish image
+fish <- list.files(here::here("data_raw/image"),
+                   pattern = ".png",
+                   full.names = TRUE)
+
+yp <- seq(0.34, length = 10, by = -0.075)
+xp <- -0.18
+
+g_alpha_img <- ggdraw() +
+  draw_image(fish[1], x = xp, y = yp[1], scale = 0.06) +
+  draw_image(fish[2], x = xp, y = yp[2], scale = 0.06) +
+  draw_image(fish[3], x = xp, y = yp[3], scale = 0.06) +
+  draw_image(fish[4], x = xp, y = yp[4], scale = 0.06) +
+  draw_image(fish[5], x = xp, y = yp[5], scale = 0.06) +
+  draw_image(fish[6], x = xp, y = yp[6], scale = 0.06) +
+  draw_image(fish[7], x = xp, y = yp[7], scale = 0.06) +
+  draw_image(fish[8], x = xp, y = yp[8], scale = 0.06) +
+  draw_image(fish[9], x = xp, y = yp[9], scale = 0.06) +
+  draw_image(fish[10], x = xp, y = yp[10], scale = 0.06) +
+  draw_plot(g_alpha)
 
 ## by site ####
 g_alpha_site <- df_plot %>%
@@ -150,7 +170,7 @@ ggsave(g_alpha_site,
        height = 9,
        width = 10)
 
-ggsave(g_alpha,
+ggsave(g_alpha_img,
        filename = here::here("output/figure_alpha_dist.pdf"),
        height = 5,
-       width = 8)
+       width = 9)
