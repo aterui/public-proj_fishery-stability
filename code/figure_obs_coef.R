@@ -61,7 +61,8 @@ g_coef <- df_mcmc %>%
              color = grey(0.5),
              linetype = "dashed") +
   geom_density_ridges(alpha = 0.5,
-                      scale = 1) +
+                      scale = 0.9,
+                      size = 0.25) +
   geom_point(data = df_q,
              pch = 2,
              aes(x = median,
@@ -77,7 +78,8 @@ g_coef <- df_mcmc %>%
                  l = lum,
                  c = con,
                  labels = c("Whole", "Enhanced", "Unenhanced")) +
-  theme_ridges()
+  theme_ridges() +
+  scale_y_discrete(expand = expansion(add = c(0.5, 1)))
 
 ggsave(g_coef,
        filename = here::here("output/figure_coef.pdf"),
