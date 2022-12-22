@@ -20,8 +20,9 @@ ABF
 g <- (g_theory + ggtitle("Theoretical prediction")) + 
   (g_obs + ggtitle("Empirical observation")) +
   g_hkd + 
-  g_example + 
+  #g_example + 
   g_masu + 
+  plot_spacer() +
   guide_area() +
   plot_layout(design = layout, guides = "collect") +
   plot_annotation(tag_levels = 'A')
