@@ -1,0 +1,20 @@
+---
+title: "Figure captions"
+output:
+  bookdown::word_document2:
+    reference_docx: word_format.docx
+    number_sections: false
+knit: (function(inputFile, encoding) {
+        rmarkdown::render(inputFile,
+                          encoding = encoding, 
+                          output_dir = "document_output")
+      })
+fontsize: 11pt
+mainfont: "Times New Roman"
+---
+
+**Figure 1** Theory and empirical observations agree that intentional release destabilizes community dynamics. In A and B, panels and colors distinguish response variables and species groups. (A) Theoretical predictions. Dots represent individual simulation replicates, and lines are the loess curves fitted to simulated data with their 95% confidence (dark shade) and prediction intervals (light shade). Parameters used in this simulation are: intrinsic growth rate of an enhanced species $r_1=$ `r round(na.omit(unique(df_sim$r1)), 2)` average interspecific competition $\bar{\alpha}=$ `r round(na.omit(unique(df_sim$alpha)), 2)`, carrying capacity $K=$ `round(na.omit(unique(df_sim$k)), 2)`, environmental stochasticity $\sigma_{\varepsilon}=$ `r round(na.omit(unique(df_sim$sd_env)), 2)`, relative fitness of captive-bred individuals $f_R=$ `r round(na.omit(unique(df_sim$phi)), 2)`. These parameter values are comparable to those estimated in the empirical Ricker model. (B) Empirical evidence. Dots represent observations at 97 sites within 31 watersheds. Lines and shades are the predicted values and their 95% credible intervals of the regression models, and line types correspond to the coefficient's posterior probabilities. Effective release is a latent explanatory variable estimated in our hierarchical Baysian model. See Methods for details. Full statistics were reported in Tables S6 -- 8. (C) Map of sampling sites (black dots) in Hokkaido, Japan. (E) Masu salmon *Oncorhynchus masou*. Photo credit: Akira Terui
+
+**Figure 2** Posterior distributions for the standardized regression coefficients of intentional release. Y-axis represents different response variables grouped by colors distinguishing species groups (whole community, enhanced species [masu salmon], and unenhanced species). Triangles indicate median estimates.
+
+**Figure 3** Estimated competition coefficients of the multi-species Ricker model. Dots represent a given pair of taxa, and box plots show median (vertical center line) and quartiles (box limits) with whiskers extending up to the most extreme data points that are within $\pm 1.5$ interquartile range. The density plot on the top shows the overall distribution of the competition coefficient. Colors distinguish taxa. The vertical broken line denotes the overall median value.
