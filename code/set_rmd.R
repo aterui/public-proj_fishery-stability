@@ -57,7 +57,7 @@ source(here::here("code/data_fmt_fishdata.R"))
 source(here::here("code/data_fmt_reg.R"))
 source(here::here("code/data_fmt_stock.R")) # call `df_stock_mu`
 source(here::here("code/figure_layout.R")) # call `df_sim`, `df_beta`
-source(here::here("code/si_figure_species_int.R")) # call `df_pd`
+source(here::here("code/figure_species_int.R")) # call `df_pd`
 
 df_stock_stage <- df_stock %>% 
   group_by(release_stage) %>% 
