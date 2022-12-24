@@ -1,5 +1,5 @@
 ---
-title: "Reply to: 2022-05603 Intentional release of native species undermines ecological stability"
+title: "Reply to: 2022-18044 Intentional release of native species undermines ecological stability"
 output:
   bookdown::pdf_document2:
    latex_engine: xelatex
@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 Dear editor,
 
-This is a revision of a manuscript: "2022­18044 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. We have refined our analysis and text in light of comments from reviewer 3. We hope the manuscript is suitable for publication in PNAS.
+This is a revision of a manuscript: "2022-18044 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. We have refined our analysis and text in light of comments from reviewer 3. We hope the manuscript is suitable for publication in PNAS.
 
 Sincerely,
 
