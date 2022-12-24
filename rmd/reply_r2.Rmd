@@ -1,0 +1,148 @@
+---
+title: "Reply to: 2022-05603 Intentional release of native species undermines ecological stability"
+output:
+  bookdown::pdf_document2:
+   latex_engine: xelatex
+   toc: false
+   number_sections: false
+csl: https://www.zotero.org/styles/pnas
+knit: (function(inputFile, encoding) {
+        rmarkdown::render(inputFile,
+                          encoding = encoding, 
+                          output_dir = "document_output")
+      })
+bibliography: reference.bib
+fontsize: 11pt
+mainfont: "Times New Roman"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Dear editor,
+
+This is a re-submission of a manuscript: "2022­05603 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. The comments were very helpful in improving our manuscript. When revising the manuscript, we have put a particular emphasis on the following points:
+
+In summary, the improved text/analysis provides clearer evidence that intentional release has destabilizing effects and clarifies its broader relevance to other systems. We appended a point-by-point response below. We hope our manuscript is now suitable for publication in your journal.
+
+Sincerely,
+
+Akira Terui, on behalf of the authors
+
+\clearpage
+
+## Point-by-point response
+
+### Editor
+
+### Reviewer 1
+
+*The authors have done a terrific job of responding to the editor and reviewer comments.*
+
+> Thank you!
+
+### Reviewer 3
+
+*The empirical results are intriguing to me. It is an impressive data set and intriguing results, but I do worry quite a bit that the results are spurious. In particular, interannual stability (CV) of the aggregate population feels like many factors could influence it. I have a series of questions with corresponding suggestions to address some of these concerns.*
+
+> Thank you for your careful reading. Please see our response below.
+
+*Sampling. Effective sampling of stream fishes is quite challenging. Cast net and e-fishing would likely have very strong influence on the catch composition (e.g., benthic fishes will be less catchable by cast net). Was sampling methodology included as a factor in the analysis?*
+
+> Thank you. This is perhaps because of our unclear writing. At all sites, a combination of electrofishing and cast net was used to capture both benthic and water-column species effectively. We have clarified this in the revised MS (L XXX). In addition, we have added some text to clarify that the sampling has constant sampling effort per unit area. Therefore, our analysis is robust to this issue.
+
+*Sampling interval. I am concerned that there were irregular sampling intervals ("1- to 3-year intervals"), especially given that variability was one of the response variables. I understand that the state-space approach estimates true abundance, but I think it is important that a secondary analysis be performed on just the sites with all years.*
+
+> The secondary analysis at sites with no missing data would be insightful for sure. However, it introduces the issue of sample size. To address reviewer's concern more appropriately, we included "the number of observation years" as a covariate in the regression model. This approach is suitable because it keeps the sample size as original while accounting for potential influences of observation intervals. The results were qualitatively similar.
+
+*Are the empirical results robust if the strong outlier on the far right is removed? It sure looks like this point would have strong leverage.*
+
+> Thank you for your careful reading. However, this data point is not identified as an outlier; thus, there is no statistical justification for removing it from analysis. Although the figure was shown in an ordinary scale, the analysis was carried out in a log-scale (see Methods). When we applied the Grubb's test to the log-transformed CV, the p-value was 0.176, indicating that our results were not strongly influenced by the highest value of CV (see R codes below). Also, we have confirmed that our results were robust even if we used robust regression with the MM method, which accounts for outliers in both response (log CV) and predictor variables (effective release). We hope this ameliorates reviewer's concern.
+
+```{r outlier, echo = TRUE}
+
+# setup -------------------------------------------------------------------
+source(here::here("code/library.R"))
+
+# data --------------------------------------------------------------------
+
+## raw data for cv, mean, sd
+suppressMessages(source(here::here("code/data_fmt_reg.R")))
+
+## select cv
+df_m <- df_ssm %>%
+  filter(group == "all",
+         response == "cv")
+
+## regression data
+df_reg <- list.files(path = here::here("output"),
+                     full.names = TRUE,
+                     pattern = "summary_reg") %>% 
+  readRDS() %>% 
+  mutate(y = response)
+
+## join weighted stock
+df_m <- df_reg %>% 
+  filter(str_detect(parameter, "ef_stock")) %>%
+  dplyr::select(site_id_numeric,
+         ef_stock = median) %>% 
+  right_join(df_m,
+             by = "site_id_numeric")
+
+# check outlier influence -------------------------------------------------
+
+# outlier check for log-cv
+## log(df_m$value) is log-transformed cv
+outliers::grubbs.test(log(df_m$value))
+
+# check robustness with MM method
+## MM method accounts for outliers in both y and x
+## log(value) - log-tranformed CV
+## ef_stock - effective release of masu salmon
+MASS::rlm(log(value) ~ scale(ef_stock),
+          method = "MM",
+          df_m) %>% 
+  summary()
+
+```
+
+*Relatively community composition could drive patterns of variability through time, as different species many have different intrinsic patterns of variability. I was struck by the diversity of life-histories in the fish community, ranging from smelt to lamprey to loach to salmonids.*
+
+> XXX
+
+*Elevation range or mean elevation of the watersheds should be included as a factor in the model. The current factors were positive, but none of them really had any proxies for the inherent dynamics of stream ecosystems or flow regime variability.*
+
+> We appreciate this suggestion! We included SD Elevation as an additional covariate in the regression model. The results were qualitatively similar.
+
+*What policy factors have led to different levels of stocking across the systems? Perhaps I missed it, but this information would be helpful for the reader to understand what factors might be associated (or not) with the large "experimental" treatment.*
+
+> Some of the watersheds (e.g. Shimonaefutoro) do not receive stocking for the purpose of regional population conservation. The rest of variation across watersheds are due largely to logistical reasons (e.g., accessibility). We have briefly mentioned this in the revised MS.
+
+*Line 38-39. I question whether this is accurate as written. There is a single release program that releases millions of plants, fish, invertebrates, etc? Perhaps I am wrong, but when I skimmed a few of the provided references it looked like those stats were for multiple programs.*
+
+> We are glad that the reviewer caught this! Yes, the reviewer is right - different programes release plants, insects, birds, fish etc. We have revised the text.
+
+*Line 44-46. I think the "nine species" refers to the "12 major fishery resources". In order to align these statistics, perhaps change "fishery resources" to "fishery species".*
+
+> Thank you, we have corrected.
+
+*Lines 47-48. I agree with the general phrase that the community impacts of hatchery releases have been underappreciated. From a community perspective, the role of hatchery fish in influencing predators is also important. It would be worth mentioning these other potential types of community interactions. For example, if we consider people and fisheries to be interacting species, there is some work on how hatcheries can enable increased harvest rates on wild stocks. Hatchery fish also subsidize predators that could then have higher predation on shared prey (hyperpredation). This has been hypothesized to be an issue with marine mammals and hatchery Pacific salmon in western North America.*
+
+*Fig 1d doesn't offer much meaningful. I suggest removing the example watershed map.*
+
+> Agree. We have removed the panel.
+
+*Line 167. Change "salmons" to "salmon".*
+
+> Corrected.
+
+*Figure 3. Genus should be included for all species. It would be nice to add species silhouettes to this figure.*
+
+> Thank you, we have modified the figure as suggested.
+
+*In places in the manuscript, I think a bit more precision is needed to acknowledge that reintroduction approaches likely have multiple motivations. For instance, I think it is quite feasible that many reintroduction programs are basically trying to create opportunities for harvest.*
+
+\clearpage
+
+# References
