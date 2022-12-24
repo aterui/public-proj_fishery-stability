@@ -30,7 +30,7 @@ list_reg <- lapply(group, FUN = function(x) {
                                 id1 == 6 & param_name == "a" ~ "Forest fraction",
                                 id1 == 7 & param_name == "a" ~ "Number of observations",
                                 id1 == 1 & param_name == "b" ~ "Ocean productivity",
-                                id1 == 2 & param_name == "b" ~ "SD Elevation"),
+                                id1 == 2 & param_name == "b" ~ "SD elevation"),
            response = case_when(response == "species_richness" ~ "Species richness",
                                 response == "cv" ~ "CV",
                                 response == "mu" ~ "Mean $\\mu$",
