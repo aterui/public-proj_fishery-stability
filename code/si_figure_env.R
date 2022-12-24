@@ -45,7 +45,7 @@ df_river <- df_env %>%
   dplyr::select(-starts_with("scl")) %>% 
   mutate(var_label = case_when(variable == "mean_stock" ~ "Number~of~releases~(million~fish)",
                                variable == "chr_a" ~ "Chlorophyll~a~(mg~m^-3)",
-                               variable == "sd_elev" ~ "SD~Elevation~(m)"))
+                               variable == "sd_elev" ~ "SD~elevation~(m)"))
 
 df0 <- bind_rows(df_site, df_river) %>% 
   mutate(var_label = factor(var_label, levels = c("Watershed~area~(km^2)",
@@ -56,7 +56,7 @@ df0 <- bind_rows(df_site, df_river) %>%
                                                   "Fraction~urban",
                                                   "Number~of~releases~(million~fish)",
                                                   "Chlorophyll~a~(mg~m^-3)",
-                                                  "SD~Elevation~(m)")))
+                                                  "SD~elevation~(m)")))
 
 g_env <- df0 %>% 
   ggplot(aes(x = value)) + 
