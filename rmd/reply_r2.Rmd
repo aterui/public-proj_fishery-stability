@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 Dear editor,
 
-This is a revision of a manuscript: "2022­18044 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. We have refined our analysis and text in light of comments from the reviewer 3. We hope the manuscript is suitable for publication in PNAS.
+This is a revision of a manuscript: "2022­18044 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. We have refined our analysis and text in light of comments from reviewer 3. We hope the manuscript is suitable for publication in PNAS.
 
 Sincerely,
 
@@ -42,11 +42,11 @@ Akira Terui, on behalf of the authors
 
 *I also recommend a bit more discussion relating to sampling method and its implications for estimated variability (the point raised by reviewer #3).*
 
-> We appreciate your recommendation. We believe our unclear writing has caused a confusion -- please let us clarify.
+> We appreciate your recommendation. Our unclear writing has caused confusion -- please let us clarify.
 >
-> First, the sampling method in the protected watersheds are consistent across all sites and years, so there is no need to include the sampling method as a control factor in the statistical model (clarified in Methods). Further, the sampling method (a combination of cast net and electrofishing) was carefully chosen to catch both water-column and benthic fish species effectively (clarified and mentioned in Discussion; L. 227 --). Therefore, we believe our data are robust to sampling bias.
+> First, the sampling method in the protected watersheds is consistent across all sites and years, so there is no need to include the sampling method as a controlling factor in the statistical model (clarified in Methods). Further, the sampling method (a combination of cast net and electrofishing) was carefully chosen to catch both water-column and benthic fish species effectively (clarified and mentioned in Discussion; L. 227 --). Therefore, our data are robust to sampling bias.
 >
-> Second, we appreciate reviewer's comment on irregular sampling interval. In the revised analysis, we have included the number of observation years as an additional covariate to address reviewer's concern. The results were qualitatively similar. Please see also our response to reviewer 3.
+> Second, we appreciate the reviewer's comment on irregular sampling intervals. In the revised analysis, we have included the number of observation years as an additional covariate to address the reviewer's concern. The results were qualitatively similar. Please see also our response to reviewer 3.
 >
 > Overall, we confirmed that our results were robust to concerns raised by reviewer 3.
 
@@ -64,15 +64,15 @@ Akira Terui, on behalf of the authors
 
 *Sampling. Effective sampling of stream fishes is quite challenging. Cast net and e-fishing would likely have very strong influence on the catch composition (e.g., benthic fishes will be less catchable by cast net). Was sampling methodology included as a factor in the analysis?*
 
-> Thank you. This is perhaps because of our unclear writing. At all sites, a combination of electrofishing and cast net was used to capture both benthic and water-column species effectively. We have clarified this in the revised MS (L 333 --). In addition, we have added some text to clarify that the sampling has constant sampling effort per unit area (see **Supplementary text**). Therefore, our analysis is robust to this issue.
+> Thank you. This is perhaps because of our unclear writing. At all sites, a combination of electrofishing and cast net was used to capture both benthic and water-column species effectively. We have clarified this in the revised MS (L 333 --). In addition, we have added some text to explain that the sampling has constant sampling effort per unit area (see **Supplementary text**). Therefore, our analysis is robust to this issue.
 
 *Sampling interval. I am concerned that there were irregular sampling intervals ("1- to 3-year intervals"), especially given that variability was one of the response variables. I understand that the state-space approach estimates true abundance, but I think it is important that a secondary analysis be performed on just the sites with all years.*
 
-> The secondary analysis at sites with no missing data would be insightful for sure. However, it introduces the issue of sample size. To address reviewer's concern more appropriately, we included "the number of observation years" as a covariate in the regression model. This approach is suitable because it keeps the sample size as original while accounting for potential influences of observation intervals. The results were qualitatively similar, confirming the robustness of our results.
+> The secondary analysis at sites with no missing data would be insightful for sure. However, it introduces the issue of sample size. To address the reviewer's concern more appropriately, we included "the number of observation years" as a covariate in the regression model. This approach is suitable because it keeps the sample size as original while accounting for potential influences of observation intervals. The results were qualitatively similar, confirming the robustness of our results.
 
 *Are the empirical results robust if the strong outlier on the far right is removed? It sure looks like this point would have strong leverage.*
 
-> Thank you for your careful reading. However, this data point is not identified as an outlier; thus, there is no statistical justification for removing it from analysis. Although the figure was shown in an ordinary scale, the analysis was carried out in a log-scale (see Methods). When we applied the Grubb's test to the log-transformed CV, the p-value was 0.176, indicating that our results were not strongly influenced by the highest value of CV (see R codes below). Also, we have confirmed that our results were robust even if we used robust regression with the MM method, which accounts for potential outliers in both response (log CV) and predictor variables (effective release). We hope this ameliorates reviewer's concern.
+> Thank you for your careful reading. However, this data point is not identified as an outlier; thus, there is no statistical justification for removing it from the analysis. Although the figure was shown on an ordinary scale, the analysis was carried out on a log-scale (see Methods). When we applied the Grubb's test to the log-transformed CV, the p-value was 0.176, indicating that our results were not strongly influenced by the highest value of CV (see R codes below). Also, we have confirmed that our results were robust even if we used robust regression with the MM method, which accounts for potential outliers in both response (log CV) and predictor variables (effective release). We hope this ameliorates the reviewer's concern.
 
 ```{r outlier, echo = TRUE}
 
@@ -123,7 +123,7 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 
 *Relatively community composition could drive patterns of variability through time, as different species many have different intrinsic patterns of variability. I was struck by the diversity of life-histories in the fish community, ranging from smelt to lamprey to loach to salmonids.*
 
-> Thank you for this comment. We agree with this opinion. However, we believe our analysis has already accounted for this aspect. The main response variable in our analysis (CV) is the aggregate measure of all species present in the community, namely: $CV = \frac{\sqrt{\sum \sigma^2_i + \sum \sum Cov_{ij}}}{\sum \mu_i}$ ($\sigma_i$ is the SD for species $i$). Therefore, the point raised by the reviewer is already accounted in our model, albeit implicitly. Also, we wanted to remind the reviewer that our results indicated that the community SD was not influenced by intentional release. Although we cannot exclude the possible importance of relative community composition, our data suggest that it has a minimal influence on the dynamics (at least in our system).
+> Thank you for this comment. We agree with this opinion. However, we believe our analysis has already accounted for this aspect. The main response variable in our analysis (CV) is the aggregate measure of all species present in the community, namely: $CV = \frac{\sqrt{\sum \sigma^2_i + \sum \sum Cov_{ij}}}{\sum \mu_i}$ ($\sigma_i$ is the SD for species $i$). Therefore, the point raised by the reviewer is already accounted for in our model, albeit implicitly. Also, we wanted to remind the reviewer that our results indicated that the community SD was not influenced by intentional release. Although we cannot exclude the possible importance of relative community composition, our data suggest that it has a minimal influence on the dynamics (at least in our system).
 
 *Elevation range or mean elevation of the watersheds should be included as a factor in the model. The current factors were positive, but none of them really had any proxies for the inherent dynamics of stream ecosystems or flow regime variability.*
 
@@ -131,11 +131,11 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 
 *What policy factors have led to different levels of stocking across the systems? Perhaps I missed it, but this information would be helpful for the reader to understand what factors might be associated (or not) with the large "experimental" treatment.*
 
-> Some of the watersheds (e.g. Shimonaefutoro) do not receive stocking for the purpose of regional population conservation. The rest of variation across watersheds are due largely to logistical reasons (e.g., accessibility). We have briefly mentioned this in the revised MS (L. 158 --).
+> Some of the watersheds (e.g. Shimonaefutoro) do not receive stocking for the purpose of regional population conservation. The rest of the variation across watersheds is due largely to logistical reasons (e.g., accessibility). We have briefly mentioned this in the revised MS (L. 158 --).
 
 *Line 38-39. I question whether this is accurate as written. There is a single release program that releases millions of plants, fish, invertebrates, etc? Perhaps I am wrong, but when I skimmed a few of the provided references it looked like those stats were for multiple programs.*
 
-> We are glad that the reviewer caught this! Yes, the reviewer is right - different programes release plants, insects, birds, fish etc. We have revised the text.
+> We are glad that the reviewer caught this! Yes, the reviewer is right - different programs release plants, insects, birds, fish etc. We have revised the text.
 
 *Line 44-46. I think the "nine species" refers to the "12 major fishery resources". In order to align these statistics, perhaps change "fishery resources" to "fishery species".*
 
@@ -143,7 +143,7 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 
 *Lines 47-48. I agree with the general phrase that the community impacts of hatchery releases have been underappreciated. From a community perspective, the role of hatchery fish in influencing predators is also important. It would be worth mentioning these other potential types of community interactions. For example, if we consider people and fisheries to be interacting species, there is some work on how hatcheries can enable increased harvest rates on wild stocks. Hatchery fish also subsidize predators that could then have higher predation on shared prey (hyperpredation). This has been hypothesized to be an issue with marine mammals and hatchery Pacific salmon in western North America.*
 
-> Thank you for the important suggestion. We agree that different types of interactions may be important to understand ecosystem-wide impacts of intentional release. We have clarified this point in the revised manuscript. In the meantime, we believe our research is unique and significant in that we have quantified "long-term" impact at the community level. As the reviewer suggested, there are some discussion on the community-level impact of intentional release (very few though). However, none of them evaluated the long-term impact. We have improved the description about the knowledge gap addressed in this study (L51 --)
+> Thank you for the important suggestion. We agree that different types of interactions may be important to understand the ecosystem-wide impacts of intentional release. We have clarified this point in the revised manuscript. In the meantime, we believe our research is unique and significant in that we have quantified "long-term" impact at the community level. As the reviewer suggested, there is some discussion about the community-level effects of intentional release (very few, though). However, none of them evaluated the long-term impact. We have improved the description of the knowledge gap addressed in this study (L51 --)
 
 *Fig 1d doesn't offer much meaningful. I suggest removing the example watershed map.*
 
