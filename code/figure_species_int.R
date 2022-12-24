@@ -135,40 +135,8 @@ g_alpha_img <- ggdraw() +
   draw_image(fish[10], x = xp, y = yp[10], scale = 0.06) +
   draw_plot(g_alpha)
 
-## by site ####
-g_alpha_site <- df_plot %>%
-  filter(alpha_prime != 1) %>% 
-  ggplot(aes(y = factor(lbs.x, levels = rev(sort(unique(lbs.x)))),
-             x = lbs.y,
-             fill = value,
-             label = sprintf("%.2f", value))) +
-  geom_tile(alpha = 0.8) +
-  geom_text(size = 2) +
-  facet_wrap(facets = ~site_id,
-             scales = "free",
-             nrow = 3,
-             ncol = 3) +
-  theme_classic() +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        axis.text.x = element_text(face = "italic",
-                                   angle = 90,
-                                   vjust = 0.2,
-                                   hjust = 0.95)) +
-  scale_x_discrete(labels = label_parse()) +
-  scale_y_discrete(labels = label_parse()) +
-  MetBrewer::scale_fill_met_c("Hiroshige", direction = -1) +
-  labs(y = expression("Taxon"~italic("i")),
-       x = expression("Taxon"~italic("j")),
-       fill = expression(alpha[ij]))
-
 
 # export ------------------------------------------------------------------
-
-ggsave(g_alpha_site,
-       filename = here::here("output/figure_alpha_site.pdf"),
-       height = 9,
-       width = 10)
 
 ggsave(g_alpha_img,
        filename = here::here("output/figure_alpha_dist.pdf"),
