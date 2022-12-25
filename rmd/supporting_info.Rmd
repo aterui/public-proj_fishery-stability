@@ -1,6 +1,4 @@
 ---
-title: |
-  ![](images/logo.png){width=4in}  
 output:
   bookdown::pdf_document2:
     fig_caption: true
@@ -17,8 +15,12 @@ knit: (function(inputFile, encoding) {
                           output_dir = "document_output")
       })
 header-includes:
-  - \pagenumbering{gobble}
   - \usepackage{amsmath, fancyhdr, caption, booktabs}
+  - \pagestyle{fancy}
+  - \renewcommand{\headrulewidth}{0pt}
+  - \fancyhead[L]{\includegraphics[width=5cm]{images/logo.png}}
+  - \fancyhead[C]{}
+  - \pagenumbering{gobble}
   - \setlength{\headheight}{13.6pt}
 bibliography: reference.bib
 csl: https://www.zotero.org/styles/pnas
@@ -51,7 +53,7 @@ Increasing the competition coefficient $\bar{\alpha}$ shifted the region with th
 
 ## Fish sampling
 
-The monitoring program employed a two-pass sampling method at all sampling sites. In each pass, a combination of electrofishing and cast net (two-pass) was used to effectively catch both benthic and water-column species in a given area. The number of cast-net throws was determined as the sampled area divided by $4.5~\text{m}^2$ (the area covered by a cast net). Thus, this sampling method has a constant sampling effort per unit area across sites.
+The monitoring program employed a two-pass sampling method at all sampling sites. In each pass, a combination of electrofishing and cast net was used to effectively catch both benthic and water-column species in a given area. The number of cast-net throws was determined as the sampled area divided by $4.5~\text{m}^2$ (the area covered by a cast net). Thus, this sampling method has a constant sampling effort per unit area across sites.
 
 \newpage
 
