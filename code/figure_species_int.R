@@ -84,17 +84,18 @@ g_alpha <- df_plot %>%
                         levels = taxon_ordered)) %>% 
   ggplot(aes(y = lbs.y,
              x = value)) +
+  geom_vline(aes(xintercept = median(value)),
+             col = grey(0.8),
+             size = 0.5,
+             linetype = "dashed") +
+  geom_jitter(height = 0.1,
+              width = 0,
+              size = 1,
+              color = grey(0.5)) +
   geom_boxplot(aes(fill = lbs.y),
                color = grey(0.4),
                alpha = 0.75,
                outlier.colour = NA) +
-  geom_jitter(height = 0.1,
-              width = 0,
-              size = 1,
-              color = grey(0.2)) +
-  geom_vline(aes(xintercept = median(value)),
-             col = grey(0.5),
-             linetype = "dashed") +
   geom_xsidedensity(aes(fill = lbs.y),
                     color = NA,
                     alpha = 0.8,
@@ -122,17 +123,16 @@ fish <- list.files(here::here("data_raw/image"),
 yp <- seq(0.34, length = 10, by = -0.075)
 xp <- -0.18
 
-g_alpha_img <- ggdraw() +
-  draw_image(fish[1], x = xp, y = yp[1], scale = 0.06) +
-  draw_image(fish[2], x = xp, y = yp[2], scale = 0.06) +
-  draw_image(fish[3], x = xp, y = yp[3], scale = 0.06) +
-  draw_image(fish[4], x = xp, y = yp[4], scale = 0.06) +
-  draw_image(fish[5], x = xp, y = yp[5], scale = 0.06) +
-  draw_image(fish[6], x = xp, y = yp[6], scale = 0.06) +
-  draw_image(fish[7], x = xp, y = yp[7], scale = 0.06) +
-  draw_image(fish[8], x = xp, y = yp[8], scale = 0.06) +
-  draw_image(fish[9], x = xp, y = yp[9], scale = 0.06) +
-  draw_image(fish[10], x = xp, y = yp[10], scale = 0.06) +
+g_alpha_img <- ggdraw()
+
+for(i in 1:length(fish)) {
+  
+  g_alpha_img <- g_alpha_img +
+    draw_image(fish[i], x = xp, y = yp[i], scale = 0.06)
+    
+}
+
+g_alpha_img <- g_alpha_img +
   draw_plot(g_alpha)
 
 

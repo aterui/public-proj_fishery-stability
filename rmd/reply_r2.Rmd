@@ -72,13 +72,13 @@ Akira Terui, on behalf of the authors
 
 *Are the empirical results robust if the strong outlier on the far right is removed? It sure looks like this point would have strong leverage.*
 
-> Thank you for your careful reading. Give this comment, we checked whether this point strongly affects the overall pattern. When we applied the Grubb's test to the log-transformed CV, the p-value was 0.176, indicating that our results were not strongly influenced by the highest value of CV (see R codes below). Please note that, although the figure was shown on an ordinary scale, the analysis was carried out on a log-scale (see Methods).
+> Thank you for your careful reading. Given this comment, we checked whether this data point strongly affects the overall pattern. When we applied the Grubb's test to the log-transformed CV, the p-value was 0.176, indicating that our results were not strongly influenced by the highest value of CV (see R codes below). Please note that, although the figure was shown on an ordinary scale, the analysis was carried out on a log-scale (see Methods).
 >
 > Also, we have confirmed that our results were robust even if we used robust regression with the MM method, which accounts for potential outliers in both response (log CV) and predictor variables (effective release).
 >
 > We hope this ameliorates the reviewer's concern.
 
-```{r outlier, echo = TRUE}
+```{r, include = FALSE}
 
 # setup -------------------------------------------------------------------
 source(here::here("code/library.R"))
@@ -107,6 +107,9 @@ df_m <- df_reg %>%
          ef_stock = median) %>% 
   right_join(df_m,
              by = "site_id_numeric")
+```
+
+```{r outlier, echo = TRUE}
 
 # check outlier influence -------------------------------------------------
 
@@ -129,7 +132,7 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 
 > Thank you for this comment. We agree with this opinion; therefore, our analysis was designed to account for this aspect. The main response variable in our analysis (CV) is the aggregate measure of all species present in the community, namely: $CV = \frac{\sqrt{\sum \sigma^2_i + \sum \sum Cov_{ij}}}{\sum \mu_i}$ ($\sigma_i$ is the SD for species $i$). As such, the point raised by the reviewer is already accounted for in our model, albeit implicitly.
 >
-> Also, we wanted to remind the reviewer that the relative community composition & species richness are the pathways through which intentional release affects community stability (see Theoretical predictions). **Intentional release changes relative abundance of unenhanced species, as our theory suggests.** Therefore, although our regression model does not include the effects of relative community composition explicitly, it is the part of the effect of intentional release. Due to the tight correlation between intentional release and community composition/richness, including both factors into a single model will create an issue of multicollinearity.
+> Also, we wanted to remind the reviewer that the relative community composition & species richness are the pathways through which intentional release affects community stability (see Theoretical predictions). Our theory predicts that **intentional release changes relative abundance of unenhanced species.** Therefore, although our regression model does not include the effects of relative community composition explicitly, it is the part of the effect of intentional release.
 >
 > In summary, we have already accounted for the point raised by the reviewer. We appreciate the input though!
 

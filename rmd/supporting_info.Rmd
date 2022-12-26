@@ -281,7 +281,7 @@ for(i in seq_len(length(list_g_dyns))) {
 
 ## Environmental variables
 
-```{r fig-env, fig.width=11, fig.height=8, fig.cap="Distribution of environmental variables in the protected watershed. Note that the number of fish released, ocean productivity (chlorophyll a), and SD elevation are measured at the watershed level while others are measured at the site level."}
+```{r fig-env, fig.width=11, fig.height=8, fig.cap="Distribution of environmental variables in protected watersheds. Note that the number of fish released, ocean productivity (chlorophyll a), and SD elevation are measured at the watershed level while others are measured at the site level."}
 
 suppressMessages(source(here::here("code/si_figure_env.R")))
 
@@ -292,7 +292,7 @@ print(g_env)
 
 ## Correlation plot
 
-```{r fig-cor, fig.width=11, fig.height=11, fig.cap="Correlation plot among environmental variables in the protected watersheds. Numbers indicate Spearman's rank correlations."}
+```{r fig-cor, fig.width=11, fig.height=11, fig.cap="Correlation plot among environmental variables in  protected watersheds. Numbers indicate Spearman's rank correlations."}
 
 suppressMessages(source(here::here("code/si_figure_cor.R")))
 ```
