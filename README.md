@@ -9,14 +9,41 @@ stability
 **Authors:** Akira Terui, Hirokazu Urabe, Masayuki Senzaki, Bungo
 Nishizawa
 
+## Analysis flow
+
+### Theory
+
+**Two-species simulation** – simulation with `cdyns::cdynsim()` (see R
+package <https://github.com/aterui/cdyns>). Run
+`run_simulation_analytical.R`. Simulation results are saved in
+`output/result_ricker_2sp.rds`.
+
+**Whole community simulation** – simulation with `cdyns::cdynsim()` (see
+R package <https://github.com/aterui/cdyns>). Run `run_simulation.R`.
+Simulation results are saved in `output/result_ricker.rds`.
+
+### Empirical
+
+**State-space AR model** – run `run_jags_model_ssm_ar.R`. Data sourced
+from `data_fmt_XXX.R` files. Model code is `model_ssm_ar.R`
+
+**Regression** – run `run_jags_model_reg.R`. Data sourced from
+`data_fmt_XXX.R` files. Model code is `model_reg.R`
+
+**State-space Ricker model** – run
+`run_jags_model_multi_ricker_sparse.R`. Data sourced from
+`data_fmt_XXX.R` files. Model code is `model_multi_ricker_sparse.R`
+
 ## Contents
 
 | dir      | class      | name                                 | description                                                                                                                                                                                                                                                                           |
 |:---------|:-----------|:-------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| code     | analysis   | run_analysis_lmcheck.R               | confirm Bayesian results with `glmmTMB()`                                                                                                                                                                                                                                             |
 | code     | figure     | figure_layout.R                      | layout empirical and theoretical patterns                                                                                                                                                                                                                                             |
 | code     | figure     | figure_obs_coef.R                    | figure codes for map (`_map`), coefficients (`_coef`), or stock effect (`_stock`)                                                                                                                                                                                                     |
 | code     | figure     | figure_obs_map.R                     | figure codes for map (`_map`), coefficients (`_coef`), or stock effect (`_stock`)                                                                                                                                                                                                     |
 | code     | figure     | figure_obs_stock.R                   | figure codes for map (`_map`), coefficients (`_coef`), or stock effect (`_stock`)                                                                                                                                                                                                     |
+| code     | figure     | figure_species_int.R                 | NA                                                                                                                                                                                                                                                                                    |
 | code     | figure     | figure_theory.R                      | theoretical predictions for stocking & community dynamics in species-rich (no postfix) or 2-species scenarios (`_2sp`)                                                                                                                                                                |
 | code     | figure     | si_figure_co.R                       | supporting figure codes for correlations in environmental variables (`_cor`), histograms for environmental data (`_env`), observed community dynamics (`_obs_dyns`), pairwise species interactions (`_species_int`), and scenario simulations in a species-rich community (`_theory`) |
 | code     | figure     | si_figure_cor.R                      | supporting figure codes for correlations in environmental variables (`_cor`), histograms for environmental data (`_env`), observed community dynamics (`_obs_dyns`), pairwise species interactions (`_species_int`), and scenario simulations in a species-rich community (`_theory`) |
@@ -62,7 +89,7 @@ Nishizawa
 
     ## R version 4.2.1 (2022-06-23 ucrt)
     ## Platform: x86_64-w64-mingw32/x64 (64-bit)
-    ## Running under: Windows 10 x64 (build 19044)
+    ## Running under: Windows 10 x64 (build 19045)
     ## 
     ## Matrix products: default
     ## 
@@ -100,10 +127,10 @@ Nishizawa
     ## [13] codetools_0.2-18    jsonlite_1.8.3      broom_1.0.1        
     ## [16] dbplyr_2.2.1        compiler_4.2.1      httr_1.4.4         
     ## [19] backports_1.4.1     assertthat_0.2.1    fastmap_1.1.0      
-    ## [22] gargle_1.2.1        cli_3.4.0           htmltools_0.5.3    
+    ## [22] gargle_1.2.1        cli_3.4.1           htmltools_0.5.3    
     ## [25] tools_4.2.1         coda_0.19-4         gtable_0.3.1       
     ## [28] glue_1.6.2          Rcpp_1.0.9          cellranger_1.1.0   
-    ## [31] fracdiff_1.5-1      vctrs_0.5.0         urca_1.3-3         
+    ## [31] fracdiff_1.5-1      vctrs_0.5.1         urca_1.3-3         
     ## [34] nlme_3.1-160        lmtest_0.9-40       lwgeom_0.2-9       
     ## [37] timeDate_4021.106   xfun_0.34           rvest_1.0.3        
     ## [40] lifecycle_1.0.3     pacman_0.5.1        googlesheets4_1.0.1

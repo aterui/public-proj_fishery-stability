@@ -24,7 +24,7 @@ tbl_readme <- tibble(name = list.files(here::here("code")),
   ) %>%
   relocate(dir, class) %>% 
   arrange(dir, class, name) %>% 
-  mutate(description = case_when(str_detect(class, "analysis") ~ "correlation for sensitivity analysis of theoretical model",
+  mutate(description = case_when(str_detect(class, "analysis") ~ "confirm Bayesian results with `glmmTMB()`",
                                  str_detect(class, "figure") & str_detect(name, "^figure_obs") ~ "figure codes for map (`_map`), coefficients (`_coef`), or stock effect (`_stock`)",
                                  str_detect(class, "figure") & str_detect(name, "theory") ~ "theoretical predictions for stocking & community dynamics in species-rich (no postfix) or 2-species scenarios (`_2sp`)",
                                  str_detect(class, "figure") & str_detect(name, "si_") ~ paste("supporting figure codes for correlations in environmental variables (`_cor`), histograms for environmental data (`_env`), observed community dynamics (`_obs_dyns`), pairwise species interactions (`_species_int`), and scenario simulations in a species-rich community (`_theory`)"),

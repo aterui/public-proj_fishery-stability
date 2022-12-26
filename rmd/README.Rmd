@@ -20,6 +20,22 @@ knitr::opts_chunk$set(echo = FALSE,
 
 **Authors:** Akira Terui, Hirokazu Urabe, Masayuki Senzaki, Bungo Nishizawa
 
+## Analysis flow
+
+### Theory
+
+**Two-species simulation** -- simulation with `cdyns::cdynsim()` (see R package https://github.com/aterui/cdyns). Run `run_simulation_analytical.R`. Simulation results are saved in `output/result_ricker_2sp.rds`.
+
+**Whole community simulation** -- simulation with `cdyns::cdynsim()` (see R package https://github.com/aterui/cdyns). Run `run_simulation.R`. Simulation results are saved in `output/result_ricker.rds`.
+
+### Empirical
+
+**State-space AR model** -- run `run_jags_model_ssm_ar.R`. Data sourced from `data_fmt_XXX.R` files. Model code is `model_ssm_ar.R`
+
+**Regression** -- run `run_jags_model_reg.R`. Data sourced from `data_fmt_XXX.R` files. Model code is `model_reg.R`
+
+**State-space Ricker model** -- run `run_jags_model_multi_ricker_sparse.R`. Data sourced from `data_fmt_XXX.R` files. Model code is `model_multi_ricker_sparse.R`
+
 ## Contents
 
 ```{r}
