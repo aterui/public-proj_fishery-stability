@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 Dear editor,
 
-This is a revision of a manuscript: "2022-18044 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. We have refined our analysis and text in light of comments from reviewer 3. We hope the manuscript is suitable for publication in PNAS.
+This is a revision of "2022-18044 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. We have refined our analysis and text in light of comments from reviewer 3. We hope the manuscript is suitable for publication in PNAS.
 
 Sincerely,
 
@@ -130,9 +130,17 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 
 *Relatively community composition could drive patterns of variability through time, as different species many have different intrinsic patterns of variability. I was struck by the diversity of life-histories in the fish community, ranging from smelt to lamprey to loach to salmonids.*
 
-> Thank you for this comment. We agree with this opinion; therefore, our analysis was designed to account for this aspect. The main response variable in our analysis (CV) is the aggregate measure of all species present in the community, namely: $CV = \frac{\sqrt{\sum \sigma^2_i + \sum \sum Cov_{ij}}}{\sum \mu_i}$ ($\sigma_i$ is the SD for species $i$). As such, the point raised by the reviewer is already accounted for in our model, albeit implicitly.
+> Thank you for this comment. We agree with this opinion; the main response variable in our analysis (CV of summed density across species) can be expressed as:
 >
-> Also, we wanted to remind the reviewer that the relative community composition & species richness are the pathways through which intentional release affects community stability (see Theoretical predictions). Our theory predicts that **intentional release changes relative abundance of unenhanced species.** Therefore, although our regression model does not include the effects of relative community composition explicitly, it is the part of the effect of intentional release.
+> $$
+> CV = \frac{\sqrt{\sum \sigma^2_i + \sum \sum Cov_{ij}}}{\sum \mu_i}
+> $$
+>
+> where $\mu_i$ and $\sigma_i$ are the mean and SD for species $i$. As such, the point raised by the reviewer is relevant for our analysis; fortunately, we have naturally accounted for it, as explained below.
+>
+> Our theory predicts that intentional release changes relative abundance of unenhanced species (and some species are competitively excluded as part of this process). The relative community composition & species richness are therefore the pathways through which intentional release affects community stability (see Theoretical predictions). Consequently, the effect of community composition is naturally integrated into the effect of intentional release, statistically speaking.
+>
+> Please note that, in our causal scenario, the inclusion of community composition in our regression model causes a problem called "over-control bias." (see @arifPredictiveModelsAren2022) The pathway through which intentional release affects community stability is, "intentional release (variable X1)" $\rightarrow$ "community composition (X2)" $\rightarrow$ "community stability (Y)." Statistical theory suggests that including both X1 and X2 to explain Y improperly underestimates (or overlooks) the effect of X1 on Y. Therefore, our model structure is appropriate from the perspective of statistical causal inference.
 >
 > In summary, we have already accounted for the point raised by the reviewer. We appreciate the input though!
 
@@ -171,3 +179,5 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 *In places in the manuscript, I think a bit more precision is needed to acknowledge that reintroduction approaches likely have multiple motivations. For instance, I think it is quite feasible that many reintroduction programs are basically trying to create opportunities for harvest.*
 
 > We understood that the reviewer commented on the last paragraph of "theoretical prediction." We have clarified that we are linking our results to reintroduction programs in conservation (paragraph starting at L135).
+
+# References
