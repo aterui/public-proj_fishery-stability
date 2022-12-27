@@ -48,7 +48,7 @@ Akira Terui, on behalf of the authors
 
 > We appreciate your recommendation. Our unclear writing has caused confusion -- please let us clarify.
 >
-> First, the sampling method in the protected watersheds is consistent across all sites and years, so there is no need to include the sampling method as a controlling factor in the statistical model (clarified in Methods). Further, the sampling method (a combination of cast net and electrofishing) was carefully chosen to catch both water-column and benthic fish species effectively (clarified and mentioned in Discussion; L. 227 --). Therefore, our data are robust to sampling bias.
+> First, the sampling method in the protected watersheds is consistent across all sites and years, so there is no need to include the sampling method as a controlling factor in the statistical model (clarified in Methods). Further, the sampling method (a combination of cast net and electrofishing) was carefully chosen to catch both water-column and benthic fish species effectively (clarified and mentioned in Discussion; L. 226 --). Therefore, our data are robust to sampling bias.
 >
 > Second, we appreciate the reviewer's comment on irregular sampling intervals. In the revised analysis, we have included the number of observation years as an additional covariate to address the reviewer's concern. The results were qualitatively similar. Please see also our response to reviewer 3.
 >
@@ -68,7 +68,7 @@ Akira Terui, on behalf of the authors
 
 *Sampling. Effective sampling of stream fishes is quite challenging. Cast net and e-fishing would likely have very strong influence on the catch composition (e.g., benthic fishes will be less catchable by cast net). Was sampling methodology included as a factor in the analysis?*
 
-> Thank you. This is perhaps because of our unclear writing. At all sites, a combination of electrofishing and cast net was used to capture both benthic and water-column species effectively. We have clarified this in the revised MS (L. 333 --). In addition, we have added some text to explain that the sampling has constant sampling effort per unit area (see **Supplementary text**). Therefore, our analysis is robust to this issue.
+> Thank you. This is perhaps because of our unclear writing. At all sites, a combination of electrofishing and cast net was used to capture both benthic and water-column species effectively. We have clarified this in the revised MS (L. 328 --). In addition, we have added some text to explain that the sampling has constant sampling effort per unit area (see **Supplementary text**). Therefore, our analysis is robust to this issue.
 
 *Sampling interval. I am concerned that there were irregular sampling intervals ("1- to 3-year intervals"), especially given that variability was one of the response variables. I understand that the state-space approach estimates true abundance, but I think it is important that a secondary analysis be performed on just the sites with all years.*
 
@@ -182,6 +182,6 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 
 *In places in the manuscript, I think a bit more precision is needed to acknowledge that reintroduction approaches likely have multiple motivations. For instance, I think it is quite feasible that many reintroduction programs are basically trying to create opportunities for harvest.*
 
-> We understood that the reviewer commented on the last paragraph of "theoretical prediction." We have clarified that we are linking our results to reintroduction programs in conservation (paragraph starting at L. 135).
+> We understood that the reviewer commented on the last paragraph of "theoretical prediction." We have clarified that we are linking our results to reintroduction programs in conservation (paragraph starting at L. 133).
 
 # References
