@@ -47,7 +47,7 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                       .combine = "bind_rows") %do% {
                                         
                                         ## for reproducibility
-                                        set.seed(j)
+                                        set.seed((x$param_id - 1) * n_rep + j)
                                         
                                         ## simulation
                                         dyn <- cdynsim(n_timestep = x$n_timestep,

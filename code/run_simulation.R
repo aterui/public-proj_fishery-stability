@@ -25,7 +25,8 @@ df_param <- expand.grid(n_timestep = 1000,
                         model = "ricker",
                         seed = 5,
                         seed_interval = 10,
-                        extinct = 0.01)
+                        extinct = 0.01) %>% 
+  mutate(param_id = seq_len(nrow(.)))
 
 n_rep <- 1000
 stock <- seq(0, 500, length = n_rep)
@@ -45,8 +46,8 @@ result <- foreach(x = iter(df_param, by = 'row'),
                                       .combine = "bind_rows") %do% {
                                         
                                         ## for reproducibility
-                                        set.seed(j)
-                                                                                    
+                                        set.seed((x$param_id - 1) * n_rep + j)
+                                        
                                         ## simulation
                                         dyn <- cdynsim(n_timestep = x$n_timestep,
                                                        n_warmup = x$n_warmup,
