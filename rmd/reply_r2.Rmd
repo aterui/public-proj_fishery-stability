@@ -5,7 +5,7 @@ output:
    latex_engine: xelatex
    toc: false
    number_sections: false
-csl: https://www.zotero.org/styles/pnas
+csl: https://www.zotero.org/styles/ecology
 knit: (function(inputFile, encoding) {
         rmarkdown::render(inputFile,
                           encoding = encoding, 
@@ -22,7 +22,11 @@ knitr::opts_chunk$set(echo = FALSE)
 
 Dear editor,
 
-This is a revision of "2022-18044 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. We have refined our analysis and text in light of comments from reviewer 3. We hope the manuscript is suitable for publication in PNAS.
+This is a revision of "2022-18044 *Intentional release of native species undermines ecological stability.*" Thank you for allowing us to revise our manuscript. We have refined our analysis and text in light of comments from reviewer 3.
+
+We also noticed a very minor error in our codes while double-checking (improper setup in .RNG seed). We have re-ran the simulations after correction just in case.
+
+We hope the manuscript is suitable for publication in PNAS.
 
 Sincerely,
 
@@ -64,7 +68,7 @@ Akira Terui, on behalf of the authors
 
 *Sampling. Effective sampling of stream fishes is quite challenging. Cast net and e-fishing would likely have very strong influence on the catch composition (e.g., benthic fishes will be less catchable by cast net). Was sampling methodology included as a factor in the analysis?*
 
-> Thank you. This is perhaps because of our unclear writing. At all sites, a combination of electrofishing and cast net was used to capture both benthic and water-column species effectively. We have clarified this in the revised MS (L 333 --). In addition, we have added some text to explain that the sampling has constant sampling effort per unit area (see **Supplementary text**). Therefore, our analysis is robust to this issue.
+> Thank you. This is perhaps because of our unclear writing. At all sites, a combination of electrofishing and cast net was used to capture both benthic and water-column species effectively. We have clarified this in the revised MS (L. 333 --). In addition, we have added some text to explain that the sampling has constant sampling effort per unit area (see **Supplementary text**). Therefore, our analysis is robust to this issue.
 
 *Sampling interval. I am concerned that there were irregular sampling intervals ("1- to 3-year intervals"), especially given that variability was one of the response variables. I understand that the state-space approach estimates true abundance, but I think it is important that a secondary analysis be performed on just the sites with all years.*
 
@@ -138,9 +142,9 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 >
 > where $\mu_i$ and $\sigma_i$ are the mean and SD for species $i$. As such, the point raised by the reviewer is relevant for our analysis; fortunately, we have naturally accounted for it, as explained below.
 >
-> Our theory predicts that intentional release changes relative abundance of unenhanced species (and some species are competitively excluded as part of this process). The relative community composition & species richness are therefore the pathways through which intentional release affects community stability (see Theoretical predictions). Consequently, the effect of community composition is naturally integrated into the effect of intentional release, statistically speaking.
+> Our theory predicts that intentional release changes relative abundance of unenhanced species (and some species are competitively excluded as part of this process). The relative community composition & species richness are therefore the pathways through which intentional release affects community stability (see Theoretical prediction). Consequently, the effect of community composition is naturally integrated into the effect of intentional release, statistically speaking.
 >
-> Please note that, in our causal scenario, the inclusion of community composition in our regression model causes a problem called "over-control bias" (see [@arifPredictiveModelsAren2022] for details). The pathway through which intentional release affects community stability is, "intentional release (variable X1)" $\rightarrow$ "community composition (X2)" $\rightarrow$ "community stability (Y)." In this case, statistical theory suggests that including both X1 and X2 to explain Y improperly underestimates (or overlooks) the effect of X1 on Y [@arifPredictiveModelsAren2022]. Therefore, our model structure is appropriate from the perspective of statistical causal inference.
+> Please note that, in our causal scenario, the inclusion of community composition in our regression model causes a problem called "over-control bias" (see @arifPredictiveModelsAren2022 for details). The pathway through which intentional release affects community stability is, "intentional release (variable X1)" $\rightarrow$ "community composition (X2)" $\rightarrow$ "community stability (Y)." In this case, statistical theory suggests that including both X1 and X2 to explain Y improperly underestimates (or overlooks) the effect of X1 on Y [@arifPredictiveModelsAren2022]. Therefore, our model structure is appropriate from the perspective of statistical causal inference.
 >
 > In summary, we have already accounted for the point raised by the reviewer. We appreciate the input though!
 
@@ -162,7 +166,7 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 
 *Lines 47-48. I agree with the general phrase that the community impacts of hatchery releases have been underappreciated. From a community perspective, the role of hatchery fish in influencing predators is also important. It would be worth mentioning these other potential types of community interactions. For example, if we consider people and fisheries to be interacting species, there is some work on how hatcheries can enable increased harvest rates on wild stocks. Hatchery fish also subsidize predators that could then have higher predation on shared prey (hyperpredation). This has been hypothesized to be an issue with marine mammals and hatchery Pacific salmon in western North America.*
 
-> Thank you for the important suggestion. We agree that different types of interactions may be important to understand the ecosystem-wide impacts of intentional release. We have clarified this point in the revised manuscript. In the meantime, we believe our research is unique and significant in that we have quantified "long-term" impact at the community level. As the reviewer suggested, there is some discussion about the community-level effects of intentional release (very few, though). However, none of them evaluated the long-term impact. We have improved the description of the knowledge gap addressed in this study (L51 --)
+> Thank you for the important suggestion. We agree that different types of interactions may be important to understand the ecosystem-wide impacts of intentional release. We have clarified this point in the revised manuscript. In the meantime, we believe our research is unique and significant in that we have quantified "long-term" impact at the community level. As the reviewer suggested, there is some discussion about the community-level effects of intentional release (very few, though). However, none of them evaluated the long-term impact. We have improved the description of the knowledge gap addressed in this study (L. 51 --)
 
 *Fig 1d doesn't offer much meaningful. I suggest removing the example watershed map.*
 
@@ -178,6 +182,6 @@ MASS::rlm(log(value) ~ scale(ef_stock),
 
 *In places in the manuscript, I think a bit more precision is needed to acknowledge that reintroduction approaches likely have multiple motivations. For instance, I think it is quite feasible that many reintroduction programs are basically trying to create opportunities for harvest.*
 
-> We understood that the reviewer commented on the last paragraph of "theoretical prediction." We have clarified that we are linking our results to reintroduction programs in conservation (paragraph starting at L135).
+> We understood that the reviewer commented on the last paragraph of "theoretical prediction." We have clarified that we are linking our results to reintroduction programs in conservation (paragraph starting at L. 135).
 
 # References
