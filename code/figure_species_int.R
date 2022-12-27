@@ -121,7 +121,7 @@ fish <- list.files(here::here("data_raw/image"),
                    full.names = TRUE)
 
 yp <- seq(0.34, length = 10, by = -0.075)
-xp <- -0.18
+xp <- -0.1
 
 g_alpha_img <- ggdraw()
 
@@ -141,4 +141,4 @@ g_alpha_img <- g_alpha_img +
 ggsave(g_alpha_img,
        filename = here::here("output/figure_alpha_dist.pdf"),
        height = 5,
-       width = 9)
+       width = 7)
