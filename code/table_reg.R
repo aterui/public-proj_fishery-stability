@@ -13,7 +13,7 @@ group <- unique(df_reg$group) %>%
   c()
 
 r_level <- c("CV",
-             "Species richness",
+             "Taxonomic richness",
              "Mean $\\mu$",
              "SD $\\sigma$")
 
@@ -31,7 +31,7 @@ list_reg <- lapply(group, FUN = function(x) {
                                 id1 == 7 & param_name == "a" ~ "Number of observations",
                                 id1 == 1 & param_name == "b" ~ "Ocean productivity",
                                 id1 == 2 & param_name == "b" ~ "SD elevation"),
-           response = case_when(response == "species_richness" ~ "Species richness",
+           response = case_when(response == "species_richness" ~ "Taxonomic richness",
                                 response == "cv" ~ "CV",
                                 response == "mu" ~ "Mean $\\mu$",
                                 response == "sigma" ~ "SD $\\sigma$"),

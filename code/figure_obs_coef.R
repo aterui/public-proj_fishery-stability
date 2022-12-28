@@ -28,9 +28,9 @@ df_mcmc <- list.files(path = here::here("output"),
                            g == 3 ~ "Unenhanced"), #other
          response = case_when(p == 1 ~ "SD",
                               p == 2 ~ "Mean",
-                              p == 3 ~ "Species richness",
+                              p == 3 ~ "Taxonomic richness",
                               p == 4 ~ "CV")) %>% 
-  filter(!(group != "Whole" & response %in% c("Species richness", "CV"))) %>% 
+  filter(!(group != "Whole" & response %in% c("Taxonomic richness", "CV"))) %>% 
   mutate(group = factor(group,
                         levels = c("Whole",
                                    "Enhanced",
@@ -38,7 +38,7 @@ df_mcmc <- list.files(path = here::here("output"),
          response = factor(response,
                            levels = c("SD",
                                       "Mean",
-                                      "Species richness",
+                                      "Taxonomic richness",
                                       "CV"))) %>% 
   dplyr::select(group, response, value)
 
