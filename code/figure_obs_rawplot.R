@@ -31,7 +31,8 @@ df_plot %>%
 
 ## masu_salmon
 df_plot %>% 
-  filter(group == "masu_salmon") %>% 
+  filter(group == "masu_salmon",
+         response != "n_species") %>% 
   ggplot(aes(x = x,
              y = value)) +
   geom_point() +
@@ -42,7 +43,8 @@ df_plot %>%
 
 ## other
 df_plot %>% 
-  filter(group == "other") %>% 
+  filter(group == "other",
+         response != "n_species") %>% 
   ggplot(aes(x = x,
              y = value)) +
   geom_point() +
