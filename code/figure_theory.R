@@ -16,7 +16,7 @@ df_sim <- sim_result %>%
                names_to = "response",
                values_to = "value") %>% 
   filter(r1 == 1.5,
-         sd_env == max(sim_result$sd_env), # sd_env = 0.75
+         sd_env == max(sim_result$sd_env), # sd_env = 0.5
          alpha == min(sim_result$alpha), # alpha = 0.25
          phi == max(sim_result$phi), # phi = 1
          k == min(sim_result$k), # k= 100
