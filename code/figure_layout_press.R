@@ -23,4 +23,3 @@ ggsave(g,
        filename = here::here("output/figure_press.png"),
        width = 10,
        height = 7)
-
